@@ -1,0 +1,8 @@
+openai>=1.12.0
+duckduckgo-search>=3.9.6
+yfinance>=0.2.31
+SQLAlchemy>=2.0.23
+fastapi>=0.109.2
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+agno>=0.1.0
