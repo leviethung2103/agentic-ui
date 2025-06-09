@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import Icon from "@/components/ui/icon"
+import { useAuth0 } from "@auth0/auth0-react";
+
 
 type AuthMode = "login" | "signup"
 
@@ -21,6 +23,8 @@ export default function AuthForm() {
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const { loginWithRedirect, isAuthenticated, user, logout } = useAuth0();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -124,7 +128,7 @@ export default function AuthForm() {
           </div>
         )}
 
-        <Button type="submit" className="w-full bg-brand hover:bg-brand/90 text-primary" disabled={isLoading}>
+        {/* <Button type="submit" className="w-full bg-brand hover:bg-brand/90 text-primary" disabled={isLoading}>
           {isLoading ? (
             <div className="flex items-center">
               <svg
@@ -145,6 +149,14 @@ export default function AuthForm() {
           ) : (
             <>{mode === "login" ? "Sign in" : "Create account"}</>
           )}
+        </Button> */}
+
+        <Button
+          type="button"
+          className="w-full bg-brand hover:bg-brand/90 text-primary mt-4"
+          onClick={() => loginWithRedirect()}
+        >
+          Sign In with Auth0
         </Button>
       </form>
 
