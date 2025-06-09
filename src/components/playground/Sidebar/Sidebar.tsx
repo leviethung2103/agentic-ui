@@ -17,7 +17,7 @@ const ENDPOINT_PLACEHOLDER = 'NO ENDPOINT ADDED'
 const SidebarHeader = () => (
   <div className="flex items-center gap-2">
     <Icon type="agno" size="xs" />
-    <span className="text-xs font-medium uppercase text-white">Agent UI</span>
+    <span className="text-xs font-medium uppercase text-white">KMSLV Agents</span>
   </div>
 )
 
@@ -168,7 +168,7 @@ const Endpoint = () => {
                   <p className="text-xs font-medium text-muted">
                     {isMounted
                       ? truncateText(selectedEndpoint, 21) ||
-                        ENDPOINT_PLACEHOLDER
+                      ENDPOINT_PLACEHOLDER
                       : 'http://localhost:7777'}
                   </p>
                   <div
