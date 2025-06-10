@@ -7,6 +7,11 @@ from agno.tools.yfinance import YFinanceTools
 import os
 from dotenv import load_dotenv
 from phoenix.otel import register
+from agno.tools.tavily import TavilyTools
+from agents.web_agent import web_agent
+from agents.finance_agent import finance_agent
+from agents.weather_agent import weather_agent
+from agents.youtube_agent import youtube_agent
 
 load_dotenv()
 
@@ -15,43 +20,26 @@ agent_storage: str = "tmp/agents.db"
 # Set environment variables for Arize Phoenix
 os.environ["PHOENIX_CLIENT_HEADERS"] = f"api_key={os.getenv('ARIZE_PHOENIX_API_KEY')}"
 os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
+os.environ['ARIZE_PHOENIX_API_KEY'] = os.getenv('ARIZE_PHOENIX_API_KEY')
 
 # Configure the Phoenix tracer
 tracer_provider = register(
-    project_name="agno-stock-price-agent",  # Default is 'default'
+    project_name="default",  # Default is 'default'
+    # project_name="agno-stock-price-agent",  # Default is 'default'
     auto_instrument=True,  # Automatically use the installed OpenInference instrumentation
 )
 
-web_agent = Agent(
-    name="Web Agent",
-    model=OpenAIChat(id="gpt-4.1-nano"),
-    tools=[DuckDuckGoTools()],
-    instructions=["Always include sources"],
-    # Store the agent sessions in a sqlite database
-    storage=SqliteStorage(table_name="web_agent", db_file=agent_storage),
-    # Adds the current date and time to the instructions
-    add_datetime_to_instructions=True,
-    # Adds the history of the conversation to the messages
-    add_history_to_messages=True,
-    # Number of history responses to add to the messages
-    num_history_responses=5,
-    # Adds markdown formatting to the messages
-    markdown=True,
-)
+# TavilyTools(
+#         search=True,                    # Enable search functionality
+#         max_tokens=500,                # Increase max tokens for more detailed results
+#         search_depth="basic",        # Use advanced search for comprehensive results
+#         format="markdown"               # Format results as markdown
+#     )
 
-finance_agent = Agent(
-    name="Finance Agent",
-    model=OpenAIChat(id="gpt-4.1-nano"),
-    tools=[YFinanceTools(stock_price=True, analyst_recommendations=True, company_info=True, company_news=True)],
-    instructions=["Always use tables to display data"],
-    storage=SqliteStorage(table_name="finance_agent", db_file=agent_storage),
-    add_datetime_to_instructions=True,
-    add_history_to_messages=True,
-    num_history_responses=5,
-    markdown=True,
-)
 
-app = Playground(agents=[web_agent, finance_agent]).get_app()
+
+app = Playground(agents=[web_agent, finance_agent,weather_agent,youtube_agent]).get_app()
 
 if __name__ == "__main__":
-    serve_playground_app("playground:app", reload=True)
+    serve_playground_app("playground:app", reload=True) # reload=True is only for development
+    # serve_playground_app("playground:app")
