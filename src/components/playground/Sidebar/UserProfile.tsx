@@ -6,10 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import Icon from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 const UserProfile = () => {
   const { user, logout, isAuthenticated } = useAuth0()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const router = useRouter()
 
   if (!isAuthenticated || !user) {
     return null
@@ -26,6 +28,11 @@ const UserProfile = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen)
   }
+
+  const navigateToSettings = () => {
+    setIsDropdownOpen(false)
+    router.push('/knowledge')
+  } 
 
   const dropdownVariants = {
     hidden: {
@@ -84,13 +91,9 @@ const UserProfile = () => {
                 <Button
                   variant="ghost"
                   className="w-full justify-start rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10"
-                  onClick={() => {
-                    setIsDropdownOpen(false)
-                    // Add settings navigation here when ready
-                    console.log('Settings clicked')
-                  }}
+                  onClick={navigateToSettings}
                 >
-                  <Icon type="user" size="xs" className="mr-2" />
+                  <Icon type="sheet" size="xs" className="mr-2" />
                   Settings
                 </Button>
 
