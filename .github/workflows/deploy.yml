@@ -7,8 +7,14 @@ on:
       - '**'
       - '!.github/**'
       - '!backend/**' # Exclude backend directory from triggering this workflow
+      - '.github/workflows/deploy.yml'
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Step
+        run: echo "Workflow is running"
   deploy:
     runs-on: ubuntu-latest
 
