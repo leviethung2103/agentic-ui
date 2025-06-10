@@ -6,10 +6,21 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
 import os
 from dotenv import load_dotenv
+from phoenix.otel import register
 
 load_dotenv()
 
 agent_storage: str = "tmp/agents.db"
+
+# Set environment variables for Arize Phoenix
+os.environ["PHOENIX_CLIENT_HEADERS"] = f"api_key={os.getenv('ARIZE_PHOENIX_API_KEY')}"
+os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
+
+# Configure the Phoenix tracer
+tracer_provider = register(
+    project_name="agno-stock-price-agent",  # Default is 'default'
+    auto_instrument=True,  # Automatically use the installed OpenInference instrumentation
+)
 
 web_agent = Agent(
     name="Web Agent",
