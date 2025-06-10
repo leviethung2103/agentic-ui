@@ -117,10 +117,11 @@ NEXT_PUBLIC_AUTH0_CLIENT_ID=your_auth0_client_id
 # Add other environment variables as needed
 ```
 
-
+# Package the UI without node_modules, .next, .git, .vscode, .github, and backend folders
+```bash
 cd /Users/hunglv/Downloads/Projects/mcpservers
 zip -r agent-ui-v0.zip agent-ui -x "*/node_modules/*" "*/.next/*" "*/.git/*" "*/.vscode/*" "*/.github/*" "*/backend/*"
-
+```
 
 
 admin@gmail.com
