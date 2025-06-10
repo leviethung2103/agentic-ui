@@ -1,8 +1,12 @@
 "use client"
 import { useState, useEffect } from "react"
-import KnowledgeCard from "./KnowledgeCard"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
+import KnowledgeCard from "./KnowledgeCard"
+import KnowledgeUpload from "./KnowledgeUpload"
 import Icon from "@/components/ui/icon"
+import { Plus } from "lucide-react"
 
 interface KnowledgeItem {
   id: string
@@ -90,6 +94,8 @@ const mockKnowledgeItems: KnowledgeItem[] = [
 
 const KnowledgeGrid = () => {
   const [searchQuery, setSearchQuery] = useState("")
+  const [showUpload, setShowUpload] = useState(false)
+  const [activeTab, setActiveTab] = useState("import")
   const [filteredItems, setFilteredItems] = useState<KnowledgeItem[]>(mockKnowledgeItems)
 
   useEffect(() => {
@@ -105,17 +111,68 @@ const KnowledgeGrid = () => {
     }
   }, [searchQuery])
 
-  const handleAddNew = () => {
-    // TODO: Implement add new item functionality
-    console.log("Add new item clicked")
+  const handleUpload = async (file: File) => {
+    try {
+      // TODO: Implement actual file upload logic
+      console.log('Uploading file:', file.name)
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // Close the upload form after successful upload
+      setShowUpload(false)
+
+      // TODO: Refresh the knowledge items list
+    } catch (error) {
+      console.error('Upload failed:', error)
+      // TODO: Show error message to user
+    }
+  }
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
+  if (showUpload) {
+    return (
+      <div className="p-6">
+        <KnowledgeUpload
+          onCancel={() => setShowUpload(false)}
+          onUpload={handleUpload}
+        />
+      </div>
+    )
   }
 
   return (
     <div className="flex h-full flex-col p-6">
+      {/* Tab Navigation */}
+      <div className="mb-4 flex space-x-4">
+        <button onClick={() => handleTabChange("import")} className={`tab ${activeTab === "import" ? "active" : ""}`}>
+          Import from File
+        </button>
+        <button onClick={() => handleTabChange("sync")} className={`tab ${activeTab === "sync" ? "active" : ""}`}>
+          Sync from Website
+        </button>
+      </div>
+
+      {activeTab === "sync" && (
+        <div className="mb-4">
+          <Input
+            type="text"
+            placeholder="Enter website URL..."
+            className="mb-2"
+          />
+          <Button onClick={() => {/* Handle sync logic */ }}>
+            Sync
+          </Button>
+        </div>
+      )}
+
       {/* Header with search and add button */}
       <div className="mb-6 flex items-center justify-between">
         <div className="relative w-80">
-          <Icon type="search" size="xs" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search knowledge..."
@@ -124,13 +181,13 @@ const KnowledgeGrid = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <button
-          onClick={handleAddNew}
-          className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+        <Button
+          onClick={() => setShowUpload(true)}
+          className="flex items-center gap-2 bg-brand hover:bg-brand/90 text-white"
         >
-          <Icon type="plus-icon" size="xs" />
+          <Plus className="h-4 w-4" />
           <span>Add New</span>
-        </button>
+        </Button>
       </div>
 
       {/* Results count */}
@@ -140,7 +197,7 @@ const KnowledgeGrid = () => {
         </p>
       </div>
 
-      {/* Grid */}
+      {/* Knowledge items grid */}
       <div className="flex-1 overflow-auto">
         {filteredItems.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
