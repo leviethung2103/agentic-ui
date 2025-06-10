@@ -2,7 +2,7 @@ name: Deploy Next.js App to VPS
 
 on:
   push:
-    branches: [main] # Or your main branch name
+    branches: [main]
     paths:
       - '**'
       - '!.github/**'
@@ -20,19 +20,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: false
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build App
-        run: npm run build
+        run: pnpm build
 
       - name: Create deployment package
         run: |
           mkdir -p deployment
-          cp -r .next public package*.json next.config.js next-env.d.ts tsconfig.json ./
-          tar -czf deployment/deploy.tar.gz .next public package*.json next.config.js next-env.d.ts tsconfig.json
+          cp -r .next public package.json pnpm-lock.yaml next.config.js next-env.d.ts tsconfig.json ./
+          tar -czf deployment/deploy.tar.gz .next public package.json pnpm-lock.yaml next.config.js next-env.d.ts tsconfig.json
 
       - name: Copy Files to VPS
         uses: appleboy/scp-action@v1.0.0
@@ -53,6 +59,12 @@ jobs:
           script: |
             cd ${{ secrets.VPS_PATH }}
 
+            # Install pnpm if not already installed
+            if ! command -v pnpm &> /dev/null; then
+              curl -fsSL https://get.pnpm.io/install.sh | sh -
+              source ~/.bashrc
+            fi
+
             # Stop the current PM2 process if running
             pm2 delete ${{ secrets.PM2_APP_NAME }} || true
 
@@ -61,10 +73,13 @@ jobs:
             rm deploy.tar.gz
 
             # Install production dependencies
-            npm ci --only=production
+            pnpm install --prod --frozen-lockfile
+
+            # Build the application
+            pnpm build
 
             # Start the application with PM2
-            pm2 start npm --name "${{ secrets.PM2_APP_NAME || 'next-app' }}" -- start
+            pm2 start pnpm --name "${{ secrets.PM2_APP_NAME || 'next-app' }}" -- start
 
             # Save PM2 process list for persistence
             pm2 save
