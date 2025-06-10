@@ -38,6 +38,8 @@ export type IconType =
   | 'trash'
   | 'search'
   | 'mail'
+  | 'file-text'
+  | 'book-open'
 
 export interface IconProps {
   type: IconType

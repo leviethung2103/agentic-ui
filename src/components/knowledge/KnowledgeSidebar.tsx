@@ -14,7 +14,7 @@ const KnowledgeSidebar = () => {
     {
       id: "knowledge" as SidebarSection,
       label: "Knowledge",
-      icon: "references" as const,
+      icon: "book-open" as const,
     },
     {
       id: "other" as SidebarSection,

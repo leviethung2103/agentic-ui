@@ -7,7 +7,6 @@ import Icon from "@/components/ui/icon"
 interface KnowledgeItem {
   id: string
   title: string
-  type: "CHATFLOW" | "WORKFLOW" | "AGENT"
   description: string
   icon: string
 }
@@ -17,28 +16,24 @@ const mockKnowledgeItems: KnowledgeItem[] = [
   {
     id: "1",
     title: "数据问答_v1.1.2_deepseek",
-    type: "CHATFLOW",
     description: "数据问答相关用于数据库问答的智能助手",
     icon: "agent",
   },
   {
     id: "2",
     title: "Agentic Investment Research - Agent",
-    type: "CHATFLOW",
     description: "Investment research and analysis agent for financial data",
     icon: "agent",
   },
   {
     id: "3",
     title: "Agentic RAG - Agent - v2",
-    type: "AGENT",
     description: "You are a helpful assistant that retrieves accurate and complete answers using a knowledge base.",
     icon: "agent",
   },
   {
     id: "4",
     title: "Chatbot Weather - Applied React",
-    type: "AGENT",
     description:
       "Answer the following questions as best you can. You have access to the following tools: Get Weather Data",
     icon: "agent",
@@ -46,56 +41,48 @@ const mockKnowledgeItems: KnowledgeItem[] = [
   {
     id: "5",
     title: "Agentic RAG - v2",
-    type: "AGENT",
     description: "You are a helpful assistant that retrieves accurate and complete answers using a knowledge base.",
     icon: "agent",
   },
   {
     id: "6",
     title: "Agentic RAG - Tool RAG",
-    type: "WORKFLOW",
     description: "Tool-based RAG implementation for enhanced retrieval",
     icon: "agent",
   },
   {
     id: "7",
     title: "Agentic RAG - Agent",
-    type: "CHATFLOW",
     description: "Advanced RAG agent for document retrieval and analysis",
     icon: "agent",
   },
   {
     id: "8",
     title: "v3 - Haravan Chatbot",
-    type: "CHATFLOW",
     description: "Add the rewriting question",
     icon: "agent",
   },
   {
     id: "9",
     title: "v2 - Haravan Chatbot",
-    type: "CHATFLOW",
     description: "Enhanced chatbot for Haravan platform",
     icon: "agent",
   },
   {
     id: "10",
     title: "Query Rewriting",
-    type: "CHATFLOW",
     description: "Query rewriting and optimization tool",
     icon: "agent",
   },
   {
     id: "11",
     title: "v3 - MultiModal Capabilities to Deepseek",
-    type: "CHATFLOW",
     description: "Multi-modal AI capabilities integration",
     icon: "agent",
   },
   {
     id: "12",
     title: "File Translation",
-    type: "CHATFLOW",
     description: "Document translation service",
     icon: "agent",
   },
@@ -112,8 +99,7 @@ const KnowledgeGrid = () => {
       const filtered = mockKnowledgeItems.filter(
         (item) =>
           item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.type.toLowerCase().includes(searchQuery.toLowerCase()),
+          item.description.toLowerCase().includes(searchQuery.toLowerCase())
       )
       setFilteredItems(filtered)
     }

@@ -23,6 +23,8 @@ import {
   ReferencesIcon
 } from './custom-icons'
 import type { IconTypeMap } from './types'
+import {FileText} from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import {
   RefreshCw,
   Edit,
@@ -79,5 +81,7 @@ export const ICONS: IconTypeMap = {
   references: ReferencesIcon,
   trash: Trash,
   search: Search,
-  mail: Mail
+  mail: Mail,
+  'file-text': FileText,
+  'book-open': BookOpen
 }
