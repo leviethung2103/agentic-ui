@@ -105,24 +105,32 @@ const KnowledgeGrid = () => {
     }
   }, [searchQuery])
 
+  const handleAddNew = () => {
+    // TODO: Implement add new item functionality
+    console.log("Add new item clicked")
+  }
+
   return (
     <div className="flex h-full flex-col p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="mb-2 text-2xl font-bold text-primary">Knowledge Base</h1>
-        <p className="text-sm text-muted">Explore and manage your knowledge items, agents, and workflows</p>
-      </div>
-
-      {/* Search */}
-      <div className="relative mb-6 w-full max-w-md">
-        <Icon type="search" size="xs" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-        <Input
-          type="text"
-          placeholder="Search knowledge items..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 border-border bg-background-secondary text-primary"
-        />
+      {/* Header with search and add button */}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="relative w-80">
+          <Icon type="search" size="xs" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+          <Input
+            type="text"
+            placeholder="Search knowledge..."
+            className="pl-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <button
+          onClick={handleAddNew}
+          className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+        >
+          <Icon type="plus-icon" size="xs" />
+          <span>Add New</span>
+        </button>
       </div>
 
       {/* Results count */}
