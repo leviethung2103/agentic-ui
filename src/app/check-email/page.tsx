@@ -1,5 +1,5 @@
-import CheckEmailPage from "@/components/auth/CheckEmailPage"
-import { Suspense } from "react";
+import CheckEmailPage from '@/components/auth/CheckEmailPage'
+import { Suspense } from 'react'
 
 export default function CheckEmailRoute() {
   return (

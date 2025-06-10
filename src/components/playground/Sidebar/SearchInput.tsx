@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import Icon from "@/components/ui/icon"
-import { cn } from "@/lib/utils"
+import { useState } from 'react'
+import Icon from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
 
 interface SearchInputProps {
   value: string
@@ -11,20 +11,25 @@ interface SearchInputProps {
   className?: string
 }
 
-const SearchInput = ({ value, onChange, placeholder = "Search sessions...", className }: SearchInputProps) => {
+const SearchInput = ({
+  value,
+  onChange,
+  placeholder = 'Search sessions...',
+  className
+}: SearchInputProps) => {
   const [isFocused, setIsFocused] = useState(false)
 
   const handleClear = () => {
-    onChange("")
+    onChange('')
   }
 
   return (
     <div className="relative w-full">
       <div
         className={cn(
-          "relative flex items-center rounded-xl border border-primary/15 bg-accent transition-colors",
-          isFocused && "border-primary/30",
-          className,
+          'relative flex items-center rounded-xl border border-primary/15 bg-accent transition-colors',
+          isFocused && 'border-primary/30',
+          className
         )}
       >
         <Icon type="search" size="xs" className="absolute left-3 text-muted" />
@@ -40,7 +45,7 @@ const SearchInput = ({ value, onChange, placeholder = "Search sessions...", clas
         {value && (
           <button
             onClick={handleClear}
-            className="absolute right-2 rounded-full p-1 hover:bg-background-secondary/50 transition-colors"
+            className="absolute right-2 rounded-full p-1 transition-colors hover:bg-background-secondary/50"
             type="button"
           >
             <Icon type="x" size="xxs" className="text-muted" />

@@ -31,7 +31,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
-
         <Auth0ProviderWrapper>
           <NuqsAdapter>{children}</NuqsAdapter>
         </Auth0ProviderWrapper>

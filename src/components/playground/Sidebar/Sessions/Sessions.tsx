@@ -1,50 +1,73 @@
-"use client"
+'use client'
 
-import { useEffect, useMemo, useState, useRef, useCallback } from "react"
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 
-import { usePlaygroundStore } from "@/store"
-import { useQueryState } from "nuqs"
-import SessionItem from "./SessionItem"
-import SessionBlankState from "./SessionBlankState"
-import useSessionLoader from "@/hooks/useSessionLoader"
-import SearchInput from "../SearchInput"
+import { usePlaygroundStore } from '@/store'
+import { useQueryState } from 'nuqs'
+import SessionItem from './SessionItem'
+import SessionBlankState from './SessionBlankState'
+import useSessionLoader from '@/hooks/useSessionLoader'
+import SearchInput from '../SearchInput'
 
-import { cn } from "@/lib/utils"
-import type { FC } from "react"
-import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from '@/lib/utils'
+import type { FC } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface SkeletonListProps {
   skeletonCount: number
 }
 
 const SkeletonList: FC<SkeletonListProps> = ({ skeletonCount }) => {
-  const skeletons = useMemo(() => Array.from({ length: skeletonCount }, (_, i) => i), [skeletonCount])
+  const skeletons = useMemo(
+    () => Array.from({ length: skeletonCount }, (_, i) => i),
+    [skeletonCount]
+  )
 
   return skeletons.map((skeleton, index) => (
-    <Skeleton key={skeleton} className={cn("mb-1 h-11 rounded-lg px-3 py-2", index > 0 && "bg-background-secondary")} />
+    <Skeleton
+      key={skeleton}
+      className={cn(
+        'mb-1 h-11 rounded-lg px-3 py-2',
+        index > 0 && 'bg-background-secondary'
+      )}
+    />
   ))
 }
 
 dayjs.extend(utc)
 
-const formatDate = (timestamp: number, format: "natural" | "full" = "full"): string => {
+const formatDate = (
+  timestamp: number,
+  format: 'natural' | 'full' = 'full'
+): string => {
   const date = dayjs.unix(timestamp).utc()
-  return format === "natural" ? date.format("HH:mm") : date.format("YYYY-MM-DD HH:mm:ss")
+  return format === 'natural'
+    ? date.format('HH:mm')
+    : date.format('YYYY-MM-DD HH:mm:ss')
 }
 
 const Sessions = () => {
-  const [agentId] = useQueryState("agent", {
+  const [agentId] = useQueryState('agent', {
     parse: (value) => value || undefined,
-    history: "push",
+    history: 'push'
   })
-  const [sessionId] = useQueryState("session")
-  const { selectedEndpoint, isEndpointActive, isEndpointLoading, sessionsData, hydrated, hasStorage, setSessionsData } =
-    usePlaygroundStore()
+  const [sessionId] = useQueryState('session')
+  const {
+    selectedEndpoint,
+    isEndpointActive,
+    isEndpointLoading,
+    sessionsData,
+    hydrated,
+    hasStorage,
+    setSessionsData
+  } = usePlaygroundStore()
   const [isScrolling, setIsScrolling] = useState(false)
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null
+  )
+  const [searchQuery, setSearchQuery] = useState('')
   const { getSession, getSessions } = useSessionLoader()
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
   const { isSessionsLoading } = usePlaygroundStore()
@@ -87,7 +110,14 @@ const Sessions = () => {
       setSessionsData(() => null)
       getSessions(agentId)
     }
-  }, [selectedEndpoint, agentId, getSessions, isEndpointLoading, hasStorage, setSessionsData])
+  }, [
+    selectedEndpoint,
+    agentId,
+    getSessions,
+    isEndpointLoading,
+    hasStorage,
+    setSessionsData
+  ])
 
   useEffect(() => {
     if (sessionId) {
@@ -101,7 +131,7 @@ const Sessions = () => {
     return sessionsData.map((entry) => ({
       ...entry,
       created_at: entry.created_at,
-      formatted_time: formatDate(entry.created_at, "natural"),
+      formatted_time: formatDate(entry.created_at, 'natural')
     }))
   }, [sessionsData])
 
@@ -111,14 +141,20 @@ const Sessions = () => {
 
     const query = searchQuery.toLowerCase().trim()
     return formattedSessionsData.filter(
-      (session) => session.title.toLowerCase().includes(query) || session.session_id.toLowerCase().includes(query),
+      (session) =>
+        session.title.toLowerCase().includes(query) ||
+        session.session_id.toLowerCase().includes(query)
     )
   }, [formattedSessionsData, searchQuery])
 
-  const handleSessionClick = useCallback((id: string) => () => setSelectedSessionId(id), [])
+  const handleSessionClick = useCallback(
+    (id: string) => () => setSelectedSessionId(id),
+    []
+  )
 
   const showSearchResults = searchQuery.trim() && filteredSessions.length === 0
-  const showNoSessions = !isSessionsLoading && (!sessionsData || sessionsData.length === 0)
+  const showNoSessions =
+    !isSessionsLoading && (!sessionsData || sessionsData.length === 0)
 
   if (isSessionsLoading || isEndpointLoading)
     return (
@@ -137,12 +173,16 @@ const Sessions = () => {
       {/* Search Input */}
       {isEndpointActive && hasStorage && (
         <div className="mb-3">
-          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search sessions..." />
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search sessions..."
+          />
         </div>
       )}
 
       <div
-        className={`h-[calc(100vh-385px)] overflow-y-auto font-geist transition-all duration-300 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:transition-opacity [&::-webkit-scrollbar]:duration-300 ${isScrolling ? "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-background [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:opacity-0" : "[&::-webkit-scrollbar]:opacity-100"}`}
+        className={`h-[calc(100vh-385px)] overflow-y-auto font-geist transition-all duration-300 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:transition-opacity [&::-webkit-scrollbar]:duration-300 ${isScrolling ? '[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-background [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:opacity-0' : '[&::-webkit-scrollbar]:opacity-100'}`}
         onScroll={handleScroll}
         onMouseOver={() => setIsScrolling(true)}
         onMouseLeave={handleScroll}
@@ -153,7 +193,9 @@ const Sessions = () => {
           <div className="mt-1 flex items-center justify-center rounded-lg bg-background-secondary/50 pb-6 pt-4">
             <div className="flex flex-col items-center gap-1">
               <div className="flex flex-col items-center gap-2">
-                <h3 className="text-sm font-medium text-primary">No results found</h3>
+                <h3 className="text-sm font-medium text-primary">
+                  No results found
+                </h3>
                 <p className="max-w-[210px] text-center text-sm text-muted">
                   No sessions match your search query "{searchQuery}"
                 </p>

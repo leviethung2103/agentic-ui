@@ -1,47 +1,47 @@
-import type { ElementType } from "react"
+import type { ElementType } from 'react'
 
 export type IconType =
-  | "mistral"
-  | "gemini"
-  | "aws"
-  | "azure"
-  | "anthropic"
-  | "groq"
-  | "fireworks"
-  | "deepseek"
-  | "cohere"
-  | "ollama"
-  | "xai"
-  | "agno"
-  | "user"
-  | "agent"
-  | "open-ai"
-  | "sheet"
-  | "nextjs"
-  | "shadcn"
-  | "tailwind"
-  | "reasoning"
-  | "agno-tag"
-  | "refresh"
-  | "edit"
-  | "save"
-  | "x"
-  | "arrow-down"
-  | "send"
-  | "download"
-  | "hammer"
-  | "check"
-  | "chevron-down"
-  | "chevron-up"
-  | "plus-icon"
-  | "references"
-  | "trash"
-  | "search"
-  | "mail"
+  | 'mistral'
+  | 'gemini'
+  | 'aws'
+  | 'azure'
+  | 'anthropic'
+  | 'groq'
+  | 'fireworks'
+  | 'deepseek'
+  | 'cohere'
+  | 'ollama'
+  | 'xai'
+  | 'agno'
+  | 'user'
+  | 'agent'
+  | 'open-ai'
+  | 'sheet'
+  | 'nextjs'
+  | 'shadcn'
+  | 'tailwind'
+  | 'reasoning'
+  | 'agno-tag'
+  | 'refresh'
+  | 'edit'
+  | 'save'
+  | 'x'
+  | 'arrow-down'
+  | 'send'
+  | 'download'
+  | 'hammer'
+  | 'check'
+  | 'chevron-down'
+  | 'chevron-up'
+  | 'plus-icon'
+  | 'references'
+  | 'trash'
+  | 'search'
+  | 'mail'
 
 export interface IconProps {
   type: IconType
-  size?: "xs" | "sm" | "md" | "lg" | "dot" | "xxs" | "default"
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'dot' | 'xxs' | 'default'
   className?: string
   color?: string
   disabled?: boolean

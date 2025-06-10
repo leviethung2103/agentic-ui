@@ -55,6 +55,68 @@ pnpm dev
 
 4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Development
+
+### Code Formatting
+
+This project uses Prettier for code formatting. To ensure consistent code style:
+
+```bash
+# Install dependencies (if not already installed)
+npm install
+
+# Format all files
+npx prettier --write .
+
+# Check formatting without making changes
+npx prettier --check .
+
+# Format specific file types
+npx prettier --write "**/*.{js,jsx,ts,tsx,css,scss,json,md}"
+```
+
+### Pre-commit Hook (Optional)
+
+To automatically format code before each commit, install `lint-staged` and `husky`:
+
+```bash
+# Install dependencies
+npm install --save-dev lint-staged husky
+
+# Set up husky
+npx husky install
+
+# Add pre-commit hook
+npx husky add .husky/pre-commit "npx lint-staged"
+```
+
+Add this to your `package.json`:
+
+```json
+"lint-staged": {
+  "**/*": "prettier --write --ignore-unknown"
+}
+```
+
+This will automatically format all staged files before each commit.
+
+### VS Code Integration
+
+For automatic formatting in VS Code:
+
+1. Install the Prettier extension
+2. Add these settings to your VS Code `settings.json`:
+
+```json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  }
+}
+```
+
 ## Connecting to an Agent Backend
 
 By default Agent UI connects to `http://localhost:7777`. You can easily change this by hovering over the endpoint URL and clicking the edit option.
@@ -99,6 +161,7 @@ pm2 startup
 The project includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) for automated deployments. To set it up:
 
 1. Add these secrets to your GitHub repository (Settings > Secrets > Actions):
+
    - `VPS_HOST`: Your VPS IP or hostname
    - `VPS_USER`: SSH username
    - `VPS_SSH_KEY`: Private SSH key for authentication
@@ -118,11 +181,11 @@ NEXT_PUBLIC_AUTH0_CLIENT_ID=your_auth0_client_id
 ```
 
 # Package the UI without node_modules, .next, .git, .vscode, .github, and backend folders
+
 ```bash
 cd /Users/hunglv/Downloads/Projects/mcpservers
 zip -r agent-ui-v0.zip agent-ui -x "*/node_modules/*" "*/.next/*" "*/.git/*" "*/.vscode/*" "*/.github/*" "*/backend/*"
 ```
-
 
 admin@gmail.com
 Admin@123

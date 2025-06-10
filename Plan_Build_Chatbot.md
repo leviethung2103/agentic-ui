@@ -1,32 +1,33 @@
 Plan: Add User Sign-In to Agent UI
+
 1. Decide on Authentication Method
-Choose a provider: Email/password, Google, GitHub, etc.
-Recommended: Use a library like NextAuth.js for Next.js projects, or Auth0/Supabase for more features.
+   Choose a provider: Email/password, Google, GitHub, etc.
+   Recommended: Use a library like NextAuth.js for Next.js projects, or Auth0/Supabase for more features.
 2. Install Authentication Dependencies
-For NextAuth.js:
-CopyInsert
-npm install next-auth
-For other providers, follow their installation guides.
+   For NextAuth.js:
+   CopyInsert
+   npm install next-auth
+   For other providers, follow their installation guides.
 3. Set Up Authentication API Route
-Create an API route (e.g., /pages/api/auth/[...nextauth].ts) to handle authentication logic.
-Configure providers, callbacks, and session settings.
+   Create an API route (e.g., /pages/api/auth/[...nextauth].ts) to handle authentication logic.
+   Configure providers, callbacks, and session settings.
 4. Create a Sign-In UI Component
-Add a SignIn component/page.
-Include provider buttons (Google, GitHub, Email, etc.).
-Add styling to match your UI.
+   Add a SignIn component/page.
+   Include provider buttons (Google, GitHub, Email, etc.).
+   Add styling to match your UI.
 5. Show Sign-In Prompt in the UI
-Check user authentication status in the main layout or sidebar.
-If the user is not signed in, display the Sign-In component/modal.
-Optionally, restrict chat or other features until the user signs in.
+   Check user authentication status in the main layout or sidebar.
+   If the user is not signed in, display the Sign-In component/modal.
+   Optionally, restrict chat or other features until the user signs in.
 6. Display User Info After Sign-In
-Show the user’s avatar, name, or email in the sidebar/header after successful sign-in.
-Add a sign-out button.
+   Show the user’s avatar, name, or email in the sidebar/header after successful sign-in.
+   Add a sign-out button.
 7. Protect API Routes (Optional)
-If your backend supports authenticated requests, check user sessions/tokens in API endpoints.
+   If your backend supports authenticated requests, check user sessions/tokens in API endpoints.
 8. Testing
-Test the sign-in flow with different providers.
-Ensure the UI updates correctly for signed-in and signed-out states.
-Example User Flowhung
+   Test the sign-in flow with different providers.
+   Ensure the UI updates correctly for signed-in and signed-out states.
+   Example User Flowhung
 
 User visits the app → sees a “Sign in to continue” prompt.
 User clicks sign-in → chooses a provider.
@@ -46,7 +47,6 @@ I've created a complete Auth0-compatible authentication system that matches your
 - **Loading states**: Visual feedback during authentication
 - **Error handling**: Toast notifications for success/failure
 
-
 ### 2. Forgot Password Form
 
 - **Email input**: Clean form for password reset requests
@@ -54,13 +54,11 @@ I've created a complete Auth0-compatible authentication system that matches your
 - **Loading states**: Visual feedback during submission
 - **Error handling**: Toast notifications for any issues
 
-
 ### 3. Check Email Confirmation Page
 
 - **Personalized message**: Shows the email address where reset link was sent
 - **Action options**: Request another link or return to login
 - **Visual feedback**: Email icon for clear context
-
 
 ### Key Features
 
@@ -70,7 +68,6 @@ I've created a complete Auth0-compatible authentication system that matches your
 - **Error handling**: Clear feedback for all user actions
 - **Loading states**: Visual indicators during async operations
 - **Form validation**: Client-side validation for required fields
-
 
 ### Technical Implementation
 

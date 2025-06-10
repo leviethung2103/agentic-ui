@@ -1,80 +1,87 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { toast } from "sonner"
-import Icon from "@/components/ui/icon"
-import { useAuth0 } from "@auth0/auth0-react";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
+import Icon from '@/components/ui/icon'
+import { useAuth0 } from '@auth0/auth0-react'
 
-
-type AuthMode = "login" | "signup"
+type AuthMode = 'login' | 'signup'
 
 export default function AuthForm() {
   const router = useRouter()
-  const [mode, setMode] = useState<AuthMode>("login")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [mode, setMode] = useState<AuthMode>('login')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { loginWithRedirect, isAuthenticated, user, logout } = useAuth0();
-
+  const { loginWithRedirect, isAuthenticated, user, logout } = useAuth0()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/login?screen_hint=signup"
+      const endpoint =
+        mode === 'login'
+          ? '/api/auth/login'
+          : '/api/auth/login?screen_hint=signup'
 
       const response = await fetch(endpoint, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           email,
           password,
-          ...(mode === "login" && { remember: rememberMe }),
-        }),
+          ...(mode === 'login' && { remember: rememberMe })
+        })
       })
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.message || "Authentication failed")
+        throw new Error(error.message || 'Authentication failed')
       }
 
       // Redirect based on response or to dashboard
-      router.push("/dashboard")
-      toast.success(mode === "login" ? "Successfully logged in!" : "Account created successfully!")
+      router.push('/dashboard')
+      toast.success(
+        mode === 'login'
+          ? 'Successfully logged in!'
+          : 'Account created successfully!'
+      )
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Authentication failed")
+      toast.error(
+        error instanceof Error ? error.message : 'Authentication failed'
+      )
     } finally {
       setIsLoading(false)
     }
   }
 
   const toggleMode = () => {
-    setMode(mode === "login" ? "signup" : "login")
+    setMode(mode === 'login' ? 'signup' : 'login')
   }
 
   return (
-    <div className="w-full max-w-md mx-auto px-4">
-      <div className="flex flex-col items-center mb-8">
+    <div className="mx-auto w-full max-w-md px-4">
+      <div className="mb-8 flex flex-col items-center">
         <Icon type="agno" size="md" />
         <h1 className="mt-6 text-2xl font-bold text-primary">
-          {mode === "login" ? "Sign in to your account" : "Create your account"}
+          {mode === 'login' ? 'Sign in to your account' : 'Create your account'}
         </h1>
         <p className="mt-2 text-sm text-muted">
-          {mode === "login"
-            ? "Enter your credentials to access your account"
-            : "Fill in the details to create a new account"}
+          {mode === 'login'
+            ? 'Enter your credentials to access your account'
+            : 'Fill in the details to create a new account'}
         </p>
       </div>
 
@@ -89,15 +96,18 @@ export default function AuthForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-background-secondary border-border text-primary"
+              className="border-border bg-background-secondary text-primary"
             />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              {mode === "login" && (
-                <Link href="/forgot-password" className="text-xs text-brand hover:underline">
+              {mode === 'login' && (
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-brand hover:underline"
+                >
                   Forgot password?
                 </Link>
               )}
@@ -105,24 +115,27 @@ export default function AuthForm() {
             <Input
               id="password"
               type="password"
-              placeholder={mode === "login" ? "••••••••" : "Create a password"}
+              placeholder={mode === 'login' ? '••••••••' : 'Create a password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-background-secondary border-border text-primary"
+              className="border-border bg-background-secondary text-primary"
               minLength={8}
             />
           </div>
         </div>
 
-        {mode === "login" && (
+        {mode === 'login' && (
           <div className="flex items-center space-x-2">
             <Checkbox
               id="remember"
               checked={rememberMe}
               onCheckedChange={(checked) => setRememberMe(checked === true)}
             />
-            <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
+            <Label
+              htmlFor="remember"
+              className="cursor-pointer text-sm font-normal"
+            >
               Remember me
             </Label>
           </div>
@@ -153,7 +166,7 @@ export default function AuthForm() {
 
         <Button
           type="button"
-          className="w-full bg-brand hover:bg-brand/90 text-primary mt-4"
+          className="mt-4 w-full bg-brand text-primary hover:bg-brand/90"
           onClick={() => loginWithRedirect()}
         >
           Sign In with Auth0
@@ -162,9 +175,15 @@ export default function AuthForm() {
 
       <div className="mt-6 text-center">
         <p className="text-sm text-muted">
-          {mode === "login" ? "Don't have an account?" : "Already have an account?"}
-          <button type="button" onClick={toggleMode} className="ml-1 text-brand hover:underline focus:outline-none">
-            {mode === "login" ? "Sign up" : "Sign in"}
+          {mode === 'login'
+            ? "Don't have an account?"
+            : 'Already have an account?'}
+          <button
+            type="button"
+            onClick={toggleMode}
+            className="ml-1 text-brand hover:underline focus:outline-none"
+          >
+            {mode === 'login' ? 'Sign up' : 'Sign in'}
           </button>
         </p>
       </div>

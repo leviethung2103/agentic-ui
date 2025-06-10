@@ -11,12 +11,14 @@ This is the backend service for the Agent UI application, providing API endpoint
 ## Setup Instructions
 
 ### 1. Clone the repository (if you haven't already)
+
 ```bash
 git clone <repository-url>
 cd agent-ui/backend
 ```
 
 ### 2. Create and activate Conda environment
+
 ```bash
 # Create a new conda environment
 conda create -n agentic python=3.9
@@ -29,12 +31,15 @@ conda activate agentic
 ```
 
 ### 3. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Set up environment variables
+
 Create a `.env` file in the backend directory with the required environment variables:
+
 ```bash
 # Example .env file
 OPENAI_API_KEY=your_openai_api_key_here
@@ -42,6 +47,7 @@ DATABASE_URL=sqlite:///./sql_app.db
 ```
 
 ### 5. Run the application
+
 ```bash
 uvicorn playground:app --reload --host 0.0.0.0 --port 8000
 ```
@@ -51,6 +57,7 @@ The API will be available at `http://localhost:8000`
 ## API Documentation
 
 Once the server is running, you can access:
+
 - Interactive API docs (Swagger UI): `http://localhost:8000/docs`
 - Alternative API docs (ReDoc): `http://localhost:8000/redoc`
 
