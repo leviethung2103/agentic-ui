@@ -19,33 +19,37 @@ const SUPPORTED_FILE_TYPES = [
 
 interface KnowledgeUploadProps {
   onCancel: () => void
-  onUpload: (file: File) => Promise<void>
+  onUpload: (files: File[]) => Promise<void>
 }
 
 export default function KnowledgeUpload({
   onCancel,
   onUpload
 }: KnowledgeUploadProps) {
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null)
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0]
-      const fileExtension =
-        '.' + selectedFile.name.split('.').pop()?.toLowerCase()
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files)
+      const invalidFiles = selectedFiles.filter(
+        file => {
+          const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
+          return fileExtension && !SUPPORTED_FILE_TYPES.includes(fileExtension)
+        }
+      )
 
-      if (fileExtension && !SUPPORTED_FILE_TYPES.includes(fileExtension)) {
+      if (invalidFiles.length > 0) {
         setError(
-          `Unsupported file type. Please upload one of: ${SUPPORTED_FILE_TYPES.join(', ')}`
+          `Unsupported file types: ${invalidFiles.map(f => f.name).join(', ')}. Supported formats: ${SUPPORTED_FILE_TYPES.join(', ')}`
         )
         return
       }
 
-      setFile(selectedFile)
+      setFiles(prevFiles => [...prevFiles, ...selectedFiles])
     }
   }
 
@@ -60,25 +64,29 @@ export default function KnowledgeUpload({
   }
 
   const handleSubmit = async () => {
-    if (!file) return
+    if (files.length === 0) return
 
     setIsUploading(true)
     setError(null)
 
     try {
-      await onUpload(file)
+      await onUpload(files)
     } catch (err) {
-      setError('Failed to upload file. Please try again.')
+      setError('Failed to upload files. Please try again.')
       console.error('Upload error:', err)
     } finally {
       setIsUploading(false)
     }
   }
 
-  const removeFile = () => {
-    setFile(null)
+  const removeFile = (index: number) => {
+    setFiles(prevFiles => prevFiles.filter((_, i) => i !== index))
     setError(null)
-    // Reset file input
+  }
+
+  const clearAllFiles = () => {
+    setFiles([])
+    setError(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -92,18 +100,20 @@ export default function KnowledgeUpload({
       <CardContent className="p-6">
         <div className="space-y-6">
           <div
-            className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/30 p-12 text-center transition-colors hover:bg-muted/50 ${file ? 'border-brand bg-brand/5' : ''}`}
+            className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted/30 p-12 text-center transition-colors hover:bg-muted/50 ${files.length > 0 ? 'border-brand bg-brand/5' : ''}`}
             onClick={handleDropZoneClick}
           >
             <Upload className="text-muted-foreground mb-4 h-10 w-10" />
             <p className="text-foreground mb-1 text-sm font-medium">
-              {file ? file.name : 'Drag and drop files here or click to browse'}
+              {files.length > 0
+                ? `${files.length} file${files.length > 1 ? 's' : ''} selected`
+                : 'Drag and drop files here or click to browse'}
             </p>
             <p className="text-muted-foreground mb-4 text-xs">
               Supported formats: {SUPPORTED_FILE_TYPES.join(', ')}
             </p>
             <Button type="button" variant="outline" onClick={handleButtonClick}>
-              Select File
+              Select Files
             </Button>
             <input
               ref={fileInputRef}
@@ -112,8 +122,9 @@ export default function KnowledgeUpload({
               className="hidden"
               onChange={handleFileChange}
               accept={SUPPORTED_FILE_TYPES.join(',')}
+              multiple
             />
-            {file && (
+            {files.length > 0 && (
               <Button
                 type="button"
                 variant="ghost"
@@ -121,13 +132,44 @@ export default function KnowledgeUpload({
                 className="mt-2 text-destructive hover:bg-destructive/10"
                 onClick={(e) => {
                   e.stopPropagation()
-                  removeFile()
+                  clearAllFiles()
                 }}
               >
-                <X className="mr-1 h-4 w-4" /> Remove File
+                <X className="mr-1 h-4 w-4" /> Clear All
               </Button>
             )}
           </div>
+
+          {files.length > 0 && (
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {files.map((file, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between rounded-md border border-border bg-muted/20 p-2"
+                >
+                  <div className="flex items-center">
+                    <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">{file.name}</span>
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      removeFile(index)
+                    }}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {error && (
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -147,7 +189,7 @@ export default function KnowledgeUpload({
             <Button
               type="button"
               onClick={handleSubmit}
-              disabled={!file || isUploading}
+              disabled={files.length === 0 || isUploading}
               className="bg-brand text-white hover:bg-brand/90"
             >
               {isUploading ? (
@@ -156,7 +198,7 @@ export default function KnowledgeUpload({
                   Uploading...
                 </>
               ) : (
-                'Upload File'
+                `Upload ${files.length} File${files.length !== 1 ? 's' : ''}`
               )}
             </Button>
           </div>

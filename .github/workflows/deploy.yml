@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'pnpm'
+          # cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm@8
@@ -74,7 +74,7 @@ jobs:
             rm deploy.tar.gz
 
             # Install production dependencies
-            pnpm install --prod --frozen-lockfile
+            pnpm install --prod
 
             # Build the application
             pnpm build
