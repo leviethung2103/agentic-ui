@@ -6,7 +6,6 @@ on:
     paths:
       - '**'
       - '!.github/**'
-      - '!backend/**' # Exclude backend directory from triggering this workflow
       - '.github/workflows/deploy.yml'
 
 jobs:
@@ -69,6 +68,30 @@ jobs:
             pm2 save
             pm2 startup | tail -n 1 | bash
 
+            # Verify the service is running
+            echo "Deployment completed. Current PM2 processes:"
+            pm2 list
+
+            # Set up and start the backend
+            cd backend
+            uv venv .venv
+            source .venv/bin/activate
+            uv pip install -r requirements.txt
+
+            # Stop existing backend PM2 process if running
+            if pm2 describe ${{ secrets.PM2_APP_NAME || 'agent-ui' }}-backend &> /dev/null; then
+              echo "Stopping existing backend PM2 process..."
+              pm2 delete ${{ secrets.PM2_APP_NAME || 'agent-ui' }}-backend
+            fi
+            
+            # Start the backend with PM2
+            echo "Starting backend with PM2..."
+            pm2 start "python playground.py" --name "${{ secrets.PM2_APP_NAME || 'agent-ui' }}-backend" --interpreter=python3 --cwd $(pwd)
+            
+            # Save PM2 process list
+            pm2 save
+            pm2 startup | tail -n 1 | bash
+            
             # Verify the service is running
             echo "Deployment completed. Current PM2 processes:"
             pm2 list
