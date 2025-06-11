@@ -23,7 +23,7 @@ import {
   ReferencesIcon
 } from './custom-icons'
 import type { IconTypeMap } from './types'
-import {FileText} from 'lucide-react'
+import { FileText } from 'lucide-react'
 import { BookOpen } from 'lucide-react'
 import {
   RefreshCw,

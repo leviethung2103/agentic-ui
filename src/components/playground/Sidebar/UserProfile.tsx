@@ -32,7 +32,7 @@ const UserProfile = () => {
   const navigateToSettings = () => {
     setIsDropdownOpen(false)
     router.push('/knowledge')
-  } 
+  }
 
   const dropdownVariants = {
     hidden: {

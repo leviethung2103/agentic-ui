@@ -1,6 +1,6 @@
-"use client"
-import Icon from "@/components/ui/icon"
-import { cn } from "@/lib/utils"
+'use client'
+import Icon from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
 
 interface KnowledgeItem {
   id: string
@@ -24,7 +24,9 @@ const KnowledgeCard = ({ item }: KnowledgeCardProps) => {
           </div>
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="mb-1 line-clamp-2 text-sm font-medium text-primary group-hover:text-primary">{item.title}</h3>
+          <h3 className="mb-1 line-clamp-2 text-sm font-medium text-primary group-hover:text-primary">
+            {item.title}
+          </h3>
         </div>
       </div>
 

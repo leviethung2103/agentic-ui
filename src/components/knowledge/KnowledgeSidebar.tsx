@@ -1,26 +1,27 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import Icon from "@/components/ui/icon"
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import UserProfile from "@/components/playground/Sidebar/UserProfile"
+'use client'
+import { Button } from '@/components/ui/button'
+import Icon from '@/components/ui/icon'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import UserProfile from '@/components/playground/Sidebar/UserProfile'
 
-type SidebarSection = "knowledge" | "other"
+type SidebarSection = 'knowledge' | 'other'
 
 const KnowledgeSidebar = () => {
-  const [activeSection, setActiveSection] = useState<SidebarSection>("knowledge")
+  const [activeSection, setActiveSection] =
+    useState<SidebarSection>('knowledge')
 
   const sidebarItems = [
     {
-      id: "knowledge" as SidebarSection,
-      label: "Knowledge",
-      icon: "book-open" as const,
+      id: 'knowledge' as SidebarSection,
+      label: 'Knowledge',
+      icon: 'book-open' as const
     },
     {
-      id: "other" as SidebarSection,
-      label: "Other",
-      icon: "search" as const,
-    },
+      id: 'other' as SidebarSection,
+      label: 'Other',
+      icon: 'search' as const
+    }
   ]
 
   return (
@@ -29,7 +30,9 @@ const KnowledgeSidebar = () => {
         {/* Header */}
         <div className="flex items-center gap-2">
           <Icon type="agno" size="xs" />
-          <span className="text-xs font-medium uppercase text-white">KMSLV Knowledge</span>
+          <span className="text-xs font-medium uppercase text-white">
+            KMSLV Knowledge
+          </span>
         </div>
 
         {/* Navigation */}
@@ -39,10 +42,10 @@ const KnowledgeSidebar = () => {
               key={item.id}
               variant="ghost"
               className={cn(
-                "w-full justify-start rounded-xl p-3 text-xs font-medium uppercase transition-colors duration-200",
+                'w-full justify-start rounded-xl p-3 text-xs font-medium uppercase transition-colors duration-200',
                 activeSection === item.id
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted hover:bg-primary/5 hover:text-primary",
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted hover:bg-primary/5 hover:text-primary'
               )}
               onClick={() => setActiveSection(item.id)}
             >
