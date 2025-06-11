@@ -12,3 +12,5 @@ openai
 openinference-instrumentation-agno 
 opentelemetry-sdk 
 opentelemetry-exporter-otlp
+tavily-python
+youtube-transcript-api
