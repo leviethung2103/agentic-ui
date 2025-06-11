@@ -35,21 +35,19 @@ export default function KnowledgeUpload({
     setError(null)
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files)
-      const invalidFiles = selectedFiles.filter(
-        file => {
-          const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
-          return fileExtension && !SUPPORTED_FILE_TYPES.includes(fileExtension)
-        }
-      )
+      const invalidFiles = selectedFiles.filter((file) => {
+        const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase()
+        return fileExtension && !SUPPORTED_FILE_TYPES.includes(fileExtension)
+      })
 
       if (invalidFiles.length > 0) {
         setError(
-          `Unsupported file types: ${invalidFiles.map(f => f.name).join(', ')}. Supported formats: ${SUPPORTED_FILE_TYPES.join(', ')}`
+          `Unsupported file types: ${invalidFiles.map((f) => f.name).join(', ')}. Supported formats: ${SUPPORTED_FILE_TYPES.join(', ')}`
         )
         return
       }
 
-      setFiles(prevFiles => [...prevFiles, ...selectedFiles])
+      setFiles((prevFiles) => [...prevFiles, ...selectedFiles])
     }
   }
 
@@ -80,7 +78,7 @@ export default function KnowledgeUpload({
   }
 
   const removeFile = (index: number) => {
-    setFiles(prevFiles => prevFiles.filter((_, i) => i !== index))
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index))
     setError(null)
   }
 
@@ -141,16 +139,16 @@ export default function KnowledgeUpload({
           </div>
 
           {files.length > 0 && (
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="max-h-40 space-y-2 overflow-y-auto">
               {files.map((file, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between rounded-md border border-border bg-muted/20 p-2"
                 >
                   <div className="flex items-center">
-                    <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <FileText className="text-muted-foreground mr-2 h-4 w-4" />
                     <span className="text-sm">{file.name}</span>
-                    <span className="ml-2 text-xs text-muted-foreground">
+                    <span className="text-muted-foreground ml-2 text-xs">
                       {(file.size / 1024).toFixed(1)} KB
                     </span>
                   </div>
@@ -158,7 +156,7 @@ export default function KnowledgeUpload({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                    className="text-muted-foreground h-6 w-6 p-0 hover:text-destructive"
                     onClick={(e) => {
                       e.stopPropagation()
                       removeFile(index)
