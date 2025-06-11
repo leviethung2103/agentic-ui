@@ -123,6 +123,17 @@ By default Agent UI connects to `http://localhost:7777`. You can easily change t
 
 The default endpoint works with the standard Agno Playground setup described in the [official documentation](https://agno.link/agent-ui#connect-to-local-agents).
 
+## Troubleshooting
+
+### Port Already in Use
+If you encounter a port conflict when starting the backend, you can kill any process using port 7777 with:
+
+```bash
+lsof -ti:7777 | xargs kill -9 2>/dev/null || true
+```
+
+This command will silently kill any process running on port 7777, or do nothing if the port is free.
+
 ## Deployment
 
 ### Prerequisites
@@ -131,30 +142,6 @@ The default endpoint works with the standard Agno Playground setup described in 
 - PM2 installed globally: `npm install -g pm2`
 - A VPS with SSH access
 
-### PM2 Configuration
-
-The project includes an `ecosystem.config.js` file for PM2 process management with the following features:
-
-- Automatic clustering (utilizes all CPU cores)
-- Memory management (auto-restart at 1GB)
-- Log rotation and management
-- Production-ready settings
-
-To start the application in production:
-
-```bash
-# Install PM2 globally if not already installed
-npm install -g pm2
-
-# Start the application
-pm2 start ecosystem.config.js --env production
-
-# Save the PM2 process list
-pm2 save
-
-# Set up PM2 to start on system boot
-pm2 startup
-```
 
 ### GitHub Actions Deployment
 
@@ -166,7 +153,6 @@ The project includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) 
    - `VPS_USER`: SSH username
    - `VPS_SSH_KEY`: Private SSH key for authentication
    - `VPS_PATH`: Deployment directory on the VPS
-   - `PM2_APP_NAME`: (Optional) Name for your PM2 process (defaults to 'nextjs-app')
 
 2. Push to the `main` branch to trigger the deployment
 

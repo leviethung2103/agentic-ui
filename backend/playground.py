@@ -41,5 +41,5 @@ tracer_provider = register(
 app = Playground(agents=[web_agent, finance_agent,weather_agent,youtube_agent]).get_app()
 
 if __name__ == "__main__":
-    serve_playground_app("playground:app", reload=True) # reload=True is only for development
+    serve_playground_app("playground:app", host="0.0.0.0", port=7777, reload=True) # reload=True is only for development
     # serve_playground_app("playground:app")

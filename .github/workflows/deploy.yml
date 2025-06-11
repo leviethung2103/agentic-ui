@@ -54,14 +54,14 @@ jobs:
             pnpm build
 
             # Stop existing PM2 process if running
-            if pm2 describe ${{ secrets.PM2_APP_NAME || 'agent-ui' }} &> /dev/null; then
+            if pm2 describe agent-ui &> /dev/null; then
               echo "Stopping existing PM2 process..."
-              pm2 delete ${{ secrets.PM2_APP_NAME || 'agent-ui' }}
+              pm2 delete agent-ui
             fi
 
             # Start the application with PM2
             echo "Starting application..."
-            pm2 start pnpm --name "${{ secrets.PM2_APP_NAME || 'agent-ui' }}" -- start -H 0.0.0.0
+            pm2 start pnpm --name "agent-ui" -- start -H 0.0.0.0
 
             # Save PM2 process list and set up startup
             echo "Setting up PM2 startup..."
@@ -74,24 +74,30 @@ jobs:
 
             # Set up and start the backend
             cd backend
+            BACKEND_DIR=$(pwd)
             uv venv .venv
             source .venv/bin/activate
             uv pip install -r requirements.txt
 
-            # Stop existing backend PM2 process if running
-            if pm2 describe ${{ secrets.PM2_APP_NAME || 'agent-ui' }}-backend &> /dev/null; then
-              echo "Stopping existing backend PM2 process..."
-              pm2 delete ${{ secrets.PM2_APP_NAME || 'agent-ui' }}-backend
-            fi
-            
-            # Start the backend with PM2
-            echo "Starting backend with PM2..."
-            pm2 start "python playground.py" --name "${{ secrets.PM2_APP_NAME || 'agent-ui' }}-backend" --interpreter=python3 --cwd $(pwd)
-            
-            # Save PM2 process list
-            pm2 save
-            pm2 startup | tail -n 1 | bash
-            
+            # Create logs directory if it doesn't exist
+            mkdir -p logs
+
+            # Stop any existing process using the same port if needed
+            lsof -ti:7777 | xargs kill -9 2>/dev/null || true
+
+            # Start the backend with nohup
+            echo "Starting backend with nohup..."
+            nohup bash -c "source .venv/bin/activate && python playground.py" > logs/backend.log 2>&1 &
+            echo $! > backend.pid
+            echo "Backend started with PID $(cat backend.pid)"
+
+
             # Verify the service is running
-            echo "Deployment completed. Current PM2 processes:"
-            pm2 list
+            sleep 2
+            if ps -p $(cat backend.pid) > /dev/null; then
+                echo "Backend is running with PID $(cat backend.pid)"
+            else
+                echo "Failed to start backend. Check logs/backend.log for details."
+                tail -n 20 logs/backend.log
+                exit 1
+            fi
