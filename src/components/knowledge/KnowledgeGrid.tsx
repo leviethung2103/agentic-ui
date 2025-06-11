@@ -114,13 +114,15 @@ const KnowledgeGrid = () => {
     }
   }, [searchQuery])
 
-  const handleUpload = async (file: File) => {
+  const handleUpload = async (files: File[]) => {
     try {
       // TODO: Implement actual file upload logic
-      console.log('Uploading file:', file.name)
+      console.log('Uploading files:', files.map((file) => file.name).join(', '))
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Simulate API call for each file
+      await Promise.all(
+        files.map((file) => new Promise((resolve) => setTimeout(resolve, 1000)))
+      )
 
       // Close the upload form after successful upload
       setShowUpload(false)
