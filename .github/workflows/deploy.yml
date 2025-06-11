@@ -62,7 +62,7 @@ jobs:
 
             # Start the application with PM2
             echo "Starting application..."
-            pm2 start pnpm --name "${{ secrets.PM2_APP_NAME || 'agent-ui' }}" -- start
+            pm2 start pnpm --name "${{ secrets.PM2_APP_NAME || 'agent-ui' }}" -- start -H 0.0.0.0
 
             # Save PM2 process list and set up startup
             echo "Setting up PM2 startup..."
