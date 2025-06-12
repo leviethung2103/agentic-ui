@@ -350,7 +350,7 @@ const useAIChatStreamHandler = () => {
               )
             }
           },
-          onComplete: () => { }
+          onComplete: () => {}
         })
       } catch (error) {
         updateMessagesWithErrorState()

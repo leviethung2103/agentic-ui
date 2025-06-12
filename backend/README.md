@@ -87,7 +87,7 @@ services:
   backend:
     build: .
     ports:
-      - "7777:7777"
+      - '7777:7777'
     env_file:
       - .env
     volumes:
@@ -114,6 +114,7 @@ docker run -p 7777:7777 --env-file .env -v $(pwd):/app agent-ui-backend
 ### Accessing the Application
 
 Once running, the application will be available at:
+
 - API: `http://localhost:7777`
 - Playground UI: `http://localhost:3000` (if frontend is running)
 
