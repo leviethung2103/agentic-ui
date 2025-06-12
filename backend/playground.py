@@ -38,7 +38,7 @@ app = Playground(agents=[web_agent, finance_agent, weather_agent, youtube_agent]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://app.buddyai.online"],
+    allow_origins=["https://app.buddyai.online", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
