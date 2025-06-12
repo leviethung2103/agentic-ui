@@ -49,6 +49,75 @@ DATABASE_URL=sqlite:///./sql_app.db
 ### 5. Run the application
 
 ```bash
+uvicorn playground:app --host 0.0.0.0 --port 7777 --reload
+```
+
+## Docker Setup
+
+### 1. Build the Docker image
+
+```bash
+docker build -t agent-ui-backend .
+```
+
+### 2. Run the Docker container
+
+```bash
+docker run -p 7777:7777 --env-file .env agent-ui-backend
+```
+
+### 3. Environment Variables
+
+Create a `.env` file with the following variables:
+
+```
+OPENAI_API_KEY=your_openai_api_key
+TAVILY_API_KEY=your_tavily_api_key  # If using web search
+ARIZE_PHOENIX_API_KEY=your_phoenix_key  # For observability
+```
+
+### 4. Docker Compose (Optional)
+
+For a more complex setup with multiple services, you can use Docker Compose. Create a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "7777:7777"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    restart: unless-stopped
+```
+
+Then run:
+
+```bash
+docker-compose up --build
+```
+
+## Development
+
+### Running with Docker in Development Mode
+
+To enable auto-reload during development:
+
+```bash
+docker run -p 7777:7777 --env-file .env -v $(pwd):/app agent-ui-backend
+```
+
+### Accessing the Application
+
+Once running, the application will be available at:
+- API: `http://localhost:7777`
+- Playground UI: `http://localhost:3000` (if frontend is running)
+
+```bash
 uvicorn playground:app --reload --host 0.0.0.0 --port 8000
 ```
 
