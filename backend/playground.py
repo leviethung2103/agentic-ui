@@ -1,15 +1,14 @@
 import os
 
+from agno.playground import Playground, serve_playground_app
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from phoenix.otel import register
-from serve_playground_app import serve_playground_app
 
 from agents.finance_agent import finance_agent
 from agents.weather_agent import weather_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
-from playground import Playground
 
 load_dotenv()
 
