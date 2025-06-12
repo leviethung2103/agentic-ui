@@ -12,6 +12,7 @@ from agents.web_agent import web_agent
 from agents.finance_agent import finance_agent
 from agents.weather_agent import weather_agent
 from agents.youtube_agent import youtube_agent
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -39,6 +40,14 @@ tracer_provider = register(
 
 
 app = Playground(agents=[web_agent, finance_agent,weather_agent,youtube_agent]).get_app()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://app.buddyai.online"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 if __name__ == "__main__":
     serve_playground_app("playground:app", host="0.0.0.0", port=7777, reload=True) # reload=True is only for development
