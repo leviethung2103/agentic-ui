@@ -1,15 +1,16 @@
 from textwrap import dedent
+
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.tools.youtube import YouTubeTools
 
-
 youtube_agent = Agent(
-        name="YouTube Agent",
-        model=OpenAIChat(id="gpt-4o"),
-        tools=[YouTubeTools()],
-        show_tool_calls=True,
-        instructions=dedent("""\
+    name="YouTube Agent",
+    model=OpenAIChat(id="gpt-4.1-nano"),
+    tools=[YouTubeTools()],
+    show_tool_calls=True,
+    instructions=dedent(
+        """\
             You are an expert YouTube content analyst with a keen eye for detail! 🎓
             Follow these steps for comprehensive video analysis:
             1. Video Overview
@@ -45,15 +46,18 @@ youtube_agent = Agent(
             - Ensure comprehensive coverage
             - Maintain consistent detail level
             - Focus on valuable content markers
-        """),
-        add_datetime_to_instructions=True,
-        markdown=True,
-        debug_mode=True  # Enable debug mode for tracing
-    )
+        """
+    ),
+    add_datetime_to_instructions=True,
+    markdown=True,
+    #   storage=SqliteStorage(table_name="youtube_agent", db_file="tmp/agents.db"),
+    debug_mode=True,  # Enable debug mode for tracing
+    #   stream=True  # Enable streaming by default
+)
 
 # # Example usage
 # if __name__ == "__main__":
-#     agent = youtube_agent           
+#     agent = youtube_agent
 #     agent.print_response(
 #         "Analyze this video: https://www.youtube.com/watch?v=zjkBMFhNj_g",
 #         stream=True,

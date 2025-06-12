@@ -9,12 +9,14 @@
 ## Getting Started
 
 1. **Fork and clone the repository**
+
    ```bash
    git clone https://github.com/your-username/agent-ui.git
    cd agent-ui
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
@@ -45,11 +47,13 @@ src/
 ## Git Workflow
 
 1. Create a new branch for your feature or bugfix:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 2. Make your changes and commit them:
+
    ```bash
    git add .
    git commit -m "feat: add new feature"
@@ -60,6 +64,7 @@ src/
 ## Testing
 
 Run the test suite:
+
 ```bash
 pnpm test
 ```
@@ -67,6 +72,7 @@ pnpm test
 ## Linting
 
 Check for code style issues:
+
 ```bash
 pnpm lint
 ```
@@ -74,6 +80,7 @@ pnpm lint
 ## Type Checking
 
 Verify TypeScript types:
+
 ```bash
 pnpm type-check
 ```

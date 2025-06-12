@@ -1,15 +1,8 @@
-
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
-from agno.playground import Playground, serve_playground_app
 from agno.storage.sqlite import SqliteStorage
-from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.yfinance import YFinanceTools
-import os
 from dotenv import load_dotenv
-from phoenix.otel import register
-from agno.tools.tavily import TavilyTools
-from agents.web_agent import web_agent
 
 load_dotenv()
 
@@ -25,5 +18,5 @@ finance_agent = Agent(
     add_history_to_messages=True,
     num_history_responses=5,
     markdown=True,
-    debug_mode=True # add the debug in order to send the traces to Phoenix
+    debug_mode=True,  # add the debug in order to send the traces to Phoenix
 )

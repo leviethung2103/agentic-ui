@@ -174,8 +174,9 @@ const Endpoint = () => {
                   <p className="text-xs font-medium text-muted">
                     {isMounted
                       ? truncateText(selectedEndpoint, 21) ||
-                      ENDPOINT_PLACEHOLDER
-                      : process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:7777'}
+                        ENDPOINT_PLACEHOLDER
+                      : process.env.NEXT_PUBLIC_FRONTEND_URL ||
+                        'http://localhost:7777'}
                   </p>
                   <div
                     className={`size-2 shrink-0 rounded-full ${getStatusColor(isEndpointActive)}`}

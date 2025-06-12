@@ -72,9 +72,60 @@ backend/
 
 ## Development
 
-- Format code: `black .`
-- Check code style: `flake8`
-- Run tests: `pytest`
+### Development Setup
+
+1. **Prerequisites**
+
+   - Python 3.8+
+   - pip (Python package manager)
+
+2. **Install Dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Code Formatting**
+   This project uses automated code formatting with pre-commit hooks. To set it up:
+
+   ```bash
+   # Install pre-commit
+   pip install pre-commit
+
+   # Install git hooks
+   pre-commit install
+   ```
+
+   The pre-commit hooks will automatically format your code and check for style issues before each commit.
+
+   To manually run the formatters:
+
+   ```bash
+   # Run all formatters
+   pre-commit run --all-files
+
+   # Run specific formatter (e.g., black)
+   pre-commit run black --all-files
+   ```
+
+### Development Tools
+
+- **Black**: Code formatter
+- **isort**: Import sorter
+- **Flake8**: Linter
+
+### Configuration
+
+- Line length: 120 characters
+- Uses Black's code style with custom configurations
+- Pre-commit hooks for automated formatting
+
+### Contributing
+
+1. Create a new branch for your feature
+2. Make your changes
+3. Run the formatters before committing
+4. Submit a pull request
 
 ## License
 

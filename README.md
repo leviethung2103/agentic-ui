@@ -126,6 +126,7 @@ The default endpoint works with the standard Agno Playground setup described in 
 ## Troubleshooting
 
 ### Port Already in Use
+
 If you encounter a port conflict when starting the backend, you can kill any process using port 7777 with:
 
 ```bash
@@ -141,7 +142,6 @@ This command will silently kill any process running on port 7777, or do nothing 
 - Node.js 18+ and npm/pnpm installed
 - PM2 installed globally: `npm install -g pm2`
 - A VPS with SSH access
-
 
 ### GitHub Actions Deployment
 

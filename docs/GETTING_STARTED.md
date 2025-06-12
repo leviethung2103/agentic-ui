@@ -11,18 +11,21 @@ Before you begin, ensure you have the following installed:
 ## Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-username/agent-ui.git
    cd agent-ui
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Set up environment variables**
    Copy the example environment file and update the values:
+
    ```bash
    cp .env.example .env.local
    ```

@@ -1,18 +1,15 @@
-from agno.agent import Agent
-from agno.models.openai import OpenAIChat
-from agno.playground import Playground, serve_playground_app
-from agno.storage.sqlite import SqliteStorage
-from agno.tools.duckduckgo import DuckDuckGoTools
-from agno.tools.yfinance import YFinanceTools
 import os
+
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 from phoenix.otel import register
-from agno.tools.tavily import TavilyTools
-from agents.web_agent import web_agent
+from serve_playground_app import serve_playground_app
+
 from agents.finance_agent import finance_agent
 from agents.weather_agent import weather_agent
+from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
-from fastapi.middleware.cors import CORSMiddleware
+from playground import Playground
 
 load_dotenv()
 
@@ -21,7 +18,7 @@ agent_storage: str = "tmp/agents.db"
 # Set environment variables for Arize Phoenix
 os.environ["PHOENIX_CLIENT_HEADERS"] = f"api_key={os.getenv('ARIZE_PHOENIX_API_KEY')}"
 os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
-os.environ['ARIZE_PHOENIX_API_KEY'] = os.getenv('ARIZE_PHOENIX_API_KEY')
+os.environ["ARIZE_PHOENIX_API_KEY"] = os.getenv("ARIZE_PHOENIX_API_KEY")
 
 # Configure the Phoenix tracer
 tracer_provider = register(
@@ -38,8 +35,7 @@ tracer_provider = register(
 #     )
 
 
-
-app = Playground(agents=[web_agent, finance_agent,weather_agent,youtube_agent]).get_app()
+app = Playground(agents=[web_agent, finance_agent, weather_agent, youtube_agent]).get_app()
 
 app.add_middleware(
     CORSMiddleware,
@@ -50,5 +46,7 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
-    serve_playground_app("playground:app", host="0.0.0.0", port=7777, reload=True) # reload=True is only for development
+    serve_playground_app(
+        "playground:app", host="0.0.0.0", port=7777, reload=True
+    )  # reload=True is only for development
     # serve_playground_app("playground:app")

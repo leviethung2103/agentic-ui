@@ -12,6 +12,7 @@
 ### 1. Server Setup
 
 1. **Connect to your server**
+
    ```bash
    ssh user@your-server-ip
    ```
@@ -26,12 +27,14 @@
 ### 2. Clone and Configure
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-username/agent-ui.git
    cd agent-ui
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install --prod
    ```
@@ -79,6 +82,7 @@ server {
 This project includes a GitHub Actions workflow for automated deployments. To set it up:
 
 1. Add the following secrets to your GitHub repository:
+
    - `VPS_HOST`: Your server IP
    - `VPS_USER`: SSH username
    - `VPS_SSH_KEY`: Private SSH key for deployment
