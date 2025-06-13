@@ -9,14 +9,14 @@ on:
       - '.github/workflows/deploy.yml'
 
 jobs:
-  deploy:
+  deploy-frontend:
+    name: Deploy Frontend
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Deploy to VPS
+      - name: Deploy Frontend to VPS
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -46,21 +46,21 @@ jobs:
             fi
 
             # Install dependencies
-            echo "Installing dependencies..."
+            echo "Installing frontend dependencies..."
             pnpm install
 
             # Build the application
-            echo "Building application..."
+            echo "Building frontend application..."
             pnpm build
 
             # Stop existing PM2 process if running
             if pm2 describe agent-ui &> /dev/null; then
-              echo "Stopping existing PM2 process..."
+              echo "Stopping existing frontend PM2 process..."
               pm2 delete agent-ui
             fi
 
             # Start the application with PM2
-            echo "Starting application..."
+            echo "Starting frontend application..."
             pm2 start pnpm --name "agent-ui" -- start -H 0.0.0.0
 
             # Save PM2 process list and set up startup
@@ -69,14 +69,52 @@ jobs:
             pm2 startup | tail -n 1 | bash
 
             # Verify the service is running
-            echo "Deployment completed. Current PM2 processes:"
+            echo "Frontend deployment completed. Current PM2 processes:"
             pm2 list
 
+  deploy-backend:
+    name: Deploy Backend
+    needs: deploy-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy Backend to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Make sure the repository exists and is up to date
+            if [ -d "agent-ui" ]; then
+              cd agent-ui
+              git fetch origin
+              git reset --hard origin/main
+              cd ..
+            else
+              echo "Error: Frontend repository not found. Deploy frontend first."
+              exit 1
+            fi
+
             # Set up and start the backend
-            cd backend
-            BACKEND_DIR=$(pwd)
-            uv venv .venv
+            echo "Setting up backend environment..."
+            cd agent-ui/backend
+            
+            # Create virtual environment if it doesn't exist
+            if [ ! -d ".venv" ]; then
+              echo "Creating virtual environment..."
+              uv venv .venv
+            fi
+            
             source .venv/bin/activate
+            
+            # Install Python dependencies
+            echo "Installing Python dependencies..."
             uv pip install -r requirements.txt
 
             # Create logs directory if it doesn't exist
@@ -86,18 +124,97 @@ jobs:
             lsof -ti:7777 | xargs kill -9 2>/dev/null || true
 
             # Start the backend with nohup
-            echo "Starting backend with nohup..."
+            echo "Starting backend service..."
             nohup bash -c "source .venv/bin/activate && python playground.py" > logs/backend.log 2>&1 &
             echo $! > backend.pid
             echo "Backend started with PID $(cat backend.pid)"
-
 
             # Verify the service is running
             sleep 2
             if ps -p $(cat backend.pid) > /dev/null; then
                 echo "Backend is running with PID $(cat backend.pid)"
+                echo "Backend deployment completed successfully."
             else
                 echo "Failed to start backend. Check logs/backend.log for details."
                 tail -n 20 logs/backend.log
+                exit 1
+            fi
+
+  deploy-lightrag-mcp:
+    name: Deploy LightRAG MCP
+    needs: deploy-backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy LightRAG MCP to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Make sure the repository exists and is up to date
+            if [ -d "agent-ui" ]; then
+              cd agent-ui
+              git fetch origin
+              git reset --hard origin/main
+              cd ..
+            else
+              echo "Error: Repository not found."
+              exit 1
+            fi
+
+            # Set up LightRAG MCP Server
+            echo "Setting up LightRAG MCP Server..."
+            cd agent-ui/lightrag-mcp
+            
+            # Create LightRAG virtual environment if it doesn't exist
+            if [ ! -d "../lightrag-venv" ]; then
+              echo "Creating LightRAG virtual environment..."
+              uv venv ../lightrag-venv
+            fi
+            
+            source ../lightrag-venv/bin/activate
+            
+            # Install LightRAG MCP dependencies
+            echo "Installing LightRAG MCP dependencies..."
+            uv pip install -r requirements.txt
+            
+            # Install in development mode
+            echo "Installing LightRAG MCP in development mode..."
+            uv pip install -e .
+            
+            # Copy .env.example to .env if .env doesn't exist
+            if [ ! -f ".env" ]; then
+              echo "Creating .env file from .env.example..."
+              cp .env.example .env
+            fi
+            
+            # Create logs directory if it doesn't exist
+            mkdir -p logs
+            
+            # Stop any existing LightRAG MCP process
+            echo "Stopping any existing LightRAG MCP process..."
+            lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+            
+            # Start LightRAG MCP server with nohup
+            echo "Starting LightRAG MCP server..."
+            nohup bash -c "source ../lightrag-venv/bin/activate && python src/lightrag_mcp/main.py" > logs/lightrag-mcp.log 2>&1 &
+            echo $! > lightrag-mcp.pid
+            echo "LightRAG MCP server started with PID $(cat lightrag-mcp.pid)"
+            
+            # Verify the LightRAG MCP service is running
+            sleep 2
+            if ps -p $(cat lightrag-mcp.pid) > /dev/null; then
+                echo "LightRAG MCP server is running with PID $(cat lightrag-mcp.pid)"
+                echo "LightRAG MCP server setup completed successfully."
+            else
+                echo "Failed to start LightRAG MCP server. Check logs/lightrag-mcp.log for details."
+                tail -n 20 logs/lightrag-mcp.log
                 exit 1
             fi
