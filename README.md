@@ -177,3 +177,33 @@ The default admin account is:
 
 - Email: admin@gmail.com
 - Password: Admin@123
+
+## LightRAG MCP Integration
+
+Agent UI includes integration with LightRAG MCP for enhanced document retrieval and knowledge graph capabilities. The LightRAG MCP server provides a unified interface for interacting with LightRAG API through the MCP protocol.
+
+### Setup
+
+If you prefer to run locally without Docker:
+
+```bash
+# Create a virtual environment
+conda create -n lightrag python=3.10
+conda activate lightrag
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install library
+pip install -e .
+
+# Copy .env.example
+cp .env.example .env
+
+
+# Run server
+# uvicorn src.lightrag_mcp.main:app --host 0.0.0.0 --port 8000
+python src/lightrag_mcp/main.py
+```
+
+For more detailed documentation, refer to the [LightRAG MCP README](./lightrag-mcp/README.md).

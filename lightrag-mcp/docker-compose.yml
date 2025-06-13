@@ -1,0 +1,17 @@
+services:
+  lightrag-mcp:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - LIGHTRAG_API_URL=http://lightrag-api:9621
+    depends_on:
+      - lightrag-api
+
+  lightrag-api:
+    image: lightrag-api:latest  # Replace with your LightRAG API image
+    ports:
+      - "9621:9621"
+    volumes:
+      - ./rag_storage:/app/rag_storage
+      - ./input:/app/input
