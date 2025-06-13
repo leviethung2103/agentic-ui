@@ -173,13 +173,13 @@ jobs:
             echo "Setting up LightRAG MCP Server..."
             cd agent-ui/lightrag-mcp
             
-            # Create LightRAG virtual environment if it doesn't exist
-            if [ ! -d "../lightrag-venv" ]; then
-              echo "Creating LightRAG virtual environment..."
-              uv venv ../lightrag-venv
+            # Create virtual environment if it doesn't exist
+            if [ ! -d ".venv" ]; then
+              echo "Creating virtual environment..."
+              uv venv .venv
             fi
             
-            source ../lightrag-venv/bin/activate
+            source .venv/bin/activate
             
             # Install LightRAG MCP dependencies
             echo "Installing LightRAG MCP dependencies..."
@@ -204,7 +204,7 @@ jobs:
             
             # Start LightRAG MCP server with nohup
             echo "Starting LightRAG MCP server..."
-            nohup bash -c "source ../lightrag-venv/bin/activate && python src/lightrag_mcp/main.py" > logs/lightrag-mcp.log 2>&1 &
+            nohup bash -c "source .venv/bin/activate && python src/lightrag_mcp/main.py" > logs/lightrag-mcp.log 2>&1 &
             echo $! > lightrag-mcp.pid
             echo "LightRAG MCP server started with PID $(cat lightrag-mcp.pid)"
             
