@@ -1,12 +1,14 @@
+import os
+from typing import Any, Dict, List, Optional
+
+import httpx
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.sqlite import SqliteStorage
 from dotenv import load_dotenv
-import httpx
-import os
-from typing import Optional, Dict, Any, List
 
 load_dotenv()
+
 
 class LightRAGTools:
     def __init__(self, base_url: str = None, api_key: str = None):
@@ -17,11 +19,11 @@ class LightRAGTools:
     async def query_documents(self, query: str, top_k: int = 5) -> Dict[str, Any]:
         """
         Query documents from LightRAG MCP server
-        
+
         Args:
             query: The search query
             top_k: Number of results to return
-            
+
         Returns:
             Dict containing the query results
         """
@@ -29,19 +31,13 @@ class LightRAGTools:
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    url,
-                    json={
-                        "query": query,
-                        "top_k": top_k,
-                        "mode": "hybrid"
-                    },
-                    headers=self.headers,
-                    timeout=30.0
+                    url, json={"query": query, "top_k": top_k, "mode": "hybrid"}, headers=self.headers, timeout=30.0
                 )
                 response.raise_for_status()
                 return response.json()
         except Exception as e:
             return {"status": "error", "message": str(e)}
+
 
 agent_storage: str = "tmp/agents.db"
 
