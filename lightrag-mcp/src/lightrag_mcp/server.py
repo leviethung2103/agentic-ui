@@ -4,15 +4,20 @@ Main module for LightRAG MCP server.
 
 import asyncio
 import logging
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Union, cast
 
+import dotenv
 from lightrag_mcp import config
 from lightrag_mcp.lightrag_client import LightRAGClient
 from mcp.server.fastmcp import Context, FastMCP
 from pydantic import Field
+
+dotenv.load_dotenv(override=True)
+
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +81,13 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
         logger.info("LightRAG MCP Server stopped")
 
 
-mcp = FastMCP("LightRAG MCP Server", lifespan=app_lifespan)
+# Configure FastMCP server
+mcp = FastMCP(
+    "LightRAG MCP Server",
+    lifespan=app_lifespan,
+    host=os.getenv("MCP_HOST", "0.0.0.0"),  # Listen on all network interfaces
+    port=int(os.getenv("MCP_PORT", 8000)),  # Default port
+)
 
 
 async def execute_lightrag_operation(operation_name: str, operation_func: Callable, ctx: Context) -> Dict[str, Any]:

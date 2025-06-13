@@ -105,6 +105,13 @@ jobs:
             echo "Setting up backend environment..."
             cd agent-ui/backend
             
+            # Set path to uv
+            export PATH="/root/.local/bin:$PATH"
+            if ! command -v uv &> /dev/null; then
+              echo "Error: uv not found at /root/.local/bin/uv"
+              exit 1
+            fi
+            
             # Create virtual environment if it doesn't exist
             if [ ! -d ".venv" ]; then
               echo "Creating virtual environment..."
@@ -172,6 +179,9 @@ jobs:
             # Set up LightRAG MCP Server
             echo "Setting up LightRAG MCP Server..."
             cd agent-ui/lightrag-mcp
+            
+            # Ensure uv is in PATH
+            export PATH="/root/.local/bin:$PATH"
             
             # Create virtual environment if it doesn't exist
             if [ ! -d ".venv" ]; then
