@@ -2,6 +2,7 @@
 How to run this file:
 1. Run: `python rag_agent_built_in_tool.py` to run the agent
 """
+
 import asyncio
 import os
 
@@ -18,7 +19,7 @@ os.makedirs(tmp_dir, exist_ok=True)
 
 # Create a knowledge base, loaded with documents from a URL
 knowledge_base = LightRagKnowledgeBase(
-    lightrag_server_url=os.environ.get("LIGHTRAG_MCP_URL"),
+    lightrag_server_url=os.environ.get("LIGHTRAG_URL"),
     path=tmp_dir,  # Load documents from a local directory
     # urls=["https://docs.agno.com/introduction/agents.md"],  # Load documents from a URL
 )

@@ -34,7 +34,7 @@ server_host = os.environ.get("SERVER_HOST", "0.0.0.0")
 server_port = int(os.environ.get("SERVER_PORT", "7777"))
 
 # Custom CORS settings
-settings = PlaygroundSettings(cors_origin_list=["https://app.buddyai.online", "http://localhost:3000"])
+settings = PlaygroundSettings(cors_origin_list=cors_origins)
 
 
 async def run_server() -> None:
