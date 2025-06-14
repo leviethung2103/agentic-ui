@@ -14,3 +14,8 @@ opentelemetry-sdk
 opentelemetry-exporter-otlp
 tavily-python
 youtube-transcript-api
+nest-asyncio
+textract
+unstructured
+markdown
+# python -m pip install --upgrade "pip<24.1" -> use for textract
