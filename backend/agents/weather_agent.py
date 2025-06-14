@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-agent_storage: str = "tmp/agents.db"
+agent_storage: str = "storage/weather_agent.db"
 
 # Create agents
 weather_agent = Agent(
@@ -14,7 +14,7 @@ weather_agent = Agent(
     model=OpenAIChat(id="gpt-4.1-nano"),
     tools=[DuckDuckGoTools()],
     instructions=["Always include sources"],
-    storage=SqliteStorage(table_name="web_agent", db_file=agent_storage),
+    storage=SqliteStorage(table_name="weather_agent", db_file=agent_storage),
     add_datetime_to_instructions=True,
     add_history_to_messages=True,
     num_history_responses=5,

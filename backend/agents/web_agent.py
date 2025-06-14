@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-agent_storage: str = "tmp/agents.db"
+agent_storage: str = "storage/web_agent.db"
 
 web_agent = Agent(
     name="Web Agent",
