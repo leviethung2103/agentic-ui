@@ -6,7 +6,6 @@ Create a `.env.local` file in the root directory to override the following envir
 
 ### Required
 
-- `NEXT_PUBLIC_API_URL`: The base URL for your API
 - `NEXT_PUBLIC_AGENT_ID`: The ID of your Agno agent
 
 ### Optional
