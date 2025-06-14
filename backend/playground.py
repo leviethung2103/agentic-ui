@@ -9,7 +9,6 @@ from agents.finance_agent import finance_agent
 from agents.weather_agent import weather_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
-from agents.rag_agent import rag_agent
 
 load_dotenv()
 
@@ -25,7 +24,7 @@ tracer_provider = register(
 )
 
 
-app = Playground(agents=[web_agent, finance_agent, weather_agent, youtube_agent, rag_agent]).get_app()
+app = Playground(agents=[web_agent, finance_agent, weather_agent, youtube_agent]).get_app()
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,6 +35,4 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
-    serve_playground_app(
-        "playground:app", host="0.0.0.0", port=7777, reload=True
-    ) 
+    serve_playground_app("playground:app", host="0.0.0.0", port=7777, reload=True)
