@@ -4,6 +4,7 @@ import nest_asyncio
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.playground import Playground
+from agno.playground.settings import PlaygroundSettings
 from agno.storage.sqlite import SqliteStorage
 from agno.tools.mcp import MCPTools
 
@@ -18,6 +19,9 @@ nest_asyncio.apply()
 agent_storage: str = "storage/rag_agent.db"
 # This is the URL of the MCP server we want to use.
 server_url = "http://160.187.240.79:8000/sse"
+
+# Custom CORS settings
+settings = PlaygroundSettings(cors_origin_list=["https://app.buddyai.online", "http://localhost:3000"])
 
 
 async def run_server() -> None:
@@ -43,11 +47,14 @@ async def run_server() -> None:
         )
 
         # nếu bỏ thêm nhiều agent khác vào thì bị lỗi
-        playground = Playground(agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent])
+        playground = Playground(
+            agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent],
+            settings=settings,
+        )
         app = playground.get_app()
 
         # Serve the app while keeping the MCPTools context manager alive
-        playground.serve(app)
+        playground.serve(app, host="0.0.0.0", port=7777)
 
 
 if __name__ == "__main__":
