@@ -1,11 +1,15 @@
 import asyncio
+import os
 
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.tools.mcp import MCPTools
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # This is the URL of the MCP server we want to use.
-server_url = "http://160.187.240.79:8000/sse"
+server_url = os.environ.get("LIGHTRAG_MCP_URL")
 
 
 async def create_rag_agent() -> Agent:

@@ -32,6 +32,7 @@ jobs:
               cd agent-ui
               git fetch origin
               git reset --hard origin/main
+              git pull origin main
             else
               echo "Cloning repository..."
               git clone ${{ secrets.REPO_URL }} agent-ui

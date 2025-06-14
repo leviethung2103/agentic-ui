@@ -1,23 +1,37 @@
 import asyncio
+import os
 
 import nest_asyncio
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.playground import Playground
+from agno.playground.settings import PlaygroundSettings
 from agno.storage.sqlite import SqliteStorage
 from agno.tools.mcp import MCPTools
+from dotenv import load_dotenv
 
 from agents.finance_agent import finance_agent
 from agents.weather_agent import weather_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
 
+load_dotenv()
+
 # Allow nested event loops
 nest_asyncio.apply()
 
 agent_storage: str = "storage/rag_agent.db"
 # This is the URL of the MCP server we want to use.
-server_url = "http://160.187.240.79:8000/sse"
+server_url = os.environ.get("LIGHTRAG_MCP_URL")
+
+# Custom CORS settings
+cors_origins = os.environ.get("CORS_ORIGINS", "").split(",")
+cors_origins = [origin.strip() for origin in cors_origins if origin.strip()]
+settings = PlaygroundSettings(cors_origin_list=cors_origins)
+
+# Get server configuration from environment variables
+server_host = os.environ.get("SERVER_HOST", "0.0.0.0")
+server_port = int(os.environ.get("SERVER_PORT", "7777"))
 
 
 async def run_server() -> None:
@@ -42,12 +56,14 @@ async def run_server() -> None:
             show_tool_calls=True,
         )
 
-        # nếu bỏ thêm nhiều agent khác vào thì bị lỗi
-        playground = Playground(agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent])
+        playground = Playground(
+            agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent],
+            settings=settings,
+        )
         app = playground.get_app()
 
         # Serve the app while keeping the MCPTools context manager alive
-        playground.serve(app)
+        playground.serve(app, host=server_host, port=server_port)
 
 
 if __name__ == "__main__":

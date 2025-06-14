@@ -17,6 +17,11 @@ os.environ["PHOENIX_CLIENT_HEADERS"] = f"api_key={os.getenv('ARIZE_PHOENIX_API_K
 os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
 os.environ["ARIZE_PHOENIX_API_KEY"] = os.getenv("ARIZE_PHOENIX_API_KEY")
 
+
+# Get server configuration from environment variables
+server_host = os.environ.get("SERVER_HOST", "0.0.0.0")
+server_port = int(os.environ.get("SERVER_PORT", "7777"))
+
 # Configure the Phoenix tracer
 tracer_provider = register(
     project_name="default",  # Default is 'default'
@@ -35,4 +40,4 @@ app.add_middleware(
 )
 
 if __name__ == "__main__":
-    serve_playground_app("playground:app", host="0.0.0.0", port=7777, reload=True)
+    serve_playground_app("playground:app", host=server_host, port=server_port, reload=True)

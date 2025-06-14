@@ -9,13 +9,16 @@ from agno.agent import Agent
 from agno.knowledge.light_rag import LightRagKnowledgeBase, lightrag_retriever
 from agno.models.openai import OpenAIChat
 from agno.storage.sqlite import SqliteStorage
+from dotenv import load_dotenv
+
+load_dotenv()
 
 tmp_dir = "tmp/"
 os.makedirs(tmp_dir, exist_ok=True)
 
 # Create a knowledge base, loaded with documents from a URL
 knowledge_base = LightRagKnowledgeBase(
-    lightrag_server_url="http://160.187.240.79:9621",
+    lightrag_server_url=os.environ.get("LIGHTRAG_MCP_URL"),
     path=tmp_dir,  # Load documents from a local directory
     # urls=["https://docs.agno.com/introduction/agents.md"],  # Load documents from a URL
 )
