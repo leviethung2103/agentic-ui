@@ -1,38 +1,54 @@
-import os
+import asyncio
 
-from agno.playground import Playground, serve_playground_app
-from dotenv import load_dotenv
-from fastapi.middleware.cors import CORSMiddleware
-from phoenix.otel import register
+import nest_asyncio
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.playground import Playground
+from agno.storage.sqlite import SqliteStorage
+from agno.tools.mcp import MCPTools
 
 from agents.finance_agent import finance_agent
 from agents.weather_agent import weather_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
 
-load_dotenv()
+# Allow nested event loops
+nest_asyncio.apply()
 
-# Set environment variables for Arize Phoenix
-os.environ["PHOENIX_CLIENT_HEADERS"] = f"api_key={os.getenv('ARIZE_PHOENIX_API_KEY')}"
-os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
-os.environ["ARIZE_PHOENIX_API_KEY"] = os.getenv("ARIZE_PHOENIX_API_KEY")
-
-# Configure the Phoenix tracer
-tracer_provider = register(
-    project_name="default",  # Default is 'default'
-    auto_instrument=True,  # Automatically use the installed OpenInference instrumentation
-)
+agent_storage: str = "storage/rag_agent.db"
+# This is the URL of the MCP server we want to use.
+server_url = "http://160.187.240.79:8000/sse"
 
 
-app = Playground(agents=[web_agent, finance_agent, weather_agent, youtube_agent]).get_app()
+async def run_server() -> None:
+    """Run the GitHub agent server."""
+    async with MCPTools(transport="sse", url=server_url, timeout_seconds=30) as mcp_tools:
+        rag_agent = Agent(
+            name="rag agent",
+            model=OpenAIChat(id="gpt-4.1-nano"),
+            tools=[mcp_tools],
+            storage=SqliteStorage(table_name="rag_agent", db_file=agent_storage),
+            markdown=True,
+            instructions=[
+                "You are a helpful assistant that can retrieve and analyze documents using the LightRAG system.",
+                "When asked a question, use the available tools to find relevant information.",
+                "Always cite your sources when providing information from the documents.",
+                "If you don't know the answer, say so rather than making up information.",
+                "Be concise and accurate in your responses.",
+                "When using tools, make sure to provide clear and specific queries to get the best results.",
+                "Use the mode=hybrid, top_k=1",
+            ],
+            debug_mode=True,
+            show_tool_calls=True,
+        )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://app.buddyai.online", "http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+        # nếu bỏ thêm nhiều agent khác vào thì bị lỗi
+        playground = Playground(agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent])
+        app = playground.get_app()
+
+        # Serve the app while keeping the MCPTools context manager alive
+        playground.serve(app)
+
 
 if __name__ == "__main__":
-    serve_playground_app("playground:app", host="0.0.0.0", port=7777, reload=True)
+    asyncio.run(run_server())
