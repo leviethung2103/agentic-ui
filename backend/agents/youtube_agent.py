@@ -2,7 +2,13 @@ from textwrap import dedent
 
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
+from agno.storage.sqlite import SqliteStorage
 from agno.tools.youtube import YouTubeTools
+from dotenv import load_dotenv
+
+load_dotenv()
+
+agent_storage: str = "storage/youtube_agent.db"
 
 youtube_agent = Agent(
     name="YouTube Agent",
@@ -50,15 +56,14 @@ youtube_agent = Agent(
     ),
     add_datetime_to_instructions=True,
     markdown=True,
-    #   storage=SqliteStorage(table_name="youtube_agent", db_file="tmp/agents.db"),
+    storage=SqliteStorage(table_name="youtube_agent", db_file=agent_storage),
     debug_mode=True,  # Enable debug mode for tracing
-    #   stream=True  # Enable streaming by default
 )
 
-# # Example usage
-# if __name__ == "__main__":
-#     agent = youtube_agent
-#     agent.print_response(
-#         "Analyze this video: https://www.youtube.com/watch?v=zjkBMFhNj_g",
-#         stream=True,
-#     )
+# Example usage
+if __name__ == "__main__":
+    agent = youtube_agent
+    agent.print_response(
+        "Analyze this video: https://www.youtube.com/watch?v=zjkBMFhNj_g",
+        stream=True,
+    )
