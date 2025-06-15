@@ -15,6 +15,7 @@ opentelemetry-exporter-otlp
 tavily-python
 youtube-transcript-api
 nest-asyncio
+mcp
 # textract
 # unstructured
 # markdown
