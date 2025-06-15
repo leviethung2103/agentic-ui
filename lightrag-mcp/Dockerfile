@@ -7,9 +7,8 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app \
-    PORT=8000 \
-    LIGHTRAG_API_URL=http://host.docker.internal:9621
+    MCP_HOST=0.0.0.0 \
+    MCP_PORT=8000
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -25,11 +24,6 @@ COPY . .
 
 # Install the package in development mode
 RUN pip install -e .
-
-# Copy .env.example to .env if it doesn't exist
-RUN if [ ! -f .env ] && [ -f .env.example ]; then \
-        cp .env.example .env; \
-    fi
 
 # Expose the port the app runs on
 EXPOSE 8000
