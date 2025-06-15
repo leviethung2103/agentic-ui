@@ -1,0 +1,94 @@
+{
+  "monitors": [
+    {
+      "name": "Agent UI Frontend",
+      "type": "http",
+      "target": "http://60.187.240.79:3000",
+      "interval": 60,
+      "retryInterval": 30,
+      "timeout": 10,
+      "httpMethod": "GET",
+      "expectStatus": 200,
+      "tags": ["frontend", "web"]
+    },
+    {
+      "name": "Agent UI Backend",
+      "type": "http",
+      "target": "http://160.187.240.79:7777/docs",
+      "interval": 60,
+      "retryInterval": 30,
+      "timeout": 10,
+      "httpMethod": "GET",
+      "expectStatus": 200,
+      "tags": ["backend", "api"]
+    },
+    {
+      "name": "LightRAG Server",
+      "type": "http",
+      "target": "http://160.187.240.79:8000/health",
+      "interval": 60,
+      "retryInterval": 30,
+      "timeout": 10,
+      "httpMethod": "GET",
+      "expectStatus": 200,
+      "tags": ["lightrag", "api"]
+    },
+    {
+      "name": "LightRAG MCP",
+      "type": "http",
+      "target": "http://160.187.240.79:8080/health",
+      "interval": 60,
+      "retryInterval": 30,
+      "timeout": 10,
+      "httpMethod": "GET",
+      "expectStatus": 200,
+      "tags": ["lightrag", "mcp"]
+    },
+    {
+      "name": "Dozzle",
+      "type": "http",
+      "target": "http://160.187.240.79:8080",
+      "interval": 60,
+      "retryInterval": 30,
+      "timeout": 10,
+      "httpMethod": "GET",
+      "expectStatus": 200,
+      "tags": ["monitoring", "logs"]
+    },
+    {
+      "name": "Uptime Kuma Self-Check",
+      "type": "http",
+      "target": "http://160.187.240.79:3001",
+      "interval": 60,
+      "retryInterval": 30,
+      "timeout": 10,
+      "httpMethod": "GET",
+      "expectStatus": 200,
+      "tags": ["monitoring", "self-check"]
+    }
+  ],
+  "notifications": [
+    {
+      "type": "smtp",
+      "name": "Gmail Alerts",
+      "host": "smtp.gmail.com",
+      "port": 587,
+      "secure": false,
+      "ignoreTLS": false,
+      "username": "bot.assisstant.hung@gmail.com",
+      "password": "Danang@123",
+      "from": "Uptime Kuma <bot.assisstant.hung@gmail.com>",
+      "to": "leviethung1280@gmail.com",
+      "disableTLS": false,
+      "disableTLSCheck": false,
+      "rejectUnauthorized": true,
+      "notificationTypesByService": {
+        "0": true,
+        "1": true,
+        "2": true,
+        "3": true
+      },
+      "isDefault": true
+    }
+  ]
+}

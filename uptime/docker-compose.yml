@@ -9,3 +9,4 @@ services:
       - "3001:3001"
     volumes:
       - ./data:/app/data
+      - ./config.json:/app/config.json
