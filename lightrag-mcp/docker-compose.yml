@@ -1,5 +1,6 @@
 services:
   lightrag-mcp:
+    container_name: agentic-lightrag-mcp
     image: agentic-ui:lightrag-mcp
     build: .
     ports:
