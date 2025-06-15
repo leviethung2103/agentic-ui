@@ -1,6 +1,6 @@
 services:
   lightrag-mcp:
-    container_name: lightrag-mcp
+    image: agentic-ui:lightrag-mcp
     build: .
     ports:
       - "${MCP_PORT:-8000}:8000"

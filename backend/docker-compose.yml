@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    image: agentic-ui:backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentic-ui-backend
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-7777}:7777"
+    volumes:
+      - .:/app
+      - ./storage:/app/storage
+      - ./tmp:/app/tmp
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - SERVER_HOST=${SERVER_HOST:-0.0.0.0}
+      - SERVER_PORT=${SERVER_PORT:-7777}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ARIZE_PHOENIX_API_KEY=${ARIZE_PHOENIX_API_KEY:-}
+      - TAVILY_API_KEY=${TAVILY_API_KEY:-}
+      - LIGHTRAG_MCP_URL=${LIGHTRAG_MCP_URL:-http://lightrag-mcp:8000}

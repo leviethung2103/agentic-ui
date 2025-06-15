@@ -1,6 +1,6 @@
 services:
   lightrag:
-    container_name: agentic-lightrag
+    container_name: agentic-lightrag-api
     image: ghcr.io/hkuds/lightrag:latest
     build:
       context: .

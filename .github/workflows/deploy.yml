@@ -73,7 +73,48 @@ jobs:
             echo "Frontend deployment completed. Current PM2 processes:"
             pm2 list
 
+  deploy-backend-docker:
+    name: Deploy Backend Docker
+    needs: deploy-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy Backend to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Make sure the repository exists and is up to date
+            if [ -d "agent-ui" ]; then
+              cd agent-ui
+              git fetch origin
+              git reset --hard origin/main
+              cd ..
+            else
+              echo "Error: Frontend repository not found. Deploy frontend first."
+              exit 1
+            fi
+
+            # Set up and start the backend
+            echo "Setting up backend environment..."
+            cd agent-ui/backend
+            
+            # Stop any existing process using the same port if needed
+            lsof -ti:7777 | xargs kill -9 2>/dev/null || true
+
+            # Build and run the backend
+            echo "Building and running backend..."
+            docker compose up -d
+
   deploy-backend:
+    if: false
     name: Deploy Backend
     needs: deploy-frontend
     runs-on: ubuntu-latest
@@ -148,6 +189,46 @@ jobs:
                 exit 1
             fi
 
+  deploy-lighrag-server-docker:
+    name: Deploy LightRAG Server Docker
+    needs: deploy-backend-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy LightRAG Server to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Make sure the repository exists and is up to date
+            if [ -d "agent-ui" ]; then
+              cd agent-ui
+              git fetch origin
+              git reset --hard origin/main
+              cd ..
+            else
+              echo "Error: Frontend repository not found. Deploy frontend first."
+              exit 1
+            fi
+
+            # Set up and start the backend
+            echo "Setting up backend environment..."
+            cd agent-ui/lighrag-server
+            
+            # Stop any existing process using the same port if needed
+            lsof -ti:9621 | xargs kill -9 2>/dev/null || true
+
+            # Build and run the backend
+            echo "Building and running backend..."
+            docker compose up -d
+
   deploy-lighrag-server:
     name: Deploy LightRAG Server
     needs: deploy-backend
@@ -198,7 +279,49 @@ jobs:
             
             echo "LightRAG Server deployment completed successfully!"
 
+  deploy-lightrag-mcp-docker:
+    name: Deploy LightRAG MCP Docker
+    needs: deploy-backend-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy LightRAG MCP to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Make sure the repository exists and is up to date
+            if [ -d "agent-ui" ]; then
+              cd agent-ui
+              git fetch origin
+              git reset --hard origin/main
+              cd ..
+            else
+              echo "Error: Repository not found."
+              exit 1
+            fi
+
+            # Set up LightRAG MCP Server
+            echo "Setting up LightRAG MCP Server..."
+            cd agent-ui/lighrag-mcp
+            
+            # Stop any existing process using the same port if needed
+            lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+
+            # Build and run the backend
+            echo "Building and running backend..."
+            docker compose up -d
+
+
   deploy-lightrag-mcp:
+    if: false
     name: Deploy LightRAG MCP
     needs: deploy-backend
     runs-on: ubuntu-latest
