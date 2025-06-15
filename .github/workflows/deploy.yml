@@ -310,7 +310,7 @@ jobs:
 
             # Set up LightRAG MCP Server
             echo "Setting up LightRAG MCP Server..."
-            cd agent-ui/lighrag-mcp
+            cd agent-ui/lightrag-mcp
             
             # Stop any existing process using the same port if needed
             lsof -ti:8000 | xargs kill -9 2>/dev/null || true
