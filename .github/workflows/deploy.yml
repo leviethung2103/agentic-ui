@@ -319,7 +319,6 @@ jobs:
             echo "Building and running backend..."
             docker compose up -d --build
 
-
   deploy-lightrag-mcp:
     if: false
     name: Deploy LightRAG MCP
@@ -402,3 +401,87 @@ jobs:
                 tail -n 20 logs/lightrag-mcp.log
                 exit 1
             fi
+
+  deploy-dozzle:
+    name: Deploy Dozzle
+    needs: [deploy-backend-docker, deploy-lighrag-server-docker, deploy-lightrag-mcp-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy Dozzle to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Make sure the repository exists
+            if [ ! -d "agent-ui" ]; then
+              echo "Error: Repository not found."
+              exit 1
+            fi
+
+            # Navigate to dozzle directory
+            cd agent-ui/dozzle
+
+            # Stop and remove existing container if it exists
+            if [ "$(docker ps -aq -f name=dozzle)" ]; then
+              echo "Stopping and removing existing Dozzle container..."
+              docker stop dozzle || true
+              docker rm dozzle || true
+            fi
+
+            # Start Dozzle container
+            echo "Starting Dozzle container..."
+            docker compose up -d --build
+
+            echo "Dozzle has been deployed successfully!"
+            echo "Access Dozzle at: http://${{ secrets.VPS_HOST }}:8080"
+  deploy-uptime-kuma:
+    name: Deploy Uptime Kuma
+    needs: deploy-dozzle  # Run after dozzle is deployed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy Uptime Kuma to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Make sure the repository exists
+            if [ ! -d "agent-ui" ]; then
+              echo "Error: Repository not found."
+              exit 1
+            fi
+
+            # Navigate to uptime directory
+            cd agent-ui/uptime
+
+            # Create data directory if it doesn't exist
+            mkdir -p data
+
+            # Stop and remove existing container if it exists
+            if [ "$(docker ps -aq -f name=uptime-kuma)" ]; then
+              echo "Stopping and removing existing Uptime Kuma container..."
+              docker stop uptime-kuma || true
+              docker rm uptime-kuma || true
+            fi
+
+            # Start Uptime Kuma container
+            echo "Starting Uptime Kuma container..."
+            docker compose up -d --build
+
+            echo "Uptime Kuma has been deployed successfully!"
+            echo "Access Uptime Kuma at: http://${{ secrets.VPS_HOST }}:3001"

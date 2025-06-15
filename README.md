@@ -14,9 +14,36 @@ A modern chat interface for AI agents built with Next.js, Tailwind CSS, and Type
 - 🎨 **Customizable UI**: Built with Tailwind CSS for easy styling
 - 🧰 **Built with Modern Stack**: Next.js, TypeScript, shadcn/ui, Framer Motion, and more
 
-## Monitoring
+## Monitoring Agents
 
 - [Phoenix Arize Projects Dashboard](https://app.phoenix.arize.com/projects) - Monitor and analyze your AI agent's performance, traces, and metrics in real-time.
+
+## Monitoring Tools
+
+This project includes two essential monitoring tools to help you keep track of your services:
+
+### Dozzle
+
+Dozzle is a lightweight, real-time log viewer for Docker containers. It provides a web interface to monitor your container logs.
+
+- **Access URL**: `http://your-vps-ip:8080`
+- **Features**:
+  - Real-time log streaming
+  - Search and filter logs
+  - Color-coded logs for better readability
+  - Support for multiple containers
+
+### Uptime Kuma
+
+Uptime Kuma is a self-hosted monitoring tool that helps you monitor the uptime of your services.
+
+- **Access URL**: `http://your-vps-ip:3001`
+- **Features**:
+  - Monitor HTTP(s) services
+  - Get notifications (Email, Telegram, Discord, etc.)
+  - Beautiful status pages
+  - Response time monitoring
+  - Certificate expiration monitoring
 
 ## Getting Started
 
