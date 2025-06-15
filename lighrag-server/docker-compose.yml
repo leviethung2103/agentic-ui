@@ -1,12 +1,10 @@
 services:
   lightrag:
     container_name: agentic-lightrag-api
-    image: ghcr.io/hkuds/lightrag:latest
+    image: agentic-ui:lighrag-api
     build:
       context: .
       dockerfile: Dockerfile
-      tags:
-        - ghcr.io/hkuds/lightrag:latest
     ports:
       - "${PORT:-9621}:9621"
     volumes:
