@@ -50,3 +50,4 @@ next-env.d.ts
 lighrag-server/.env*
 backend/storage
 backend/tmp
+lighrag-server/data

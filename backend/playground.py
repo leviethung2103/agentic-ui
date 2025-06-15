@@ -49,11 +49,11 @@ async def run_server() -> None:
             instructions=[
                 "You are a helpful assistant that can retrieve and analyze documents using the LightRAG system.",
                 "When asked a question, use the available tools to find relevant information.",
-                "Always cite your sources when providing information from the documents.",
                 "If you don't know the answer, say so rather than making up information.",
                 "Be concise and accurate in your responses.",
                 "When using tools, make sure to provide clear and specific queries to get the best results.",
                 "Use the mode=hybrid, top_k=1",
+                "Always include sources or references at the end of your answer in markdown format.",
             ],
             debug_mode=True,
             show_tool_calls=True,
