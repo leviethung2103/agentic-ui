@@ -51,3 +51,4 @@ lighrag-server/.env*
 backend/storage
 backend/tmp
 lighrag-server/data
+uptime/data
