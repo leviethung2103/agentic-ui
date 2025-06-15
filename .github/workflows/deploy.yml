@@ -115,7 +115,7 @@ jobs:
 
             # Clean up unused Docker resources (excluding volumes)
             echo "Cleaning up unused Docker resources..."
-            docker system prune -af || true
+            docker system prune -f || true
 
   deploy-backend:
     if: false
@@ -235,7 +235,7 @@ jobs:
 
             # Clean up unused Docker resources (excluding volumes)
             echo "Cleaning up unused Docker resources..."
-            docker system prune -af || true
+            docker system prune -f || true
 
   deploy-lighrag-server:
     name: Deploy LightRAG Server
@@ -289,7 +289,7 @@ jobs:
 
             # Clean up unused Docker resources (excluding volumes)
             echo "Cleaning up unused Docker resources..."
-            docker system prune -af || true
+            docker system prune -f || true
 
   deploy-lightrag-mcp-docker:
     name: Deploy LightRAG MCP Docker
@@ -333,7 +333,7 @@ jobs:
 
             # Clean up unused Docker resources (excluding volumes)
             echo "Cleaning up unused Docker resources..."
-            docker system prune -af || true
+            docker system prune -f || true
 
   deploy-lightrag-mcp:
     if: false
@@ -458,7 +458,7 @@ jobs:
 
             # Clean up unused Docker resources (excluding volumes)
             echo "Cleaning up unused Docker resources..."
-            docker system prune -af || true
+            docker system prune -f || true
 
             echo "Dozzle has been deployed successfully!"
             echo "Access Dozzle at: http://${{ secrets.VPS_HOST }}:8080"
@@ -505,7 +505,7 @@ jobs:
 
             # Clean up unused Docker resources (excluding volumes)
             echo "Cleaning up unused Docker resources..."
-            docker system prune -af || true
+            docker system prune -f || true
 
             echo "Uptime Kuma has been deployed successfully!"
             echo "Access Uptime Kuma at: http://${{ secrets.VPS_HOST }}:3001"
