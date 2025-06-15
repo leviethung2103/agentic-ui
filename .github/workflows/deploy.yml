@@ -111,7 +111,7 @@ jobs:
 
             # Build and run the backend
             echo "Building and running backend..."
-            docker compose up -d
+            docker compose up -d --build
 
   deploy-backend:
     if: false
@@ -227,7 +227,7 @@ jobs:
 
             # Build and run the backend
             echo "Building and running backend..."
-            docker compose up -d
+            docker compose up -d --build
 
   deploy-lighrag-server:
     name: Deploy LightRAG Server
@@ -317,7 +317,7 @@ jobs:
 
             # Build and run the backend
             echo "Building and running backend..."
-            docker compose up -d
+            docker compose up -d --build
 
 
   deploy-lightrag-mcp:
