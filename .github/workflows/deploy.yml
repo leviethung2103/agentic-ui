@@ -194,9 +194,9 @@ jobs:
             
             # Start new container
             echo "Starting new LightRAG container..."
-            docker-compose -f docker-compose.yml up -d
+            docker compose down && docker compose up -d
             
-            echo "Deployment completed successfully!"
+            echo "LightRAG Server deployment completed successfully!"
 
   deploy-lightrag-mcp:
     name: Deploy LightRAG MCP
