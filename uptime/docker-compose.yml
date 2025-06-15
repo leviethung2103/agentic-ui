@@ -3,7 +3,7 @@ version: '3.8'
 services:
   uptime-kuma:
     image: louislam/uptime-kuma:latest
-    container_name: uptime-kuma
+    container_name: agentic-ui-uptime-kuma
     restart: unless-stopped
     ports:
       - "3001:3001"
