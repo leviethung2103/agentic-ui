@@ -118,7 +118,11 @@ const HorizontalRule = ({ className, ...props }: HorizontalRuleProps) => (
   />
 )
 
-const InlineCode: FC<PreparedTextProps> = ({ children, className, ...props }) => {
+const InlineCode: FC<PreparedTextProps> = ({
+  children,
+  className,
+  ...props
+}) => {
   // If this is a code block (has className), render it differently
   if (className) {
     return (
@@ -129,7 +133,7 @@ const InlineCode: FC<PreparedTextProps> = ({ children, className, ...props }) =>
       </pre>
     )
   }
-  
+
   // Inline code
   return (
     <code className="relative whitespace-pre-wrap rounded-sm bg-background-secondary/50 p-1">
@@ -277,17 +281,25 @@ const Pre: FC<CodeBlockProps> = ({ children }) => {
   if (!children || typeof children !== 'object' || !('props' in children)) {
     return <div className="my-4">{children}</div>
   }
-  
-  const childrenProps = children.props as { children?: React.ReactNode[] | React.ReactNode }
-  const childrenArray = Array.isArray(childrenProps.children) 
-    ? childrenProps.children 
-    : childrenProps.children ? [childrenProps.children] : []
-  
-  const codeElement = childrenArray[0] as React.ReactElement<CodeProps> | undefined
-  const code = typeof codeElement?.props?.children === 'string' 
-    ? codeElement.props.children 
-    : ''
-  const language = codeElement?.props?.className?.replace('language-', '') || 'text'
+
+  const childrenProps = children.props as {
+    children?: React.ReactNode[] | React.ReactNode
+  }
+  const childrenArray = Array.isArray(childrenProps.children)
+    ? childrenProps.children
+    : childrenProps.children
+      ? [childrenProps.children]
+      : []
+
+  const codeElement = childrenArray[0] as
+    | React.ReactElement<CodeProps>
+    | undefined
+  const code =
+    typeof codeElement?.props?.children === 'string'
+      ? codeElement.props.children
+      : ''
+  const language =
+    codeElement?.props?.className?.replace('language-', '') || 'text'
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(code)
@@ -295,23 +307,31 @@ const Pre: FC<CodeBlockProps> = ({ children }) => {
 
   return (
     <div className="my-4 rounded-lg bg-gray-900">
-      <div className="flex items-center justify-between bg-gray-800 px-4 py-2 text-xs text-gray-300 rounded-t-lg">
+      <div className="flex items-center justify-between rounded-t-lg bg-gray-800 px-4 py-2 text-xs text-gray-300">
         <span className="uppercase">{language}</span>
-        <button 
+        <button
           onClick={copyToClipboard}
-          className="flex items-center gap-1 hover:text-white transition-colors"
+          className="flex items-center gap-1 transition-colors hover:text-white"
           title="Copy to clipboard"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
           Copy
         </button>
       </div>
-      <div className="p-4 overflow-x-auto">
-        {children}
-      </div>
+      <div className="overflow-x-auto p-4">{children}</div>
     </div>
   )
 }

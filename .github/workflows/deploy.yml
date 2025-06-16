@@ -106,7 +106,7 @@ jobs:
             # Set up and start the backend
             echo "Setting up backend environment..."
             cd agent-ui/backend
-            
+
             # Stop any existing process using the same port if needed
             lsof -ti:7777 | xargs kill -9 2>/dev/null || true
 
@@ -150,22 +150,22 @@ jobs:
             # Set up and start the backend
             echo "Setting up backend environment..."
             cd agent-ui/backend
-            
+
             # Set path to uv
             export PATH="/root/.local/bin:$PATH"
             if ! command -v uv &> /dev/null; then
               echo "Error: uv not found at /root/.local/bin/uv"
               exit 1
             fi
-            
+
             # Create virtual environment if it doesn't exist
             if [ ! -d ".venv" ]; then
               echo "Creating virtual environment..."
               uv venv .venv
             fi
-            
+
             source .venv/bin/activate
-            
+
             # Install Python dependencies
             echo "Installing Python dependencies..."
             uv pip install -r requirements.txt
@@ -225,7 +225,7 @@ jobs:
             # Set up and start the backend
             echo "Setting up backend environment..."
             cd agent-ui/lighrag-server
-            
+
             # Stop any existing process using the same port if needed
             lsof -ti:9621 | xargs kill -9 2>/dev/null || true
 
@@ -273,18 +273,18 @@ jobs:
             # Create necessary directories
             mkdir -p ./data/rag_storage
             mkdir -p ./data/inputs
-            
+
             # Stop and remove existing container if it exists
             if [ "$(docker ps -aq -f name=agentic-lighrag)" ]; then
               echo "Stopping and removing existing container..."
               docker stop agentic-lighrag || true
               docker rm agentic-lighrag || true
             fi
-            
+
             # Start new container
             echo "Starting new LightRAG container..."
             docker compose down && docker compose up -d
-            
+
             echo "LightRAG Server deployment completed successfully!"
 
             # Clean up unused Docker resources (excluding volumes)
@@ -323,7 +323,7 @@ jobs:
             # Set up LightRAG MCP Server
             echo "Setting up LightRAG MCP Server..."
             cd agent-ui/lightrag-mcp
-            
+
             # Stop any existing process using the same port if needed
             lsof -ti:8000 | xargs kill -9 2>/dev/null || true
 
@@ -368,45 +368,45 @@ jobs:
             # Set up LightRAG MCP Server
             echo "Setting up LightRAG MCP Server..."
             cd agent-ui/lightrag-mcp
-            
+
             # Ensure uv is in PATH
             export PATH="/root/.local/bin:$PATH"
-            
+
             # Create virtual environment if it doesn't exist
             if [ ! -d ".venv" ]; then
               echo "Creating virtual environment..."
               uv venv .venv
             fi
-            
+
             source .venv/bin/activate
-            
+
             # Install LightRAG MCP dependencies
             echo "Installing LightRAG MCP dependencies..."
             uv pip install -r requirements.txt
-            
+
             # Install in development mode
             echo "Installing LightRAG MCP in development mode..."
             uv pip install -e .
-            
+
             # Copy .env.example to .env if .env doesn't exist
             if [ ! -f ".env" ]; then
               echo "Creating .env file from .env.example..."
               cp .env.example .env
             fi
-            
+
             # Create logs directory if it doesn't exist
             mkdir -p logs
-            
+
             # Stop any existing LightRAG MCP process
             echo "Stopping any existing LightRAG MCP process..."
             lsof -ti:8000 | xargs kill -9 2>/dev/null || true
-            
+
             # Start LightRAG MCP server with nohup
             echo "Starting LightRAG MCP server..."
             nohup bash -c "source .venv/bin/activate && python src/lightrag_mcp/main.py" > logs/lightrag-mcp.log 2>&1 &
             echo $! > lightrag-mcp.pid
             echo "LightRAG MCP server started with PID $(cat lightrag-mcp.pid)"
-            
+
             # Verify the LightRAG MCP service is running
             sleep 2
             if ps -p $(cat lightrag-mcp.pid) > /dev/null; then
@@ -420,7 +420,12 @@ jobs:
 
   deploy-dozzle:
     name: Deploy Dozzle
-    needs: [deploy-backend-docker, deploy-lighrag-server-docker, deploy-lightrag-mcp-docker]
+    needs:
+      [
+        deploy-backend-docker,
+        deploy-lighrag-server-docker,
+        deploy-lightrag-mcp-docker
+      ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -464,7 +469,7 @@ jobs:
             echo "Access Dozzle at: http://${{ secrets.VPS_HOST }}:8080"
   deploy-uptime-kuma:
     name: Deploy Uptime Kuma
-    needs: deploy-dozzle  # Run after dozzle is deployed
+    needs: deploy-dozzle # Run after dozzle is deployed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

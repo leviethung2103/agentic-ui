@@ -12,13 +12,13 @@ The LightRAG Server is designed to provide a Web UI and API support. The Web UI 
 
 ### Installation
 
-* Install from PyPI
+- Install from PyPI
 
 ```bash
 pip install "lightrag-hku[api]"
 ```
 
-* Installation from Source
+- Installation from Source
 
 ```bash
 # Clone the repository
@@ -36,10 +36,10 @@ pip install -e ".[api]"
 
 LightRAG necessitates the integration of both an LLM (Large Language Model) and an Embedding Model to effectively execute document indexing and querying operations. Prior to the initial deployment of the LightRAG server, it is essential to configure the settings for both the LLM and the Embedding Model. LightRAG supports binding to various LLM/Embedding backends:
 
-* ollama
-* lollms
-* openai or openai compatible
-* azure_openai
+- ollama
+- lollms
+- openai or openai compatible
+- azure_openai
 
 It is recommended to use environment variables to configure the LightRAG Server. There is an example environment variable file named `env.example` in the root directory of the project. Please copy this file to the startup directory and rename it to `.env`. After that, you can modify the parameters related to the LLM and Embedding models in the `.env` file. It is important to note that the LightRAG Server will load the environment variables from `.env` into the system environment variables each time it starts. **LightRAG Server will prioritize the settings in the system environment variables to .env file**.
 
@@ -47,7 +47,7 @@ It is recommended to use environment variables to configure the LightRAG Server.
 
 Here are some examples of common settings for LLM and Embedding models:
 
-* OpenAI LLM + Ollama Embedding:
+- OpenAI LLM + Ollama Embedding:
 
 ```
 LLM_BINDING=openai
@@ -64,7 +64,7 @@ EMBEDDING_DIM=1024
 # EMBEDDING_BINDING_API_KEY=your_api_key
 ```
 
-* Ollama LLM + Ollama Embedding:
+- Ollama LLM + Ollama Embedding:
 
 ```
 LLM_BINDING=ollama
@@ -84,16 +84,19 @@ EMBEDDING_DIM=1024
 ### Starting LightRAG Server
 
 The LightRAG Server supports two operational modes:
-* The simple and efficient Uvicorn mode:
+
+- The simple and efficient Uvicorn mode:
 
 ```
 lightrag-server
 ```
-* The multiprocess Gunicorn + Uvicorn mode (production mode, not supported on Windows environments):
+
+- The multiprocess Gunicorn + Uvicorn mode (production mode, not supported on Windows environments):
 
 ```
 lightrag-gunicorn --workers 4
 ```
+
 The `.env` file **must be placed in the startup directory**.
 
 Upon launching, the LightRAG Server will create a documents directory (default is `./inputs`) and a data directory (default is `./rag_storage`). This allows you to initiate multiple instances of LightRAG Server from different directories, with each instance configured to listen on a distinct network port.
@@ -107,20 +110,22 @@ Here are some commonly used startup parameters:
 - `--input-dir`: Specifying the directory to scan for documents (default: ./inputs)
 
 > - The requirement for the .env file to be in the startup directory is intentionally designed this way. The purpose is to support users in launching multiple LightRAG instances simultaneously, allowing different .env files for different instances.
-> - **After changing the .env file, you need to open a new terminal to make  the new settings take effect.** This because the LightRAG Server will load the environment variables from .env into the system environment variables each time it starts, and LightRAG Server will prioritize the settings in the system environment variables.
+> - **After changing the .env file, you need to open a new terminal to make the new settings take effect.** This because the LightRAG Server will load the environment variables from .env into the system environment variables each time it starts, and LightRAG Server will prioritize the settings in the system environment variables.
 
 ### Launching LightRAG Server with Docker
 
-* Clone the repository:
+- Clone the repository:
+
 ```shell
 git clone https://github.com/HKUDS/LightRAG.git
 cd LightRAG
 ```
 
-* Prepare the .env file:
-    Create a personalized .env file from sample file `env.example`. Configure the LLM and embedding parameters according to your requirements.
+- Prepare the .env file:
+  Create a personalized .env file from sample file `env.example`. Configure the LLM and embedding parameters according to your requirements.
 
-* Start the LightRAG Server using the following commands:
+- Start the LightRAG Server using the following commands:
+
 ```shell
 docker compose up
 # Use --build if you have pulled a new version
@@ -129,15 +134,14 @@ docker compose up --build
 
 ### Deploying LightRAG Server with docker without cloneing the repository
 
-* Create a working folder for LightRAG Server:
+- Create a working folder for LightRAG Server:
 
 ```shell
 mkdir lightrag
 cd lightrag
 ```
 
-* Create a docker compose file named docker-compose.yml:
-
+- Create a docker compose file named docker-compose.yml:
 
 ```yaml
 services:
@@ -145,7 +149,7 @@ services:
     container_name: lightrag
     image: ghcr.io/hkuds/lightrag:latest
     ports:
-      - "${PORT:-9621}:9621"
+      - '${PORT:-9621}:9621'
     volumes:
       - ./data/rag_storage:/app/data/rag_storage
       - ./data/inputs:/app/data/inputs
@@ -155,17 +159,19 @@ services:
       - .env
     restart: unless-stopped
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
 ```
-* Prepare the .env file:
-    Create a personalized .env file from sample file `env.example`. Configure the LLM and embedding parameters according to your requirements.
 
-* Start the LightRAG Server using the following commands:
+- Prepare the .env file:
+  Create a personalized .env file from sample file `env.example`. Configure the LLM and embedding parameters according to your requirements.
+
+- Start the LightRAG Server using the following commands:
+
 ```shell
 docker compose up
 ```
 
-> Historical versions of LightRAG docker images can be found here: [LightRAG Docker Images]( https://github.com/HKUDS/LightRAG/pkgs/container/lightrag)
+> Historical versions of LightRAG docker images can be found here: [LightRAG Docker Images](https://github.com/HKUDS/LightRAG/pkgs/container/lightrag)
 
 ### Auto scan on startup
 
@@ -276,7 +282,7 @@ When using LightRAG for content queries, avoid combining the search process with
 
 By default, the LightRAG Server can be accessed without any authentication. We can configure the server with an API Key or account credentials to secure it.
 
-* API Key:
+- API Key:
 
 ```
 LIGHTRAG_API_KEY=your-secure-api-key-here
@@ -285,7 +291,7 @@ WHITELIST_PATHS=/health,/api/*
 
 > Health check and Ollama emulation endpoints are excluded from API Key check by default.
 
-* Account credentials (the Web UI requires login before access can be granted):
+- Account credentials (the Web UI requires login before access can be granted):
 
 LightRAG API Server implements JWT-based authentication using the HS256 algorithm. To enable secure access control, the following environment variables are required:
 
@@ -340,9 +346,9 @@ EMBEDDING_MODEL=your-embedding-deployment-name
 
 The API Server can be configured in three ways (highest priority first):
 
-* Command line arguments
-* Environment variables or .env file
-* Config.ini (Only for storage configuration)
+- Command line arguments
+- Environment variables or .env file
+- Config.ini (Only for storage configuration)
 
 Most of the configurations come with default settings; check out the details in the sample file: `.env.example`. Data storage configuration can also be set by config.ini. A sample file `config.ini.example` is provided for your convenience.
 
@@ -350,15 +356,16 @@ Most of the configurations come with default settings; check out the details in 
 
 LightRAG supports binding to various LLM/Embedding backends:
 
-* ollama
-* lollms
-* openai & openai compatible
-* azure_openai
+- ollama
+- lollms
+- openai & openai compatible
+- azure_openai
 
 Use environment variables `LLM_BINDING` or CLI argument `--llm-binding` to select the LLM backend type. Use environment variables `EMBEDDING_BINDING` or CLI argument `--embedding-binding` to select the Embedding backend type.
 
 ### Entity Extraction Configuration
-* ENABLE_LLM_CACHE_FOR_EXTRACT: Enable LLM cache for entity extraction (default: true)
+
+- ENABLE_LLM_CACHE_FOR_EXTRACT: Enable LLM cache for entity extraction (default: true)
 
 It's very common to set `ENABLE_LLM_CACHE_FOR_EXTRACT` to true for a test environment to reduce the cost of LLM calls.
 
@@ -366,14 +373,14 @@ It's very common to set `ENABLE_LLM_CACHE_FOR_EXTRACT` to true for a test enviro
 
 LightRAG uses 4 types of storage for different purposes:
 
-* KV_STORAGE: llm response cache, text chunks, document information
-* VECTOR_STORAGE: entities vectors, relation vectors, chunks vectors
-* GRAPH_STORAGE: entity relation graph
-* DOC_STATUS_STORAGE: document indexing status
+- KV_STORAGE: llm response cache, text chunks, document information
+- VECTOR_STORAGE: entities vectors, relation vectors, chunks vectors
+- GRAPH_STORAGE: entity relation graph
+- DOC_STATUS_STORAGE: document indexing status
 
 Each storage type has several implementations:
 
-* KV_STORAGE supported implementations:
+- KV_STORAGE supported implementations:
 
 ```
 JsonKVStorage    JsonFile (default)
@@ -382,7 +389,7 @@ RedisKVStorage   Redis
 MongoKVStorage   MongoDB
 ```
 
-* GRAPH_STORAGE supported implementations:
+- GRAPH_STORAGE supported implementations:
 
 ```
 NetworkXStorage      NetworkX (default)
@@ -392,7 +399,7 @@ PGGraphStorage       PostgreSQL with AGE plugin
 
 > Testing has shown that Neo4J delivers superior performance in production environments compared to PostgreSQL with AGE plugin.
 
-* VECTOR_STORAGE supported implementations:
+- VECTOR_STORAGE supported implementations:
 
 ```
 NanoVectorDBStorage         NanoVector (default)
@@ -404,7 +411,7 @@ QdrantVectorDBStorage       Qdrant
 MongoVectorDBStorage        MongoDB
 ```
 
-* DOC_STATUS_STORAGE: supported implementations:
+- DOC_STATUS_STORAGE: supported implementations:
 
 ```
 JsonDocStatusStorage        JsonFile (default)
@@ -427,26 +434,26 @@ You cannot change storage implementation selection after adding documents to Lig
 
 ### LightRAG API Server Command Line Options
 
-| Parameter             | Default       | Description                                                                                                                     |
-| --------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| --host                | 0.0.0.0       | Server host                                                                                                                     |
-| --port                | 9621          | Server port                                                                                                                     |
-| --working-dir         | ./rag_storage | Working directory for RAG storage                                                                                               |
-| --input-dir           | ./inputs      | Directory containing input documents                                                                                            |
-| --max-async           | 4             | Maximum number of async operations                                                                                              |
-| --max-tokens          | 32768         | Maximum token size                                                                                                              |
-| --timeout             | 150           | Timeout in seconds. None for infinite timeout (not recommended)                                                                 |
-| --log-level           | INFO          | Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)                                                                           |
-| --verbose             | -             | Verbose debug output (True, False)                                                                                              |
-| --key                 | None          | API key for authentication. Protects the LightRAG server against unauthorized access                                            |
-| --ssl                 | False         | Enable HTTPS                                                                                                                    |
-| --ssl-certfile        | None          | Path to SSL certificate file (required if --ssl is enabled)                                                                     |
-| --ssl-keyfile         | None          | Path to SSL private key file (required if --ssl is enabled)                                                                     |
-| --top-k               | 50            | Number of top-k items to retrieve; corresponds to entities in "local" mode and relationships in "global" mode.                  |
-| --cosine-threshold    | 0.4           | The cosine threshold for nodes and relation retrieval, works with top-k to control the retrieval of nodes and relations.        |
-| --llm-binding         | ollama        | LLM binding type (lollms, ollama, openai, openai-ollama, azure_openai)                                                          |
-| --embedding-binding   | ollama        | Embedding binding type (lollms, ollama, openai, azure_openai)                                                                   |
-| --auto-scan-at-startup| -             | Scan input directory for new files and start indexing                                                                           |
+| Parameter              | Default       | Description                                                                                                              |
+| ---------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| --host                 | 0.0.0.0       | Server host                                                                                                              |
+| --port                 | 9621          | Server port                                                                                                              |
+| --working-dir          | ./rag_storage | Working directory for RAG storage                                                                                        |
+| --input-dir            | ./inputs      | Directory containing input documents                                                                                     |
+| --max-async            | 4             | Maximum number of async operations                                                                                       |
+| --max-tokens           | 32768         | Maximum token size                                                                                                       |
+| --timeout              | 150           | Timeout in seconds. None for infinite timeout (not recommended)                                                          |
+| --log-level            | INFO          | Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)                                                                    |
+| --verbose              | -             | Verbose debug output (True, False)                                                                                       |
+| --key                  | None          | API key for authentication. Protects the LightRAG server against unauthorized access                                     |
+| --ssl                  | False         | Enable HTTPS                                                                                                             |
+| --ssl-certfile         | None          | Path to SSL certificate file (required if --ssl is enabled)                                                              |
+| --ssl-keyfile          | None          | Path to SSL private key file (required if --ssl is enabled)                                                              |
+| --top-k                | 50            | Number of top-k items to retrieve; corresponds to entities in "local" mode and relationships in "global" mode.           |
+| --cosine-threshold     | 0.4           | The cosine threshold for nodes and relation retrieval, works with top-k to control the retrieval of nodes and relations. |
+| --llm-binding          | ollama        | LLM binding type (lollms, ollama, openai, openai-ollama, azure_openai)                                                   |
+| --embedding-binding    | ollama        | Embedding binding type (lollms, ollama, openai, azure_openai)                                                            |
+| --auto-scan-at-startup | -             | Scan input directory for new files and start indexing                                                                    |
 
 ### .env Examples
 
@@ -489,7 +496,7 @@ EMBEDDING_BINDING_HOST=http://localhost:11434
 
 ```
 
-## Document and Chunk  Processing Login Clarification
+## Document and Chunk Processing Login Clarification
 
 The document processing pipeline in LightRAG is somewhat complex and is divided into two primary stages: the Extraction stage (entity and relationship extraction) and the Merging stage (entity and relationship merging). There are two key parameters that control pipeline concurrency: the maximum number of files processed in parallel (MAX_PARALLEL_INSERT) and the maximum number of concurrent LLM requests (MAX_ASYNC). The workflow is described as follows:
 
@@ -524,6 +531,7 @@ You can test the API endpoints using the provided curl commands or through the S
 ### Query Endpoints:
 
 #### POST /query
+
 Query the RAG system with options for different search modes.
 
 ```bash
@@ -535,13 +543,12 @@ curl -X POST "http://localhost:9621/query" \
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc0OTkyMTQwNywicm9sZSI6InVzZXIiLCJtZXRhZGF0YSI6eyJhdXRoX21vZGUiOiJlbmFibGVkIn19.ZMTi6MoUJbntfSpEZ-yEBrp4cYCwdm6wpIa3evFoemo
 
 curl -X POST "http://localhost:9621/query" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc0OTkyMTQwNywicm9sZSI6InVzZXIiLCJtZXRhZGF0YSI6eyJhdXRoX21vZGUiOiJlbmFibGVkIn19.ZMTi6MoUJbntfSpEZ-yEBrp4cYCwdm6wpIa3evFoemo" \
-    -d '{"query": "table in Electromagnets—Increasing Coils", "mode": "hybrid", "top_k": 10, "only_need_context": true}'
-
-
+ -H "Content-Type: application/json" \
+ -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTc0OTkyMTQwNywicm9sZSI6InVzZXIiLCJtZXRhZGF0YSI6eyJhdXRoX21vZGUiOiJlbmFibGVkIn19.ZMTi6MoUJbntfSpEZ-yEBrp4cYCwdm6wpIa3evFoemo" \
+ -d '{"query": "table in Electromagnets—Increasing Coils", "mode": "hybrid", "top_k": 10, "only_need_context": true}'
 
 #### POST /query/stream
+
 Stream responses from the RAG system.
 
 ```bash
@@ -553,6 +560,7 @@ curl -X POST "http://localhost:9621/query/stream" \
 ### Document Management Endpoints:
 
 #### POST /documents/text
+
 Insert text directly into the RAG system.
 
 ```bash
@@ -562,6 +570,7 @@ curl -X POST "http://localhost:9621/documents/text" \
 ```
 
 #### POST /documents/file
+
 Upload a single file to the RAG system.
 
 ```bash
@@ -571,6 +580,7 @@ curl -X POST "http://localhost:9621/documents/file" \
 ```
 
 #### POST /documents/batch
+
 Upload multiple files at once.
 
 ```bash
@@ -633,6 +643,7 @@ Handle generate completion requests. For compatibility purposes, the request is 
 ### Utility Endpoints:
 
 #### GET /health
+
 Check server health and configuration.
 
 ```bash

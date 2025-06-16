@@ -21,17 +21,20 @@ LightRAG MCP Server is a bridge between LightRAG API and MCP-compatible clients.
 ![LightRAG MCP Server](docs/system.png)
 
 ### Prerequisites
+
 - Docker and Docker Compose installed on your system
 - LightRAG API server running (see Integration section below)
 
 ### Running with Docker
 
 1. **Build the Docker image**
+
    ```bash
    docker build -t lightrag-mcp .
    ```
 
 2. **Run the container**
+
    ```bash
    docker run -d \
      --name lightrag-mcp \
@@ -44,11 +47,11 @@ LightRAG MCP Server is a bridge between LightRAG API and MCP-compatible clients.
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `LIGHTRAG_API_URL` | URL of the LightRAG API server | `http://host.docker.internal:9621` |
-| `LIGHTRAG_API_KEY` | API key for authentication (if required) | `` |
-| `PORT` | Port to run the MCP server on | `8000` |
+| Variable           | Description                              | Default                            |
+| ------------------ | ---------------------------------------- | ---------------------------------- |
+| `LIGHTRAG_API_URL` | URL of the LightRAG API server           | `http://host.docker.internal:9621` |
+| `LIGHTRAG_API_KEY` | API key for authentication (if required) | ``                                 |
+| `PORT`             | Port to run the MCP server on            | `8000`                             |
 
 ### Configuration File
 
@@ -113,9 +116,11 @@ The SSE endpoint at http://localhost:8000/sse
 ## Available MCP Tools
 
 ### Document Queries
+
 - `query_document`: Execute a query to documents through LightRAG API
 
 ### Document Management
+
 - `insert_document`: Add text directly to LightRAG storage
 - `upload_document`: Upload document from file to the /input directory
 - `insert_file`: Add document from file directly to storage
@@ -125,6 +130,7 @@ The SSE endpoint at http://localhost:8000/sse
 - `get_pipeline_status`: Get status of document processing in pipeline
 
 ### Knowledge Graph Operations
+
 - `get_graph_labels`: Get labels (node and relationship types) from knowledge graph
 - `create_entities`: Create multiple entities in knowledge graph
 - `edit_entities`: Edit multiple existing entities in knowledge graph
@@ -135,4 +141,5 @@ The SSE endpoint at http://localhost:8000/sse
 - `merge_entities`: Merge multiple entities into one with relationship migration
 
 ### Monitoring
+
 - `check_lightrag_health`: Check LightRAG API status

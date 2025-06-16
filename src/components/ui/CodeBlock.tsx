@@ -22,8 +22,8 @@ const CodeBlock: FC<CodeBlockProps> = ({ language = 'plaintext', code }) => {
 
   const handleCopy = async () => {
     if (!code) return
-    
-    try { 
+
+    try {
       await navigator.clipboard.writeText(code)
       const button = copyButtonRef.current
       if (button) {
@@ -43,25 +43,27 @@ const CodeBlock: FC<CodeBlockProps> = ({ language = 'plaintext', code }) => {
   }
 
   return (
-    <div className="relative my-6 rounded-lg overflow-hidden bg-[#1e1e1e] border border-gray-700 shadow-lg">
+    <div className="relative my-6 overflow-hidden rounded-lg border border-gray-700 bg-[#1e1e1e] shadow-lg">
       {language && (
-        <div className="flex justify-between items-center px-5 py-3 bg-gray-800/80 border-b border-gray-700 text-gray-300 text-xs">
-          <span className="uppercase font-medium tracking-wider text-gray-400">{language}</span>
+        <div className="flex items-center justify-between border-b border-gray-700 bg-gray-800/80 px-5 py-3 text-xs text-gray-300">
+          <span className="font-medium uppercase tracking-wider text-gray-400">
+            {language}
+          </span>
           <button
             ref={copyButtonRef}
             onClick={handleCopy}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors duration-200"
+            className="flex items-center gap-1.5 rounded-md bg-gray-700 px-3 py-1.5 text-gray-300 transition-colors duration-200 hover:bg-gray-600 hover:text-white"
             aria-label="Copy code"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="14" 
-              height="14" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
               strokeLinejoin="round"
               className="mr-1"
             >
@@ -73,11 +75,12 @@ const CodeBlock: FC<CodeBlockProps> = ({ language = 'plaintext', code }) => {
         </div>
       )}
       <pre className="m-0 overflow-x-auto text-sm leading-relaxed">
-        <code 
+        <code
           ref={codeRef}
-          className={`language-${language} font-mono block p-5`}
+          className={`language-${language} block p-5 font-mono`}
           style={{
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+            fontFamily:
+              'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
             lineHeight: '1.5',
             tabSize: 2
           }}

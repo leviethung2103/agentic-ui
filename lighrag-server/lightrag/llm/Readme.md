@@ -1,4 +1,3 @@
-
 1. **LlamaIndex** (`llm/llama_index.py`):
    - Provides integration with OpenAI and other providers through LlamaIndex
    - Supports both direct API access and proxy services like LiteLLM
@@ -15,6 +14,7 @@ LightRAG supports LlamaIndex for embeddings and completions in two ways: direct 
 ### Setup
 
 First, install the required dependencies:
+
 ```bash
 pip install llama-index-llms-litellm llama-index-embeddings-litellm
 ```
@@ -130,11 +130,13 @@ rag = LightRAG(
 ### Environment Variables
 
 For OpenAI direct usage:
+
 ```bash
 OPENAI_API_KEY=your-openai-key
 ```
 
 For LiteLLM proxy:
+
 ```bash
 # LiteLLM Configuration
 LITELLM_URL=http://litellm:4000
@@ -147,7 +149,9 @@ EMBEDDING_MAX_TOKEN_SIZE=8192
 ```
 
 ### Key Differences
+
 1. **Direct OpenAI**:
+
    - Simpler setup
    - Direct API access
    - Requires OpenAI API key

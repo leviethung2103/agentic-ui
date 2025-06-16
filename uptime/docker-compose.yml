@@ -6,7 +6,7 @@ services:
     container_name: agentic-ui-uptime-kuma
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - '3001:3001'
     volumes:
       - ./data:/app/data
       - ./config.json:/app/config.json

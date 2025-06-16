@@ -9,30 +9,31 @@ import CodeBlock from '@/components/ui/CodeBlock'
 const components = {
   // Headings
   h1: ({ node, ...props }: any) => (
-    <h1 className="text-3xl font-bold my-4" {...props} />
+    <h1 className="my-4 text-3xl font-bold" {...props} />
   ),
   h2: ({ node, ...props }: any) => (
-    <h2 className="text-2xl font-bold my-3" {...props} />
+    <h2 className="my-3 text-2xl font-bold" {...props} />
   ),
   h3: ({ node, ...props }: any) => (
-    <h3 className="text-xl font-bold my-2" {...props} />
+    <h3 className="my-2 text-xl font-bold" {...props} />
   ),
   // Lists
   ol: ({ node, ...props }: any) => (
-    <ol className="list-decimal pl-6 my-2 space-y-1" {...props} />
+    <ol className="my-2 list-decimal space-y-1 pl-6" {...props} />
   ),
   ul: ({ node, ...props }: any) => (
-    <ul className="list-disc pl-6 my-2 space-y-1" {...props} />
+    <ul className="my-2 list-disc space-y-1 pl-6" {...props} />
   ),
-  li: ({ node, ...props }: any) => (
-    <li className="my-1" {...props} />
-  ),
+  li: ({ node, ...props }: any) => <li className="my-1" {...props} />,
   // Code blocks
   code: ({ node, inline, className, children, ...props }: any) => {
     // Handle inline code blocks (single backticks)
     if (inline) {
       return (
-        <code className={cn('rounded bg-gray-800 px-1.5 py-0.5 text-sm', className)} {...props}>
+        <code
+          className={cn('rounded bg-gray-800 px-1.5 py-0.5 text-sm', className)}
+          {...props}
+        >
           {children}
         </code>
       )
@@ -44,12 +45,16 @@ const components = {
     const code = String(children).replace(/\n$/, '')
 
     // Only render as code block if there are newlines or it's explicitly a code block
-    const shouldRenderAsBlock = code.includes('\n') || className?.includes('language-')
-    
+    const shouldRenderAsBlock =
+      code.includes('\n') || className?.includes('language-')
+
     return shouldRenderAsBlock ? (
       <CodeBlock language={language} code={code} />
     ) : (
-      <code className={cn('rounded bg-gray-800 px-1.5 py-0.5 text-sm', className)} {...props}>
+      <code
+        className={cn('rounded bg-gray-800 px-1.5 py-0.5 text-sm', className)}
+        {...props}
+      >
         {children}
       </code>
     )
@@ -59,8 +64,13 @@ const components = {
     return children
   },
   a: ({ node, ...props }: any) => (
-    <a {...props} className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer" />
-  ),
+    <a
+      {...props}
+      className="text-blue-400 hover:underline"
+      target="_blank"
+      rel="noopener noreferrer"
+    />
+  )
   // Add other custom components as needed
 }
 

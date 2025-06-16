@@ -37,20 +37,24 @@
 ## 使用方法
 
 1. **启动程序**:
+
    ```bash
    pip install lightrag-hku[tools]
    lightrag-viewer
    ```
 
 2. **加载字体**:
+
    - 将中文字体文件 `font.ttf` 放置在 `assets` 目录下
    - 或者修改 `CUSTOM_FONT` 常量来使用其他字体文件
 
 3. **加载图文件**:
+
    - 点击界面上的 "Load GraphML" 按钮
    - 选择 GraphML 格式的图文件
 
 4. **交互控制**:
+
    - **相机移动**:
      - W: 前进
      - S: 后退

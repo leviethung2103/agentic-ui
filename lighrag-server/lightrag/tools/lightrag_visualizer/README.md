@@ -7,6 +7,7 @@ An interactive 3D graph visualization tool included in the LightRAG package for 
 ## Installation
 
 ### Quick Install
+
 ```bash
 pip install lightrag-hku[tools]  # Install with visualization tool only
 # or
@@ -14,6 +15,7 @@ pip install lightrag-hku[api,tools]  # Install with both API and visualization t
 ```
 
 ## Launch the Viewer
+
 ```bash
 lightrag-viewer
 ```
@@ -46,6 +48,7 @@ lightrag-viewer
 ## Interactive Controls
 
 ### Camera Movement
+
 - W: Move forward
 - S: Move backward
 - A: Move left
@@ -54,15 +57,18 @@ lightrag-viewer
 - E: Move down
 
 ### View Control
+
 - Hold right mouse button and drag to rotate view
 
 ### Node Interaction
+
 - Hover mouse to highlight nodes
 - Click to select nodes
 
 ## Visualization Settings
 
 Adjustable via UI control panel:
+
 - Layout type
 - Node size
 - Edge width
@@ -90,6 +96,7 @@ Adjustable via UI control panel:
 ### Common Issues
 
 1. **Command Not Found**
+
    ```bash
    # Make sure you installed with the 'tools' option
    pip install lightrag-hku[tools]
@@ -99,6 +106,7 @@ Adjustable via UI control panel:
    ```
 
 2. **ModernGL Initialization Failed**
+
    ```bash
    # Check OpenGL version
    glxinfo | grep "OpenGL version"
@@ -113,6 +121,7 @@ Adjustable via UI control panel:
 ## Usage with LightRAG
 
 The viewer is particularly useful for:
+
 - Visualizing RAG knowledge graphs
 - Analyzing document relationships
 - Exploring semantic connections
