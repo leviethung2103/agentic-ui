@@ -52,3 +52,5 @@ backend/storage
 backend/tmp
 lighrag-server/data
 uptime/data
+
+lighrag-server/rag_storage
