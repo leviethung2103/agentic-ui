@@ -118,7 +118,19 @@ const HorizontalRule = ({ className, ...props }: HorizontalRuleProps) => (
   />
 )
 
-const InlineCode: FC<PreparedTextProps> = ({ children }) => {
+const InlineCode: FC<PreparedTextProps> = ({ children, className, ...props }) => {
+  // If this is a code block (has className), render it differently
+  if (className) {
+    return (
+      <pre className="my-4 overflow-x-auto rounded-md bg-background-secondary/50 p-4">
+        <code className={className} {...props}>
+          {children}
+        </code>
+      </pre>
+    )
+  }
+  
+  // Inline code
   return (
     <code className="relative whitespace-pre-wrap rounded-sm bg-background-secondary/50 p-1">
       {children}
@@ -248,6 +260,11 @@ const TableCell = ({ className, ...props }: TableCellProps) => (
   />
 )
 
+// Pre component for code blocks
+const Pre: FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <div className="my-4">{children}</div>
+}
+
 export const components = {
   h1: Heading1,
   h2: Heading2,
@@ -265,6 +282,7 @@ export const components = {
   del: DeletedText,
   hr: HorizontalRule,
   blockquote: Blockquote,
+  pre: Pre,
   code: InlineCode,
   a: AnchorLink,
   img: Img,
