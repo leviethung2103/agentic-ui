@@ -23,7 +23,7 @@ const CodeBlock: FC<CodeBlockProps> = ({ language = 'plaintext', code }) => {
   const handleCopy = async () => {
     if (!code) return
     
-    try {
+    try { 
       await navigator.clipboard.writeText(code)
       const button = copyButtonRef.current
       if (button) {
@@ -43,14 +43,14 @@ const CodeBlock: FC<CodeBlockProps> = ({ language = 'plaintext', code }) => {
   }
 
   return (
-    <div className="relative my-4 rounded-md overflow-hidden bg-[#1e1e1e] border border-gray-700">
+    <div className="relative my-6 rounded-lg overflow-hidden bg-[#1e1e1e] border border-gray-700 shadow-lg">
       {language && (
-        <div className="flex justify-between items-center px-4 py-2 bg-gray-800 text-gray-400 text-xs">
-          <span className="uppercase">{language}</span>
+        <div className="flex justify-between items-center px-5 py-3 bg-gray-800/80 border-b border-gray-700 text-gray-300 text-xs">
+          <span className="uppercase font-medium tracking-wider text-gray-400">{language}</span>
           <button
             ref={copyButtonRef}
             onClick={handleCopy}
-            className="flex items-center gap-1 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors duration-200"
             aria-label="Copy code"
           >
             <svg 
@@ -72,10 +72,15 @@ const CodeBlock: FC<CodeBlockProps> = ({ language = 'plaintext', code }) => {
           </button>
         </div>
       )}
-      <pre className="p-4 overflow-x-auto text-sm">
+      <pre className="m-0 overflow-x-auto text-sm leading-relaxed">
         <code 
           ref={codeRef}
-          className={`language-${language} font-mono`}
+          className={`language-${language} font-mono block p-5`}
+          style={{
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+            lineHeight: '1.5',
+            tabSize: 2
+          }}
         >
           {code}
         </code>
