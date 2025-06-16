@@ -16,6 +16,7 @@ tavily-python
 youtube-transcript-api
 nest-asyncio
 mcp
+jina
 # textract
 # unstructured
 # markdown

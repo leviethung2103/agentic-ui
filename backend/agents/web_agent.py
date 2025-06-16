@@ -1,6 +1,9 @@
+import os
+
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 from agno.storage.sqlite import SqliteStorage
+from agno.tools.jina import JinaReaderTools
 from agno.tools.tavily import TavilyTools
 from dotenv import load_dotenv
 
@@ -11,7 +14,7 @@ agent_storage: str = "storage/web_agent.db"
 web_agent = Agent(
     name="Web Agent",
     model=OpenAIChat(id="gpt-4.1-nano"),
-    tools=[TavilyTools()],
+    tools=[TavilyTools(), JinaReaderTools(api_key=os.getenv("JINA_API_KEY"))],
     instructions=["Always include sources"],
     # Store the agent sessions in a sqlite database
     storage=SqliteStorage(table_name="web_agent", db_file=agent_storage),

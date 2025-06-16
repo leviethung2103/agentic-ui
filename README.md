@@ -150,6 +150,16 @@ By default Agent UI connects to `http://localhost:7777`. You can easily change t
 
 The default endpoint works with the standard Agno Playground setup described in the [official documentation](https://agno.link/agent-ui#connect-to-local-agents).
 
+## Running Embedding Model
+
+To run the Nomic embedding model continuously, use the following curl command:
+
+```bash
+curl http://localhost:11434/api/embeddings -d '{"model": "nomic-embed-text:latest", "keep_alive": -1}'
+```
+
+This will keep the model loaded in memory for faster subsequent requests. The `keep_alive: -1` parameter ensures the model stays loaded until explicitly unloaded or the service restarts.
+
 ## Troubleshooting
 
 ### Port Already in Use

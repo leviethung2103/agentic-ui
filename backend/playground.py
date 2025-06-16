@@ -10,7 +10,9 @@ from agno.storage.sqlite import SqliteStorage
 from agno.tools.mcp import MCPTools
 from dotenv import load_dotenv
 
+from agents.code_agent import code_agent
 from agents.finance_agent import finance_agent
+from agents.image_agent import image_agent
 from agents.weather_agent import weather_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
@@ -54,13 +56,14 @@ async def run_server() -> None:
                 "When using tools, make sure to provide clear and specific queries to get the best results.",
                 "Use the mode=hybrid, top_k=1",
                 "Always include sources or references at the end of your answer in markdown format.",
+                "If your answer includes an image, always embed it using Markdown image syntax: ![alt text](image_url). Do not just include the URL as a link.",
             ],
             debug_mode=True,
             show_tool_calls=True,
         )
 
         playground = Playground(
-            agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent],
+            agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent, image_agent, code_agent],
             settings=settings,
         )
         app = playground.get_app()
