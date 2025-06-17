@@ -4,7 +4,6 @@ import traceback
 import asyncio
 import configparser
 import os
-import time
 import warnings
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
@@ -1006,7 +1005,7 @@ class LightRAG:
                         except Exception as e:
                             # Log error and update pipeline status
                             logger.error(traceback.format_exc())
-                            error_msg = f"Failed to extract document {current_file_number}/{total_files}: {file_path}"
+                            error_msg = f"Failed to extrat document {current_file_number}/{total_files}: {file_path}"
                             logger.error(error_msg)
                             async with pipeline_status_lock:
                                 pipeline_status["latest_message"] = error_msg
@@ -1236,6 +1235,7 @@ class LightRAG:
         self,
         custom_kg: dict[str, Any],
         full_doc_id: str = None,
+        file_path: str = "custom_kg",
     ) -> None:
         update_storage = False
         try:
@@ -1245,7 +1245,6 @@ class LightRAG:
             for chunk_data in custom_kg.get("chunks", []):
                 chunk_content = clean_text(chunk_data["content"])
                 source_id = chunk_data["source_id"]
-                file_path = chunk_data.get("file_path", "custom_kg")
                 tokens = len(self.tokenizer.encode(chunk_content))
                 chunk_order_index = (
                     0
@@ -1262,7 +1261,7 @@ class LightRAG:
                     "full_doc_id": full_doc_id
                     if full_doc_id is not None
                     else source_id,
-                    "file_path": file_path,
+                    "file_path": file_path,  # Add file path
                     "status": DocStatus.PROCESSED,
                 }
                 all_chunks_data[chunk_id] = chunk_entry
@@ -1283,7 +1282,6 @@ class LightRAG:
                 description = entity_data.get("description", "No description provided")
                 source_chunk_id = entity_data.get("source_id", "UNKNOWN")
                 source_id = chunk_to_source_map.get(source_chunk_id, "UNKNOWN")
-                file_path = entity_data.get("file_path", "custom_kg")
 
                 # Log if source_id is UNKNOWN
                 if source_id == "UNKNOWN":
@@ -1297,8 +1295,6 @@ class LightRAG:
                     "entity_type": entity_type,
                     "description": description,
                     "source_id": source_id,
-                    "file_path": file_path,
-                    "created_at": int(time.time()),
                 }
                 # Insert node data into the knowledge graph
                 await self.chunk_entity_relation_graph.upsert_node(
@@ -1318,7 +1314,6 @@ class LightRAG:
                 weight = relationship_data.get("weight", 1.0)
                 source_chunk_id = relationship_data.get("source_id", "UNKNOWN")
                 source_id = chunk_to_source_map.get(source_chunk_id, "UNKNOWN")
-                file_path = relationship_data.get("file_path", "custom_kg")
 
                 # Log if source_id is UNKNOWN
                 if source_id == "UNKNOWN":
@@ -1338,8 +1333,6 @@ class LightRAG:
                                 "source_id": source_id,
                                 "description": "UNKNOWN",
                                 "entity_type": "UNKNOWN",
-                                "file_path": file_path,
-                                "created_at": int(time.time()),
                             },
                         )
 
@@ -1352,11 +1345,8 @@ class LightRAG:
                         "description": description,
                         "keywords": keywords,
                         "source_id": source_id,
-                        "file_path": file_path,
-                        "created_at": int(time.time()),
                     },
                 )
-
                 edge_data: dict[str, str] = {
                     "src_id": src_id,
                     "tgt_id": tgt_id,
@@ -1364,8 +1354,6 @@ class LightRAG:
                     "keywords": keywords,
                     "source_id": source_id,
                     "weight": weight,
-                    "file_path": file_path,
-                    "created_at": int(time.time()),
                 }
                 all_relationships_data.append(edge_data)
                 update_storage = True
@@ -1378,7 +1366,7 @@ class LightRAG:
                     "source_id": dp["source_id"],
                     "description": dp["description"],
                     "entity_type": dp["entity_type"],
-                    "file_path": dp.get("file_path", "custom_kg"),
+                    "file_path": file_path,  # Add file path
                 }
                 for dp in all_entities_data
             }
@@ -1394,7 +1382,7 @@ class LightRAG:
                     "keywords": dp["keywords"],
                     "description": dp["description"],
                     "weight": dp["weight"],
-                    "file_path": dp.get("file_path", "custom_kg"),
+                    "file_path": file_path,  # Add file path
                 }
                 for dp in all_relationships_data
             }

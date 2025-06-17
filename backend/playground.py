@@ -16,6 +16,7 @@ from agents.image_agent import image_agent
 from agents.weather_agent import weather_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
+from textwrap import dedent
 
 load_dotenv()
 
@@ -46,18 +47,19 @@ async def run_server() -> None:
             name="rag agent",
             model=OpenAIChat(id="gpt-4.1-nano"),
             tools=[mcp_tools],
+            description="You are a helpful assistant that can retrieve and analyze documents using the LightRAG system.",
             storage=SqliteStorage(table_name="rag_agent", db_file=agent_storage),
             markdown=True,
-            instructions=[
-                "You are a helpful assistant that can retrieve and analyze documents using the LightRAG system.",
-                "When asked a question, use the available tools to find relevant information.",
-                "If you don't know the answer, say so rather than making up information.",
-                "Be concise and accurate in your responses.",
-                "When using tools, make sure to provide clear and specific queries to get the best results.",
-                "Use the mode=hybrid, top_k=1",
-                "Always include sources or references at the end of your answer in markdown format.",
-                "If your answer includes an image, always embed it using Markdown image syntax: ![alt text](image_url). Do not just include the URL as a link.",
-            ],
+            instructions=dedent("""\
+                Search your knowledge before answering the question.
+                Use the mode=hybrid, top_k=1
+                
+                Remember:
+                    - Always include sources or references at the end of your answer in markdown format.
+            """),
+            add_datetime_to_instructions=True,
+            add_history_to_messages=True,
+            num_history_runs=3,
             debug_mode=True,
             show_tool_calls=True,
         )

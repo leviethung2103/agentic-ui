@@ -84,30 +84,22 @@ class InsertTextRequest(BaseModel):
 
     Attributes:
         text: The text content to be inserted into the RAG system
-        file_source: Source of the text (optional)
     """
 
     text: str = Field(
         min_length=1,
         description="The text to insert",
     )
-    file_source: str = Field(default=None, min_length=0, description="File Source")
 
     @field_validator("text", mode="after")
     @classmethod
-    def strip_text_after(cls, text: str) -> str:
+    def strip_after(cls, text: str) -> str:
         return text.strip()
-
-    @field_validator("file_source", mode="after")
-    @classmethod
-    def strip_source_after(cls, file_source: str) -> str:
-        return file_source.strip()
 
     class Config:
         json_schema_extra = {
             "example": {
-                "text": "This is a sample text to be inserted into the RAG system.",
-                "file_source": "Source of the text (optional)",
+                "text": "This is a sample text to be inserted into the RAG system."
             }
         }
 
@@ -117,26 +109,17 @@ class InsertTextsRequest(BaseModel):
 
     Attributes:
         texts: List of text contents to be inserted into the RAG system
-        file_sources: Sources of the texts (optional)
     """
 
     texts: list[str] = Field(
         min_length=1,
         description="The texts to insert",
     )
-    file_sources: list[str] = Field(
-        default=None, min_length=0, description="Sources of the texts"
-    )
 
     @field_validator("texts", mode="after")
     @classmethod
-    def strip_texts_after(cls, texts: list[str]) -> list[str]:
+    def strip_after(cls, texts: list[str]) -> list[str]:
         return [text.strip() for text in texts]
-
-    @field_validator("file_sources", mode="after")
-    @classmethod
-    def strip_sources_after(cls, file_sources: list[str]) -> list[str]:
-        return [file_source.strip() for file_source in file_sources]
 
     class Config:
         json_schema_extra = {
@@ -144,10 +127,7 @@ class InsertTextsRequest(BaseModel):
                 "texts": [
                     "This is the first text to be inserted.",
                     "This is the second text to be inserted.",
-                ],
-                "file_sources": [
-                    "First file source (optional)",
-                ],
+                ]
             }
         }
 
@@ -676,25 +656,16 @@ async def pipeline_index_files(rag: LightRAG, file_paths: List[Path]):
         logger.error(traceback.format_exc())
 
 
-async def pipeline_index_texts(
-    rag: LightRAG, texts: List[str], file_sources: List[str] = None
-):
+async def pipeline_index_texts(rag: LightRAG, texts: List[str]):
     """Index a list of texts
 
     Args:
         rag: LightRAG instance
         texts: The texts to index
-        file_sources: Sources of the texts
     """
     if not texts:
         return
-    if file_sources is not None:
-        if len(file_sources) != 0 and len(file_sources) != len(texts):
-            [
-                file_sources.append("unknown_source")
-                for _ in range(len(file_sources), len(texts))
-            ]
-    await rag.apipeline_enqueue_documents(input=texts, file_paths=file_sources)
+    await rag.apipeline_enqueue_documents(texts)
     await rag.apipeline_process_enqueue_documents()
 
 
@@ -845,12 +816,7 @@ def create_document_routes(
             HTTPException: If an error occurs during text processing (500).
         """
         try:
-            background_tasks.add_task(
-                pipeline_index_texts,
-                rag,
-                [request.text],
-                file_sources=[request.file_source],
-            )
+            background_tasks.add_task(pipeline_index_texts, rag, [request.text])
             return InsertResponse(
                 status="success",
                 message="Text successfully received. Processing will continue in background.",
@@ -885,12 +851,7 @@ def create_document_routes(
             HTTPException: If an error occurs during text processing (500).
         """
         try:
-            background_tasks.add_task(
-                pipeline_index_texts,
-                rag,
-                request.texts,
-                file_sources=request.file_sources,
-            )
+            background_tasks.add_task(pipeline_index_texts, rag, request.texts)
             return InsertResponse(
                 status="success",
                 message="Text successfully received. Processing will continue in background.",

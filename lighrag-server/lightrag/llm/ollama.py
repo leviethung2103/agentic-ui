@@ -11,20 +11,32 @@ import pipmaster as pm  # Pipmaster for dynamic library install
 if not pm.is_installed("ollama"):
     pm.install("ollama")
 
-from typing import Union
+import ollama
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
+from lightrag.exceptions import (
+    APIConnectionError,
+    RateLimitError,
+    APITimeoutError,
+)
+from lightrag.api import __api_version__
 
 import numpy as np
-import ollama
-from lightrag.api import __api_version__
-from lightrag.exceptions import APIConnectionError, APITimeoutError, RateLimitError
+from typing import Union
 from lightrag.utils import logger
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=4, max=10),
-    retry=retry_if_exception_type((RateLimitError, APIConnectionError, APITimeoutError)),
+    retry=retry_if_exception_type(
+        (RateLimitError, APIConnectionError, APITimeoutError)
+    ),
 )
 async def _ollama_model_if_cache(
     model,
@@ -91,15 +103,21 @@ async def _ollama_model_if_cache(
             await ollama_client._client.aclose()
             logger.debug("Successfully closed Ollama client after exception")
         except Exception as close_error:
-            logger.warning(f"Failed to close Ollama client after exception: {close_error}")
+            logger.warning(
+                f"Failed to close Ollama client after exception: {close_error}"
+            )
         raise e
     finally:
         if not stream:
             try:
                 await ollama_client._client.aclose()
-                logger.debug("Successfully closed Ollama client for non-streaming response")
+                logger.debug(
+                    "Successfully closed Ollama client for non-streaming response"
+                )
             except Exception as close_error:
-                logger.warning(f"Failed to close Ollama client in finally block: {close_error}")
+                logger.warning(
+                    f"Failed to close Ollama client in finally block: {close_error}"
+                )
 
 
 async def ollama_model_complete(
@@ -141,7 +159,9 @@ async def ollama_embed(texts: list[str], embed_model, **kwargs) -> np.ndarray:
             await ollama_client._client.aclose()
             logger.debug("Successfully closed Ollama client after exception in embed")
         except Exception as close_error:
-            logger.warning(f"Failed to close Ollama client after exception in embed: {close_error}")
+            logger.warning(
+                f"Failed to close Ollama client after exception in embed: {close_error}"
+            )
         raise e
     finally:
         try:

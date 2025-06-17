@@ -12,13 +12,13 @@ LightRAG 服务器旨在提供 Web 界面和 API 支持。Web 界面便于文档
 
 ### 安装
 
-- 从 PyPI 安装
+* 从 PyPI 安装
 
 ```bash
 pip install "lightrag-hku[api]"
 ```
 
-- 从源代码安装
+* 从源代码安装
 
 ```bash
 # 克隆仓库
@@ -36,18 +36,16 @@ pip install -e ".[api]"
 
 LightRAG 需要同时集成 LLM（大型语言模型）和嵌入模型以有效执行文档索引和查询操作。在首次部署 LightRAG 服务器之前，必须配置 LLM 和嵌入模型的设置。LightRAG 支持绑定到各种 LLM/嵌入后端：
 
-- ollama
-- lollms
-- openai 或 openai 兼容
-- azure_openai
+* ollama
+* lollms
+* openai 或 openai 兼容
+* azure_openai
 
-建议使用环境变量来配置 LightRAG 服务器。项目根目录中有一个名为 `env.example` 的示例环境变量文件。请将此文件复制到启动目录并重命名为 `.env`。之后，您可以在 `.env` 文件中修改与 LLM 和嵌入模型相关的参数。需要注意的是，LightRAG 服务器每次启动时都会将 `.env` 中的环境变量加载到系统环境变量中。**LightRAG 服务器会优先使用系统环境变量中的设置**。
-
-> 由于安装了 Python 扩展的 VS Code 可能会在集成终端中自动加载 .env 文件，请在每次修改 .env 文件后打开新的终端会话。
+建议使用环境变量来配置 LightRAG 服务器。项目根目录中有一个名为 `env.example` 的示例环境变量文件。请将此文件复制到启动目录并重命名为 `.env`。之后，您可以在 `.env` 文件中修改与 LLM 和嵌入模型相关的参数。需要注意的是，LightRAG 服务器每次启动时都会将 `.env` 中的环境变量加载到系统环境变量中。由于 LightRAG 服务器会优先使用系统环境变量中的设置，如果您在通过命令行启动 LightRAG 服务器后修改了 `.env` 文件，则需要执行 `source .env` 使新设置生效。
 
 以下是 LLM 和嵌入模型的一些常见设置示例：
 
-- OpenAI LLM + Ollama 嵌入
+* OpenAI LLM + Ollama 嵌入
 
 ```
 LLM_BINDING=openai
@@ -64,7 +62,7 @@ EMBEDDING_DIM=1024
 # EMBEDDING_BINDING_API_KEY=your_api_key
 ```
 
-- Ollama LLM + Ollama 嵌入
+* Ollama LLM + Ollama 嵌入
 
 ```
 LLM_BINDING=ollama
@@ -84,19 +82,16 @@ EMBEDDING_DIM=1024
 ### 启动 LightRAG 服务器
 
 LightRAG 服务器支持两种运行模式：
-
-- 简单高效的 Uvicorn 模式
+* 简单高效的 Uvicorn 模式
 
 ```
 lightrag-server
 ```
-
-- 多进程 Gunicorn + Uvicorn 模式（生产模式，不支持 Windows 环境）
+* 多进程 Gunicorn + Uvicorn 模式（生产模式，不支持 Windows 环境）
 
 ```
 lightrag-gunicorn --workers 4
 ```
-
 `.env` 文件必须放在启动目录中。启动时，LightRAG 服务器将创建一个文档目录（默认为 `./inputs`）和一个数据目录（默认为 `./rag_storage`）。这允许您从不同目录启动多个 LightRAG 服务器实例，每个实例配置为监听不同的网络端口。
 
 以下是一些常用的启动参数：
@@ -110,69 +105,23 @@ lightrag-gunicorn --workers 4
 > - **要求将.env文件置于启动目录中是经过特意设计的**。 这样做的目的是支持用户同时启动多个LightRAG实例，并为不同实例配置不同的.env文件。
 > - **修改.env文件后，您需要重新打开终端以使新设置生效**。 这是因为每次启动时，LightRAG Server会将.env文件中的环境变量加载至系统环境变量，且系统环境变量的设置具有更高优先级。
 
-### 使用 Docker 启动 LightRAG 服务器
+### 使用 Docker Compose 启动 LightRAG 服务器
 
-- 克隆代码仓库：
-
-```shell
+* 克隆代码仓库：
+```
 git clone https://github.com/HKUDS/LightRAG.git
 cd LightRAG
 ```
 
-- 配置 .env 文件：
-  通过复制示例文件 [`env.example`](env.example) 创建个性化的 .env 文件，并根据实际需求设置 LLM 及 Embedding 参数。
+* 配置 .env 文件：
+    通过复制 env.example 文件创建个性化的 .env 文件，并根据实际需求设置 LLM 及 Embedding 参数。
 
-- 通过以下命令启动 LightRAG 服务器：
-
-```shell
+* 通过以下命令启动 LightRAG 服务器：
+```
 docker compose up
 # 如拉取了新版本，请添加 --build 重新构建
 docker compose up --build
 ```
-
-### 无需克隆代码而使用 Docker 部署 LightRAG 服务器
-
-- 为 LightRAG 服务器创建工作文件夹：
-
-```shell
-mkdir lightrag
-cd lightrag
-```
-
-- 准备 .env 文件：
-  通过复制 env.example 文件创建个性化的.env 文件。根据您的需求配置 LLM 和嵌入参数。
-
-- 创建一个名为 docker-compose.yml 的 docker compose 文件：
-
-```yaml
-services:
-  lightrag:
-    container_name: lightrag
-    image: ghcr.io/hkuds/lightrag:latest
-    ports:
-      - '${PORT:-9621}:9621'
-    volumes:
-      - ./data/rag_storage:/app/data/rag_storage
-      - ./data/inputs:/app/data/inputs
-      - ./config.ini:/app/config.ini
-      - ./.env:/app/.env
-    env_file:
-      - .env
-    restart: unless-stopped
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-```
-
-- 准备 .env 文件：
-  通过复制示例文件 [`env.example`](env.example) 创建个性化的 .env 文件。根据您的需求配置 LLM 和嵌入参数。
-
-- 使用以下命令启动 LightRAG 服务器：
-
-```shell
-docker compose up
-```
-
-> 在此获取LightRAG docker镜像历史版本: [LightRAG Docker Images](https://github.com/HKUDS/LightRAG/pkgs/container/lightrag)
 
 ### 启动时自动扫描
 
@@ -283,7 +232,7 @@ Open WebUI 使用 LLM 来执行会话标题和会话关键词生成任务。因�
 
 默认情况下，LightRAG 服务器可以在没有任何认证的情况下访问。我们可以使用 API 密钥或账户凭证配置服务器以确保其安全。
 
-- API 密钥
+* API 密钥
 
 ```
 LIGHTRAG_API_KEY=your-secure-api-key-here
@@ -292,7 +241,7 @@ WHITELIST_PATHS=/health,/api/*
 
 > 健康检查和 Ollama 模拟端点默认不进行 API 密钥检查。
 
-- 账户凭证（Web 界面需要登录后才能访问）
+* 账户凭证（Web 界面需要登录后才能访问）
 
 LightRAG API 服务器使用基于 HS256 算法的 JWT 认证。要启用安全访问控制，需要以下环境变量：
 
@@ -346,9 +295,9 @@ EMBEDDING_MODEL=your-embedding-deployment-name
 
 API 服务器可以通过三种方式配置（优先级从高到低）：
 
-- 命令行参数
-- 环境变量或 .env 文件
-- Config.ini（仅用于存储配置）
+* 命令行参数
+* 环境变量或 .env 文件
+* Config.ini（仅用于存储配置）
 
 大多数配置都有默认设置，详细信息请查看示例文件：`.env.example`。数据存储配置也可以通过 config.ini 设置。为方便起见，提供了示例文件 `config.ini.example`。
 
@@ -356,16 +305,15 @@ API 服务器可以通过三种方式配置（优先级从高到低）：
 
 LightRAG 支持绑定到各种 LLM/嵌入后端：
 
-- ollama
-- lollms
-- openai 和 openai 兼容
-- azure_openai
+* ollama
+* lollms
+* openai 和 openai 兼容
+* azure_openai
 
 使用环境变量 `LLM_BINDING` 或 CLI 参数 `--llm-binding` 选择 LLM 后端类型。使用环境变量 `EMBEDDING_BINDING` 或 CLI 参数 `--embedding-binding` 选择嵌入后端类型。
 
 ### 实体提取配置
-
-- ENABLE_LLM_CACHE_FOR_EXTRACT：为实体提取启用 LLM 缓存（默认：true）
+* ENABLE_LLM_CACHE_FOR_EXTRACT：为实体提取启用 LLM 缓存（默认：true）
 
 在测试环境中将 `ENABLE_LLM_CACHE_FOR_EXTRACT` 设置为 true 以减少 LLM 调用成本是很常见的做法。
 
@@ -373,14 +321,14 @@ LightRAG 支持绑定到各种 LLM/嵌入后端：
 
 LightRAG 使用 4 种类型的存储用于不同目的：
 
-- KV_STORAGE：llm 响应缓存、文本块、文档信息
-- VECTOR_STORAGE：实体向量、关系向量、块向量
-- GRAPH_STORAGE：实体关系图
-- DOC_STATUS_STORAGE：文档索引状态
+* KV_STORAGE：llm 响应缓存、文本块、文档信息
+* VECTOR_STORAGE：实体向量、关系向量、块向量
+* GRAPH_STORAGE：实体关系图
+* DOC_STATUS_STORAGE：文档索引状态
 
 每种存储类型都有几种实现：
 
-- KV_STORAGE 支持的实现名称
+* KV_STORAGE 支持的实现名称
 
 ```
 JsonKVStorage    JsonFile(默认)
@@ -389,7 +337,7 @@ RedisKVStorage   Redis
 MongoKVStorage   MogonDB
 ```
 
-- GRAPH_STORAGE 支持的实现名称
+* GRAPH_STORAGE 支持的实现名称
 
 ```
 NetworkXStorage      NetworkX(默认)
@@ -399,7 +347,7 @@ PGGraphStorage       PostgreSQL with AGE plugin
 
 > 在测试中Neo4j图形数据库相比PostgreSQL AGE有更好的性能表现。
 
-- VECTOR_STORAGE 支持的实现名称
+* VECTOR_STORAGE 支持的实现名称
 
 ```
 NanoVectorDBStorage         NanoVector(默认)
@@ -411,7 +359,7 @@ QdrantVectorDBStorage       Qdrant
 MongoVectorDBStorage        MongoDB
 ```
 
-- DOC_STATUS_STORAGE 支持的实现名称
+* DOC_STATUS_STORAGE 支持的实现名称
 
 ```
 JsonDocStatusStorage        JsonFile(默认)
@@ -434,26 +382,26 @@ LIGHTRAG_DOC_STATUS_STORAGE=PGDocStatusStorage
 
 ### LightRag API 服务器命令行选项
 
-| 参数                 | 默认值        | 描述                                                                       |
-| -------------------- | ------------- | -------------------------------------------------------------------------- |
-| --host               | 0.0.0.0       | 服务器主机                                                                 |
-| --port               | 9621          | 服务器端口                                                                 |
-| --working-dir        | ./rag_storage | RAG 存储的工作目录                                                         |
-| --input-dir          | ./inputs      | 包含输入文档的目录                                                         |
-| --max-async          | 4             | 最大异步操作数                                                             |
-| --max-tokens         | 32768         | 最大 token 大小                                                            |
-| --timeout            | 150           | 超时时间（秒）。None 表示无限超时（不推荐）                                |
-| --log-level          | INFO          | 日志级别（DEBUG、INFO、WARNING、ERROR、CRITICAL）                          |
-| --verbose            | -             | 详细调试输出（True、False）                                                |
-| --key                | None          | 用于认证的 API 密钥。保护 lightrag 服务器免受未授权访问                    |
-| --ssl                | False         | 启用 HTTPS                                                                 |
-| --ssl-certfile       | None          | SSL 证书文件路径（如果启用 --ssl 则必需）                                  |
-| --ssl-keyfile        | None          | SSL 私钥文件路径（如果启用 --ssl 则必需）                                  |
-| --top-k              | 50            | 要检索的 top-k 项目数；在"local"模式下对应实体，在"global"模式下对应关系。 |
-| --cosine-threshold   | 0.4           | 节点和关系检索的余弦阈值，与 top-k 一起控制节点和关系的检索。              |
-| --llm-binding        | ollama        | LLM 绑定类型（lollms、ollama、openai、openai-ollama、azure_openai）        |
-| --embedding-binding  | ollama        | 嵌入绑定类型（lollms、ollama、openai、azure_openai）                       |
-| auto-scan-at-startup | -             | 扫描输入目录中的新文件并开始索引                                           |
+| 参数 | 默认值 | 描述 |
+|-----------|---------|-------------|
+| --host | 0.0.0.0 | 服务器主机 |
+| --port | 9621 | 服务器端口 |
+| --working-dir | ./rag_storage | RAG 存储的工作目录 |
+| --input-dir | ./inputs | 包含输入文档的目录 |
+| --max-async | 4 | 最大异步操作数 |
+| --max-tokens | 32768 | 最大 token 大小 |
+| --timeout | 150 | 超时时间（秒）。None 表示无限超时（不推荐） |
+| --log-level | INFO | 日志级别（DEBUG、INFO、WARNING、ERROR、CRITICAL） |
+| --verbose | - | 详细调试输出（True、False） |
+| --key | None | 用于认证的 API 密钥。保护 lightrag 服务器免受未授权访问 |
+| --ssl | False | 启用 HTTPS |
+| --ssl-certfile | None | SSL 证书文件路径（如果启用 --ssl 则必需） |
+| --ssl-keyfile | None | SSL 私钥文件路径（如果启用 --ssl 则必需） |
+| --top-k | 50 | 要检索的 top-k 项目数；在"local"模式下对应实体，在"global"模式下对应关系。 |
+| --cosine-threshold | 0.4 | 节点和关系检索的余弦阈值，与 top-k 一起控制节点和关系的检索。 |
+| --llm-binding | ollama | LLM 绑定类型（lollms、ollama、openai、openai-ollama、azure_openai） |
+| --embedding-binding | ollama | 嵌入绑定类型（lollms、ollama、openai、azure_openai） |
+| auto-scan-at-startup | - | 扫描输入目录中的新文件并开始索引 |
 
 ### .env 文件示例
 
@@ -494,6 +442,8 @@ EMBEDDING_BINDING_HOST=http://localhost:11434
 # WHITELIST_PATHS=/api/*
 # WHITELIST_PATHS=/health,/api/*
 ```
+
+
 
 #### 使用 ollama 默认本地服务器作为 llm 和嵌入后端运行 Lightrag 服务器
 
@@ -549,40 +499,20 @@ lightrag-server --key my-key
 ```
 
 **重要说明：**
-
 - 对于 LoLLMs：确保指定的模型已安装在您的 LoLLMs 实例中
 - 对于 Ollama：确保指定的模型已安装在您的 Ollama 实例中
 - 对于 OpenAI：确保您已设置 OPENAI_API_KEY 环境变量
 - 对于 Azure OpenAI：按照先决条件部分所述构建和配置您的服务器
 
 要获取任何服务器的帮助，使用 --help 标志：
-
 ```bash
 lightrag-server --help
 ```
 
 注意：如果您不需要 API 功能，可以使用以下命令安装不带 API 支持的基本包：
-
 ```bash
 pip install lightrag-hku
 ```
-
-## 文档和块处理逻辑说明
-
-LightRAG 中的文档处理流程有些复杂，分为两个主要阶段：提取阶段（实体和关系提取）和合并阶段（实体和关系合并）。有两个关键参数控制流程并发性：并行处理的最大文件数（`MAX_PARALLEL_INSERT`）和最大并发 LLM 请求数（`MAX_ASYNC`）。工作流程描述如下：
-
-1. `MAX_PARALLEL_INSERT` 控制提取阶段并行处理的文件数量。
-2. `MAX_ASYNC` 限制系统中并发 LLM 请求的总数，包括查询、提取和合并的请求。LLM 请求具有不同的优先级：查询操作优先级最高，其次是合并，然后是提取。
-3. 在单个文件中，来自不同文本块的实体和关系提取是并发处理的，并发度由 `MAX_ASYNC` 设置。只有在处理完 `MAX_ASYNC` 个文本块后，系统才会继续处理同一文件中的下一批文本块。
-4. 合并阶段仅在文件中所有文本块完成实体和关系提取后开始。当一个文件进入合并阶段时，流程允许下一个文件开始提取。
-5. 由于提取阶段通常比合并阶段快，因此实际并发处理的文件数可能会超过 `MAX_PARALLEL_INSERT`，因为此参数仅控制提取阶段的并行度。
-6. 为防止竞争条件，合并阶段不支持多个文件的并发处理；一次只能合并一个文件，其他文件必须在队列中等待。
-7. 每个文件在流程中被视为一个原子处理单元。只有当其所有文本块都完成提取和合并后，文件才会被标记为成功处理。如果在处理过程中发生任何错误，整个文件将被标记为失败，并且必须重新处理。
-8. 当由于错误而重新处理文件时，由于 LLM 缓存，先前处理的文本块可以快速跳过。尽管 LLM 缓存在合并阶段也会被利用，但合并顺序的不一致可能会限制其在此阶段的有效性。
-9. 如果在提取过程中发生错误，系统不会保留任何中间结果。如果在合并过程中发生错误，已合并的实体和关系可能会被保留；当重新处理同一文件时，重新提取的实体和关系将与现有实体和关系合并，而不会影响查询结果。
-10. 在合并阶段结束时，所有实体和关系数据都会在向量数据库中更新。如果此时发生错误，某些更新可能会被保留。但是，下一次处理尝试将覆盖先前结果，确保成功重新处理的文件不会影响未来查询结果的完整性。
-
-大型文件应分割成较小的片段以启用增量处理。可以通过在 Web UI 上按“扫描”按钮来启动失败文件的重新处理。
 
 ## API 端点
 
@@ -602,7 +532,6 @@ LightRAG 中的文档处理流程有些复杂，分为两个主要阶段：提�
 ### 查询端点
 
 #### POST /query
-
 使用不同搜索模式查询 RAG 系统。
 
 ```bash
@@ -612,7 +541,6 @@ curl -X POST "http://localhost:9621/query" \
 ```
 
 #### POST /query/stream
-
 从 RAG 系统流式获取响应。
 
 ```bash
@@ -624,7 +552,6 @@ curl -X POST "http://localhost:9621/query/stream" \
 ### 文档管理端点
 
 #### POST /documents/text
-
 直接将文本插入 RAG 系统。
 
 ```bash
@@ -634,7 +561,6 @@ curl -X POST "http://localhost:9621/documents/text" \
 ```
 
 #### POST /documents/file
-
 向 RAG 系统上传单个文件。
 
 ```bash
@@ -644,7 +570,6 @@ curl -X POST "http://localhost:9621/documents/file" \
 ```
 
 #### POST /documents/batch
-
 一次上传多个文件。
 
 ```bash
@@ -707,7 +632,6 @@ curl -N -X POST http://localhost:9621/api/chat -H "Content-Type: application/jso
 ### 实用工具端点
 
 #### GET /health
-
 检查服务器健康状况和配置。
 
 ```bash
