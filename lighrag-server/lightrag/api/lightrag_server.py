@@ -2,59 +2,39 @@
 LightRAG FastAPI Server
 """
 
-from fastapi import FastAPI, Depends, HTTPException, status
 import asyncio
-import os
+import configparser
 import logging
 import logging.config
-import uvicorn
-import pipmaster as pm
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
-from pathlib import Path
-import configparser
-from ascii_colors import ASCIIColors
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from dotenv import load_dotenv
-from lightrag.api.utils_api import (
-    get_combined_auth_dependency,
-    display_splash_screen,
-    check_env_file,
-)
-from .config import (
-    global_args,
-    update_uvicorn_mode_config,
-    get_default_host,
-)
-from lightrag.utils import get_env_value
+import os
 import sys
-from lightrag import LightRAG, __version__ as core_version
+from contextlib import asynccontextmanager
+from pathlib import Path
+
+import pipmaster as pm
+import uvicorn
+from ascii_colors import ASCIIColors
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
+from lightrag import LightRAG
+from lightrag import __version__ as core_version
 from lightrag.api import __api_version__
-from lightrag.types import GPTKeywordExtractionFormat
-from lightrag.utils import EmbeddingFunc
-from lightrag.constants import (
-    DEFAULT_LOG_MAX_BYTES,
-    DEFAULT_LOG_BACKUP_COUNT,
-    DEFAULT_LOG_FILENAME,
-)
-from lightrag.api.routers.document_routes import (
-    DocumentManager,
-    create_document_routes,
-    run_scanning_process,
-)
-from lightrag.api.routers.query_routes import create_query_routes
+from lightrag.api.auth import auth_handler
+from lightrag.api.routers.document_routes import DocumentManager, create_document_routes, run_scanning_process
 from lightrag.api.routers.graph_routes import create_graph_routes
 from lightrag.api.routers.ollama_api import OllamaAPI
+from lightrag.api.routers.query_routes import create_query_routes
+from lightrag.api.utils_api import check_env_file, display_splash_screen, get_combined_auth_dependency
+from lightrag.constants import DEFAULT_LOG_BACKUP_COUNT, DEFAULT_LOG_FILENAME, DEFAULT_LOG_MAX_BYTES
+from lightrag.kg.shared_storage import get_namespace_data, get_pipeline_status_lock, initialize_pipeline_status
+from lightrag.types import GPTKeywordExtractionFormat
+from lightrag.utils import EmbeddingFunc, get_env_value, logger, set_verbose_debug
 
-from lightrag.utils import logger, set_verbose_debug
-from lightrag.kg.shared_storage import (
-    get_namespace_data,
-    get_pipeline_status_lock,
-    initialize_pipeline_status,
-)
-from fastapi.security import OAuth2PasswordRequestForm
-from lightrag.api.auth import auth_handler
+from .config import get_default_host, global_args, update_uvicorn_mode_config
 
 # use the .env that is inside the current folder
 # allows to use different .env file for each lightrag instance
@@ -101,9 +81,7 @@ def create_app(args):
     # Add SSL validation
     if args.ssl:
         if not args.ssl_certfile or not args.ssl_keyfile:
-            raise Exception(
-                "SSL certificate and key files must be provided when SSL is enabled"
-            )
+            raise Exception("SSL certificate and key files must be provided when SSL is enabled")
         if not os.path.exists(args.ssl_certfile):
             raise Exception(f"SSL certificate file not found: {args.ssl_certfile}")
         if not os.path.exists(args.ssl_keyfile):
@@ -155,8 +133,7 @@ def create_app(args):
     # Initialize FastAPI
     app_kwargs = {
         "title": "LightRAG Server API",
-        "description": "Providing API for LightRAG core, Web UI and Ollama Model Emulation"
-        + "(With authentication)"
+        "description": "Providing API for LightRAG core, Web UI and Ollama Model Emulation" + "(With authentication)"
         if api_key
         else "",
         "version": __api_version__,
@@ -199,19 +176,16 @@ def create_app(args):
     # Create working directory if it doesn't exist
     Path(args.working_dir).mkdir(parents=True, exist_ok=True)
     if args.llm_binding == "lollms" or args.embedding_binding == "lollms":
-        from lightrag.llm.lollms import lollms_model_complete, lollms_embed
+        from lightrag.llm.lollms import lollms_embed, lollms_model_complete
     if args.llm_binding == "ollama" or args.embedding_binding == "ollama":
-        from lightrag.llm.ollama import ollama_model_complete, ollama_embed
+        from lightrag.llm.ollama import ollama_embed, ollama_model_complete
     if args.llm_binding == "openai" or args.embedding_binding == "openai":
         from lightrag.llm.openai import openai_complete_if_cache, openai_embed
     if args.llm_binding == "azure_openai" or args.embedding_binding == "azure_openai":
-        from lightrag.llm.azure_openai import (
-            azure_openai_complete_if_cache,
-            azure_openai_embed,
-        )
+        from lightrag.llm.azure_openai import azure_openai_complete_if_cache, azure_openai_embed
     if args.llm_binding_host == "openai-ollama" or args.embedding_binding == "ollama":
-        from lightrag.llm.openai import openai_complete_if_cache
         from lightrag.llm.ollama import ollama_embed
+        from lightrag.llm.openai import openai_complete_if_cache
 
     async def openai_alike_model_complete(
         prompt,
@@ -318,9 +292,7 @@ def create_app(args):
             graph_storage=args.graph_storage,
             vector_storage=args.vector_storage,
             doc_status_storage=args.doc_status_storage,
-            vector_db_storage_cls_kwargs={
-                "cosine_better_than_threshold": args.cosine_threshold
-            },
+            vector_db_storage_cls_kwargs={"cosine_better_than_threshold": args.cosine_threshold},
             enable_llm_cache_for_entity_extract=args.enable_llm_cache_for_extract,
             enable_llm_cache=args.enable_llm_cache,
             auto_manage_storages_states=False,
@@ -344,9 +316,7 @@ def create_app(args):
             graph_storage=args.graph_storage,
             vector_storage=args.vector_storage,
             doc_status_storage=args.doc_status_storage,
-            vector_db_storage_cls_kwargs={
-                "cosine_better_than_threshold": args.cosine_threshold
-            },
+            vector_db_storage_cls_kwargs={"cosine_better_than_threshold": args.cosine_threshold},
             enable_llm_cache_for_entity_extract=args.enable_llm_cache_for_extract,
             enable_llm_cache=args.enable_llm_cache,
             auto_manage_storages_states=False,
@@ -374,9 +344,7 @@ def create_app(args):
 
         if not auth_handler.accounts:
             # Authentication not configured, return guest token
-            guest_token = auth_handler.create_token(
-                username="guest", role="guest", metadata={"auth_mode": "disabled"}
-            )
+            guest_token = auth_handler.create_token(username="guest", role="guest", metadata={"auth_mode": "disabled"})
             return {
                 "auth_configured": False,
                 "access_token": guest_token,
@@ -402,9 +370,7 @@ def create_app(args):
     async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         if not auth_handler.accounts:
             # Authentication not configured, return guest token
-            guest_token = auth_handler.create_token(
-                username="guest", role="guest", metadata={"auth_mode": "disabled"}
-            )
+            guest_token = auth_handler.create_token(username="guest", role="guest", metadata={"auth_mode": "disabled"})
             return {
                 "access_token": guest_token,
                 "token_type": "bearer",
@@ -417,14 +383,10 @@ def create_app(args):
             }
         username = form_data.username
         if auth_handler.accounts.get(username) != form_data.password:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials"
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
 
         # Regular user login
-        user_token = auth_handler.create_token(
-            username=username, role="user", metadata={"auth_mode": "enabled"}
-        )
+        user_token = auth_handler.create_token(username=username, role="user", metadata={"auth_mode": "enabled"})
         return {
             "access_token": user_token,
             "token_type": "bearer",
@@ -483,9 +445,7 @@ def create_app(args):
         async def get_response(self, path: str, scope):
             response = await super().get_response(path, scope)
             if path.endswith(".html"):
-                response.headers["Cache-Control"] = (
-                    "no-cache, no-store, must-revalidate"
-                )
+                response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
                 response.headers["Pragma"] = "no-cache"
                 response.headers["Expires"] = "0"
             return response
@@ -648,9 +608,7 @@ def main():
             }
         )
 
-    print(
-        f"Starting Uvicorn server in single-process mode on {global_args.host}:{global_args.port}"
-    )
+    print(f"Starting Uvicorn server in single-process mode on {global_args.host}:{global_args.port}")
     uvicorn.run(**uvicorn_config)
 
 

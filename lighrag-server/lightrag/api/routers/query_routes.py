@@ -6,12 +6,12 @@ import json
 import logging
 from typing import Any, Dict, List, Literal, Optional
 
+from ascii_colors import trace_exception
 from fastapi import APIRouter, Depends, HTTPException
 from lightrag.base import QueryParam
-from ..utils_api import get_combined_auth_dependency
 from pydantic import BaseModel, Field, field_validator
 
-from ascii_colors import trace_exception
+from ..utils_api import get_combined_auth_dependency
 
 router = APIRouter(tags=["query"])
 
@@ -97,9 +97,7 @@ class QueryRequest(BaseModel):
             return None
         for msg in conversation_history:
             if "role" not in msg or msg["role"] not in {"user", "assistant"}:
-                raise ValueError(
-                    "Each message must have a 'role' key with value 'user' or 'assistant'."
-                )
+                raise ValueError("Each message must have a 'role' key with value 'user' or 'assistant'.")
         return conversation_history
 
     def to_query_params(self, is_stream: bool) -> "QueryParam":
@@ -122,9 +120,7 @@ class QueryResponse(BaseModel):
 def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
     combined_auth = get_combined_auth_dependency(api_key)
 
-    @router.post(
-        "/query", response_model=QueryResponse, dependencies=[Depends(combined_auth)]
-    )
+    @router.post("/query", response_model=QueryResponse, dependencies=[Depends(combined_auth)])
     async def query_text(request: QueryRequest):
         """
         Handle a POST request at the /query endpoint to process user queries using RAG capabilities.

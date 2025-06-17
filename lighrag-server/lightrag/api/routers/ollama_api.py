@@ -1,18 +1,18 @@
-from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
-from typing import List, Dict, Any, Optional
-import logging
-import time
-import json
-import re
-from enum import Enum
-from fastapi.responses import StreamingResponse
 import asyncio
+import json
+import logging
+import re
+import time
+from enum import Enum
+from typing import Any, Dict, List, Optional
+
 from ascii_colors import trace_exception
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from lightrag import LightRAG, QueryParam
+from lightrag.api.utils_api import get_combined_auth_dependency, ollama_server_infos
 from lightrag.utils import TiktokenTokenizer
-from lightrag.api.utils_api import ollama_server_infos, get_combined_auth_dependency
-from fastapi import Depends
+from pydantic import BaseModel
 
 
 # query mode according to query prefix (bypass is not LightRAG quer mode)
@@ -212,9 +212,7 @@ class OllamaAPI:
                     self.rag.llm_model_kwargs["system_prompt"] = request.system
 
                 if request.stream:
-                    response = await self.rag.llm_model_func(
-                        query, stream=True, **self.rag.llm_model_kwargs
-                    )
+                    response = await self.rag.llm_model_func(query, stream=True, **self.rag.llm_model_kwargs)
 
                     async def stream_generator():
                         try:
@@ -334,9 +332,7 @@ class OllamaAPI:
                     )
                 else:
                     first_chunk_time = time.time_ns()
-                    response_text = await self.rag.llm_model_func(
-                        query, stream=False, **self.rag.llm_model_kwargs
-                    )
+                    response_text = await self.rag.llm_model_func(query, stream=False, **self.rag.llm_model_kwargs)
                     last_chunk_time = time.time_ns()
 
                     if not response_text:
@@ -378,14 +374,10 @@ class OllamaAPI:
                 # Get the last message as query and previous messages as history
                 query = messages[-1].content
                 # Convert OllamaMessage objects to dictionaries
-                conversation_history = [
-                    {"role": msg.role, "content": msg.content} for msg in messages[:-1]
-                ]
+                conversation_history = [{"role": msg.role, "content": msg.content} for msg in messages[:-1]]
 
                 # Check for query prefix
-                cleaned_query, mode, only_need_context, user_prompt = parse_query_mode(
-                    query
-                )
+                cleaned_query, mode, only_need_context, user_prompt = parse_query_mode(query)
 
                 start_time = time.time_ns()
                 prompt_tokens = estimate_tokens(cleaned_query)
@@ -402,10 +394,7 @@ class OllamaAPI:
                 if user_prompt is not None:
                     param_dict["user_prompt"] = user_prompt
 
-                if (
-                    hasattr(self.rag, "args")
-                    and self.rag.args.history_turns is not None
-                ):
+                if hasattr(self.rag, "args") and self.rag.args.history_turns is not None:
                     param_dict["history_turns"] = self.rag.args.history_turns
 
                 query_param = QueryParam(**param_dict)
@@ -422,9 +411,7 @@ class OllamaAPI:
                             **self.rag.llm_model_kwargs,
                         )
                     else:
-                        response = await self.rag.aquery(
-                            cleaned_query, param=query_param
-                        )
+                        response = await self.rag.aquery(cleaned_query, param=query_param)
 
                     async def stream_generator():
                         try:
@@ -558,9 +545,7 @@ class OllamaAPI:
                     first_chunk_time = time.time_ns()
 
                     # Determine if the request is prefix with "/bypass" or from Open WebUI's session title and session keyword generation task
-                    match_result = re.search(
-                        r"\n<chat_history>\nUSER:", cleaned_query, re.MULTILINE
-                    )
+                    match_result = re.search(r"\n<chat_history>\nUSER:", cleaned_query, re.MULTILINE)
                     if match_result or mode == SearchMode.bypass:
                         if request.system:
                             self.rag.llm_model_kwargs["system_prompt"] = request.system
@@ -572,9 +557,7 @@ class OllamaAPI:
                             **self.rag.llm_model_kwargs,
                         )
                     else:
-                        response_text = await self.rag.aquery(
-                            cleaned_query, param=query_param
-                        )
+                        response_text = await self.rag.aquery(cleaned_query, param=query_param)
 
                     last_chunk_time = time.time_ns()
 

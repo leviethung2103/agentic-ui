@@ -1,32 +1,27 @@
 from __future__ import annotations
-import weakref
 
 import asyncio
-import html
 import csv
+import html
 import json
 import logging
 import logging.handlers
 import os
 import re
+import weakref
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from functools import wraps
 from hashlib import md5
-from typing import Any, Protocol, Callable, TYPE_CHECKING, List
-import xml.etree.ElementTree as ET
+from typing import TYPE_CHECKING, Any, Callable, List, Protocol
+
 import numpy as np
-from lightrag.prompt import PROMPTS
 from dotenv import load_dotenv
-from lightrag.constants import (
-    DEFAULT_LOG_MAX_BYTES,
-    DEFAULT_LOG_BACKUP_COUNT,
-    DEFAULT_LOG_FILENAME,
-)
+from lightrag.constants import DEFAULT_LOG_BACKUP_COUNT, DEFAULT_LOG_FILENAME, DEFAULT_LOG_MAX_BYTES
+from lightrag.prompt import PROMPTS
 
 
-def get_env_value(
-    env_key: str, default: any, value_type: type = str, special_none: bool = False
-) -> any:
+def get_env_value(env_key: str, default: any, value_type: type = str, special_none: bool = False) -> any:
     """
     Get value from environment variable with type conversion
 
@@ -86,9 +81,7 @@ def verbose_debug(msg: str, *args, **kwargs):
         else:
             formatted_msg = msg
         # Then truncate the formatted message
-        truncated_msg = (
-            formatted_msg[:100] + "..." if len(formatted_msg) > 100 else formatted_msg
-        )
+        truncated_msg = formatted_msg[:100] + "..." if len(formatted_msg) > 100 else formatted_msg
         logger.debug(truncated_msg, **kwargs)
 
 
@@ -138,11 +131,7 @@ class LightragPathFilter(logging.Filter):
             status = record.args[4]
 
             # Filter out successful GET requests to filtered paths
-            if (
-                method == "GET"
-                and (status == 200 or status == 304)
-                and path in self.filtered_paths
-            ):
+            if method == "GET" and (status == 200 or status == 304) and path in self.filtered_paths:
                 return False
 
             return True
@@ -168,9 +157,7 @@ def setup_logger(
         enable_file_logging: Whether to enable logging to a file (defaults to True)
     """
     # Configure formatters
-    detailed_formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    detailed_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     simple_formatter = logging.Formatter("%(levelname)s: %(message)s")
 
     logger_instance = logging.getLogger(logger_name)
@@ -196,9 +183,7 @@ def setup_logger(
 
         # Get log file max size and backup count from environment variables
         log_max_bytes = get_env_value("LOG_MAX_BYTES", DEFAULT_LOG_MAX_BYTES, int)
-        log_backup_count = get_env_value(
-            "LOG_BACKUP_COUNT", DEFAULT_LOG_BACKUP_COUNT, int
-        )
+        log_backup_count = get_env_value("LOG_BACKUP_COUNT", DEFAULT_LOG_BACKUP_COUNT, int)
 
         try:
             # Add file handler
@@ -376,9 +361,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
                                 future.cancel()
                             logger.debug("limit_async: Task cancelled during execution")
                         except Exception as e:
-                            logger.error(
-                                f"limit_async: Error in decorated function: {str(e)}"
-                            )
+                            logger.error(f"limit_async: Error in decorated function: {str(e)}")
                             if not future.done():
                                 future.set_exception(e)
                         finally:
@@ -408,9 +391,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
                     workers_needed = max_size - active_tasks_count
 
                     if workers_needed > 0:
-                        logger.info(
-                            f"limit_async: Creating {workers_needed} new workers"
-                        )
+                        logger.info(f"limit_async: Creating {workers_needed} new workers")
                         new_tasks = set()
                         for _ in range(workers_needed):
                             task = asyncio.create_task(worker())
@@ -443,9 +424,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
                 # Increment reinitialization counter if this is not the first initialization
                 if reinit_count > 0:
                     reinit_count += 1
-                    logger.warning(
-                        f"limit_async: Reinitializing needed (count: {reinit_count})"
-                    )
+                    logger.warning(f"limit_async: Reinitializing needed (count: {reinit_count})")
                 else:
                     reinit_count = 1  # First initialization
 
@@ -457,9 +436,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
                 # Log active tasks count during reinitialization
                 active_tasks_count = len(tasks)
                 if active_tasks_count > 0 and reinit_count > 1:
-                    logger.warning(
-                        f"limit_async: {active_tasks_count} tasks still running during reinitialization"
-                    )
+                    logger.warning(f"limit_async: {active_tasks_count} tasks still running during reinitialization")
 
                 # Create initial worker tasks, only adding the number needed
                 workers_needed = max_size - active_tasks_count
@@ -490,9 +467,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
             try:
                 await asyncio.wait_for(queue.join(), timeout=5.0)
             except asyncio.TimeoutError:
-                logger.warning(
-                    "limit_async: Timeout waiting for queue to empty during shutdown"
-                )
+                logger.warning("limit_async: Timeout waiting for queue to empty during shutdown")
 
             # Cancel all worker tasks
             for task in list(tasks):
@@ -514,9 +489,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
             logger.info("limit_async: Priority queue workers shutdown complete")
 
         @wraps(func)
-        async def wait_func(
-            *args, _priority=10, _timeout=None, _queue_timeout=None, **kwargs
-        ):
+        async def wait_func(*args, _priority=10, _timeout=None, _queue_timeout=None, **kwargs):
             """
             Execute the function with priority-based concurrency control
             Args:
@@ -555,9 +528,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
                             timeout=_queue_timeout,
                         )
                     except asyncio.TimeoutError:
-                        raise QueueFullError(
-                            f"Queue full, timeout after {_queue_timeout} seconds"
-                        )
+                        raise QueueFullError(f"Queue full, timeout after {_queue_timeout} seconds")
                 else:
                     # No timeout, may wait indefinitely
                     # current_count is used to ensure FIFO order
@@ -578,9 +549,7 @@ def priority_limit_async_func_call(max_size: int, max_queue_size: int = 1000):
                         # Cancel the future
                         if not future.done():
                             future.cancel()
-                        raise TimeoutError(
-                            f"limit_async: Task timed out after {_timeout} seconds"
-                        )
+                        raise TimeoutError(f"limit_async: Task timed out after {_timeout} seconds")
                 else:
                     # Wait for the result without timeout
                     return await future
@@ -705,9 +674,7 @@ class TiktokenTokenizer(Tokenizer):
 
 def pack_user_ass_to_openai_messages(*args: str):
     roles = ["user", "assistant"]
-    return [
-        {"role": roles[i % 2], "content": content} for i, content in enumerate(args)
-    ]
+    return [{"role": roles[i % 2], "content": content} for i, content in enumerate(args)]
 
 
 def split_string_by_multi_markers(content: str, markers: list[str]) -> list[str]:
@@ -859,9 +826,7 @@ async def get_best_cached_response(
     original_prompt=None,
     cache_type=None,
 ) -> str | None:
-    logger.debug(
-        f"get_best_cached_response:  mode={mode} cache_type={cache_type} use_llm_check={use_llm_check}"
-    )
+    logger.debug(f"get_best_cached_response:  mode={mode} cache_type={cache_type} use_llm_check={use_llm_check}")
     mode_cache = await hashing_kv.get_by_id(mode)
     if not mode_cache:
         return None
@@ -883,22 +848,16 @@ async def get_best_cached_response(
 
         try:
             # Safely convert cached embedding
-            cached_quantized = np.frombuffer(
-                bytes.fromhex(cache_data["embedding"]), dtype=np.uint8
-            ).reshape(cache_data["embedding_shape"])
+            cached_quantized = np.frombuffer(bytes.fromhex(cache_data["embedding"]), dtype=np.uint8).reshape(
+                cache_data["embedding_shape"]
+            )
 
             # Ensure min_val and max_val are valid float values
             embedding_min = cache_data.get("embedding_min")
             embedding_max = cache_data.get("embedding_max")
 
-            if (
-                embedding_min is None
-                or embedding_max is None
-                or embedding_min >= embedding_max
-            ):
-                logger.warning(
-                    f"Invalid embedding min/max values: min={embedding_min}, max={embedding_max}"
-                )
+            if embedding_min is None or embedding_max is None or embedding_min >= embedding_max:
+                logger.warning(f"Invalid embedding min/max values: min={embedding_min}, max={embedding_max}")
                 continue
 
             cached_embedding = dequantize_embedding(
@@ -919,13 +878,7 @@ async def get_best_cached_response(
 
     if best_similarity > similarity_threshold:
         # If LLM check is enabled and all required parameters are provided
-        if (
-            use_llm_check
-            and llm_func
-            and original_prompt
-            and best_prompt
-            and best_response is not None
-        ):
+        if use_llm_check and llm_func and original_prompt and best_prompt and best_response is not None:
             compare_prompt = PROMPTS["similarity_check"].format(
                 original_prompt=original_prompt, cached_prompt=best_prompt
             )
@@ -945,9 +898,7 @@ async def get_best_cached_response(
                         "original_question": original_prompt[:100] + "..."
                         if len(original_prompt) > 100
                         else original_prompt,
-                        "cached_question": best_prompt[:100] + "..."
-                        if len(best_prompt) > 100
-                        else best_prompt,
+                        "cached_question": best_prompt[:100] + "..." if len(best_prompt) > 100 else best_prompt,
                         "similarity_score": round(best_similarity, 4),
                         "threshold": similarity_threshold,
                     }
@@ -958,9 +909,7 @@ async def get_best_cached_response(
                 logger.warning(f"LLM similarity check failed: {e}")
                 return None  # Return None directly when LLM check fails
 
-        prompt_display = (
-            best_prompt[:50] + "..." if len(best_prompt) > 50 else best_prompt
-        )
+        prompt_display = best_prompt[:50] + "..." if len(best_prompt) > 50 else best_prompt
         log_data = {
             "event": "cache_hit",
             "type": cache_type,
@@ -1004,9 +953,7 @@ def quantize_embedding(embedding: np.ndarray | list[float], bits: int = 8) -> tu
     return quantized, min_val, max_val
 
 
-def dequantize_embedding(
-    quantized: np.ndarray, min_val: float, max_val: float, bits=8
-) -> np.ndarray:
+def dequantize_embedding(quantized: np.ndarray, min_val: float, max_val: float, bits=8) -> np.ndarray:
     """Restore quantized embedding"""
     if min_val == max_val:
         # handle constant vector
@@ -1076,10 +1023,7 @@ async def save_to_cache(hashing_kv, cache_data: CacheData):
 
     # Get existing cache data
     if exists_func(hashing_kv, "get_by_mode_and_id"):
-        mode_cache = (
-            await hashing_kv.get_by_mode_and_id(cache_data.mode, cache_data.args_hash)
-            or {}
-        )
+        mode_cache = await hashing_kv.get_by_mode_and_id(cache_data.mode, cache_data.args_hash) or {}
     else:
         mode_cache = await hashing_kv.get_by_id(cache_data.mode) or {}
 
@@ -1087,21 +1031,15 @@ async def save_to_cache(hashing_kv, cache_data: CacheData):
     if cache_data.args_hash in mode_cache:
         existing_content = mode_cache[cache_data.args_hash].get("return")
         if existing_content == cache_data.content:
-            logger.info(
-                f"Cache content unchanged for {cache_data.args_hash}, skipping update"
-            )
+            logger.info(f"Cache content unchanged for {cache_data.args_hash}, skipping update")
             return
 
     # Update cache with new content
     mode_cache[cache_data.args_hash] = {
         "return": cache_data.content,
         "cache_type": cache_data.cache_type,
-        "embedding": cache_data.quantized.tobytes().hex()
-        if cache_data.quantized is not None
-        else None,
-        "embedding_shape": cache_data.quantized.shape
-        if cache_data.quantized is not None
-        else None,
+        "embedding": cache_data.quantized.tobytes().hex() if cache_data.quantized is not None else None,
+        "embedding_shape": cache_data.quantized.shape if cache_data.quantized is not None else None,
         "embedding_min": cache_data.min_val,
         "embedding_max": cache_data.max_val,
         "original_prompt": cache_data.prompt,
@@ -1123,9 +1061,7 @@ def safe_unicode_decode(content):
         return chr(int(match.group(1), 16))
 
     # Perform the substitution
-    decoded_content = unicode_escape_pattern.sub(
-        replace_unicode_escape, content.decode("utf-8")
-    )
+    decoded_content = unicode_escape_pattern.sub(replace_unicode_escape, content.decode("utf-8"))
 
     return decoded_content
 
@@ -1142,9 +1078,7 @@ def exists_func(obj, func_name: str) -> bool:
         return False
 
 
-def get_conversation_turns(
-    conversation_history: list[dict[str, Any]], num_turns: int
-) -> str:
+def get_conversation_turns(conversation_history: list[dict[str, Any]], num_turns: int) -> str:
     """
     Process conversation history to get the specified number of complete turns.
 
@@ -1166,8 +1100,7 @@ def get_conversation_turns(
     # First, filter out keyword extraction messages
     for msg in conversation_history:
         if msg["role"] == "assistant" and (
-            msg["content"].startswith('{ "high_level_keywords"')
-            or msg["content"].startswith("{'high_level_keywords'")
+            msg["content"].startswith('{ "high_level_keywords"') or msg["content"].startswith("{'high_level_keywords'")
         ):
             continue
         messages.append(msg)
@@ -1197,9 +1130,7 @@ def get_conversation_turns(
     # Format the turns into a string
     formatted_turns: list[str] = []
     for turn in turns:
-        formatted_turns.extend(
-            [f"user: {turn[0]['content']}", f"assistant: {turn[1]['content']}"]
-        )
+        formatted_turns.extend([f"user: {turn[0]['content']}", f"assistant: {turn[1]['content']}"])
 
     return "\n".join(formatted_turns)
 
@@ -1278,9 +1209,7 @@ async def aexport_data(
         entity_row = {
             "entity_name": entity_name,
             "source_id": source_id,
-            "graph_data": str(
-                entity_info["graph_data"]
-            ),  # Convert to string to ensure compatibility
+            "graph_data": str(entity_info["graph_data"]),  # Convert to string to ensure compatibility
         }
         if include_vector_data and "vector_data" in entity_info:
             entity_row["vector_data"] = str(entity_info["vector_data"])
@@ -1292,14 +1221,10 @@ async def aexport_data(
             if src_entity == tgt_entity:
                 continue
 
-            edge_exists = await chunk_entity_relation_graph.has_edge(
-                src_entity, tgt_entity
-            )
+            edge_exists = await chunk_entity_relation_graph.has_edge(src_entity, tgt_entity)
             if edge_exists:
                 # Get edge information from graph
-                edge_data = await chunk_entity_relation_graph.get_edge(
-                    src_entity, tgt_entity
-                )
+                edge_data = await chunk_entity_relation_graph.get_edge(src_entity, tgt_entity)
                 source_id = edge_data.get("source_id") if edge_data else None
 
                 relation_info = {
@@ -1356,9 +1281,7 @@ async def aexport_data(
             # Relationships
             if relationships_data:
                 csvfile.write("# RELATIONSHIPS\n")
-                writer = csv.DictWriter(
-                    csvfile, fieldnames=relationships_data[0].keys()
-                )
+                writer = csv.DictWriter(csvfile, fieldnames=relationships_data[0].keys())
                 writer.writeheader()
                 writer.writerows(relationships_data)
 
@@ -1367,12 +1290,8 @@ async def aexport_data(
         import pandas as pd
 
         entities_df = pd.DataFrame(entities_data) if entities_data else pd.DataFrame()
-        relations_df = (
-            pd.DataFrame(relations_data) if relations_data else pd.DataFrame()
-        )
-        relationships_df = (
-            pd.DataFrame(relationships_data) if relationships_data else pd.DataFrame()
-        )
+        relations_df = pd.DataFrame(relations_data) if relations_data else pd.DataFrame()
+        relationships_df = pd.DataFrame(relationships_data) if relationships_data else pd.DataFrame()
 
         with pd.ExcelWriter(output_path, engine="xlsxwriter") as writer:
             if not entities_df.empty:
@@ -1380,9 +1299,7 @@ async def aexport_data(
             if not relations_df.empty:
                 relations_df.to_excel(writer, sheet_name="Relations", index=False)
             if not relationships_df.empty:
-                relationships_df.to_excel(
-                    writer, sheet_name="Relationships", index=False
-                )
+                relationships_df.to_excel(writer, sheet_name="Relationships", index=False)
 
     elif file_format == "md":
         # Markdown export
@@ -1394,15 +1311,11 @@ async def aexport_data(
             if entities_data:
                 # Write header
                 mdfile.write("| " + " | ".join(entities_data[0].keys()) + " |\n")
-                mdfile.write(
-                    "| " + " | ".join(["---"] * len(entities_data[0].keys())) + " |\n"
-                )
+                mdfile.write("| " + " | ".join(["---"] * len(entities_data[0].keys())) + " |\n")
 
                 # Write rows
                 for entity in entities_data:
-                    mdfile.write(
-                        "| " + " | ".join(str(v) for v in entity.values()) + " |\n"
-                    )
+                    mdfile.write("| " + " | ".join(str(v) for v in entity.values()) + " |\n")
                 mdfile.write("\n\n")
             else:
                 mdfile.write("*No entity data available*\n\n")
@@ -1412,15 +1325,11 @@ async def aexport_data(
             if relations_data:
                 # Write header
                 mdfile.write("| " + " | ".join(relations_data[0].keys()) + " |\n")
-                mdfile.write(
-                    "| " + " | ".join(["---"] * len(relations_data[0].keys())) + " |\n"
-                )
+                mdfile.write("| " + " | ".join(["---"] * len(relations_data[0].keys())) + " |\n")
 
                 # Write rows
                 for relation in relations_data:
-                    mdfile.write(
-                        "| " + " | ".join(str(v) for v in relation.values()) + " |\n"
-                    )
+                    mdfile.write("| " + " | ".join(str(v) for v in relation.values()) + " |\n")
                 mdfile.write("\n\n")
             else:
                 mdfile.write("*No relation data available*\n\n")
@@ -1430,19 +1339,11 @@ async def aexport_data(
             if relationships_data:
                 # Write header
                 mdfile.write("| " + " | ".join(relationships_data[0].keys()) + " |\n")
-                mdfile.write(
-                    "| "
-                    + " | ".join(["---"] * len(relationships_data[0].keys()))
-                    + " |\n"
-                )
+                mdfile.write("| " + " | ".join(["---"] * len(relationships_data[0].keys())) + " |\n")
 
                 # Write rows
                 for relationship in relationships_data:
-                    mdfile.write(
-                        "| "
-                        + " | ".join(str(v) for v in relationship.values())
-                        + " |\n"
-                    )
+                    mdfile.write("| " + " | ".join(str(v) for v in relationship.values()) + " |\n")
             else:
                 mdfile.write("*No relationship data available*\n\n")
 
@@ -1457,19 +1358,14 @@ async def aexport_data(
             txtfile.write("-" * 80 + "\n")
             if entities_data:
                 # Create fixed width columns
-                col_widths = {
-                    k: max(len(k), max(len(str(e[k])) for e in entities_data))
-                    for k in entities_data[0]
-                }
+                col_widths = {k: max(len(k), max(len(str(e[k])) for e in entities_data)) for k in entities_data[0]}
                 header = "  ".join(k.ljust(col_widths[k]) for k in entities_data[0])
                 txtfile.write(header + "\n")
                 txtfile.write("-" * len(header) + "\n")
 
                 # Write rows
                 for entity in entities_data:
-                    row = "  ".join(
-                        str(v).ljust(col_widths[k]) for k, v in entity.items()
-                    )
+                    row = "  ".join(str(v).ljust(col_widths[k]) for k, v in entity.items())
                     txtfile.write(row + "\n")
                 txtfile.write("\n\n")
             else:
@@ -1480,19 +1376,14 @@ async def aexport_data(
             txtfile.write("-" * 80 + "\n")
             if relations_data:
                 # Create fixed width columns
-                col_widths = {
-                    k: max(len(k), max(len(str(r[k])) for r in relations_data))
-                    for k in relations_data[0]
-                }
+                col_widths = {k: max(len(k), max(len(str(r[k])) for r in relations_data)) for k in relations_data[0]}
                 header = "  ".join(k.ljust(col_widths[k]) for k in relations_data[0])
                 txtfile.write(header + "\n")
                 txtfile.write("-" * len(header) + "\n")
 
                 # Write rows
                 for relation in relations_data:
-                    row = "  ".join(
-                        str(v).ljust(col_widths[k]) for k, v in relation.items()
-                    )
+                    row = "  ".join(str(v).ljust(col_widths[k]) for k, v in relation.items())
                     txtfile.write(row + "\n")
                 txtfile.write("\n\n")
             else:
@@ -1504,29 +1395,21 @@ async def aexport_data(
             if relationships_data:
                 # Create fixed width columns
                 col_widths = {
-                    k: max(len(k), max(len(str(r[k])) for r in relationships_data))
-                    for k in relationships_data[0]
+                    k: max(len(k), max(len(str(r[k])) for r in relationships_data)) for k in relationships_data[0]
                 }
-                header = "  ".join(
-                    k.ljust(col_widths[k]) for k in relationships_data[0]
-                )
+                header = "  ".join(k.ljust(col_widths[k]) for k in relationships_data[0])
                 txtfile.write(header + "\n")
                 txtfile.write("-" * len(header) + "\n")
 
                 # Write rows
                 for relationship in relationships_data:
-                    row = "  ".join(
-                        str(v).ljust(col_widths[k]) for k, v in relationship.items()
-                    )
+                    row = "  ".join(str(v).ljust(col_widths[k]) for k, v in relationship.items())
                     txtfile.write(row + "\n")
             else:
                 txtfile.write("No relationship data available\n\n")
 
     else:
-        raise ValueError(
-            f"Unsupported file format: {file_format}. "
-            f"Choose from: csv, excel, md, txt"
-        )
+        raise ValueError(f"Unsupported file format: {file_format}. " f"Choose from: csv, excel, md, txt")
     if file_format is not None:
         print(f"Data exported to: {output_path} with format: {file_format}")
     else:
@@ -1718,12 +1601,8 @@ def normalize_extracted_info(name: str, is_entity=False) -> str:
     name = re.sub(r"(?<=[\u4e00-\u9fa5])\s+(?=[\u4e00-\u9fa5])", "", name)
 
     # Remove spaces between Chinese and English/numbers/symbols
-    name = re.sub(
-        r"(?<=[\u4e00-\u9fa5])\s+(?=[a-zA-Z0-9\(\)\[\]@#$%!&\*\-=+_])", "", name
-    )
-    name = re.sub(
-        r"(?<=[a-zA-Z0-9\(\)\[\]@#$%!&\*\-=+_])\s+(?=[\u4e00-\u9fa5])", "", name
-    )
+    name = re.sub(r"(?<=[\u4e00-\u9fa5])\s+(?=[a-zA-Z0-9\(\)\[\]@#$%!&\*\-=+_])", "", name)
+    name = re.sub(r"(?<=[a-zA-Z0-9\(\)\[\]@#$%!&\*\-=+_])\s+(?=[\u4e00-\u9fa5])", "", name)
 
     # Remove English quotation marks from the beginning and end
     if len(name) >= 2 and name.startswith('"') and name.endswith('"'):
@@ -1806,9 +1685,7 @@ class TokenTracker:
         if "total_tokens" in token_counts:
             self.total_tokens += token_counts["total_tokens"]
         else:
-            self.total_tokens += token_counts.get(
-                "prompt_tokens", 0
-            ) + token_counts.get("completion_tokens", 0)
+            self.total_tokens += token_counts.get("prompt_tokens", 0) + token_counts.get("completion_tokens", 0)
 
         self.call_count += 1
 

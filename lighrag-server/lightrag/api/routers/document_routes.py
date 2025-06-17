@@ -3,21 +3,22 @@ This module contains all document-related routes for the LightRAG API.
 """
 
 import asyncio
-from pyuca import Collator
-from lightrag.utils import logger
-import aiofiles
 import shutil
 import traceback
-import pipmaster as pm
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Literal
-from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
-from pydantic import BaseModel, Field, field_validator
+from typing import Any, Dict, List, Literal, Optional
 
+import aiofiles
+import pipmaster as pm
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
 from lightrag import LightRAG
-from lightrag.base import DocProcessingStatus, DocStatus
 from lightrag.api.utils_api import get_combined_auth_dependency
+from lightrag.base import DocProcessingStatus, DocStatus
+from lightrag.utils import logger
+from pydantic import BaseModel, Field, field_validator
+from pyuca import Collator
+
 from ..config import global_args
 
 
@@ -63,12 +64,8 @@ class ScanResponse(BaseModel):
         message: Optional message with additional details
     """
 
-    status: Literal["scanning_started"] = Field(
-        description="Status of the scanning operation"
-    )
-    message: Optional[str] = Field(
-        default=None, description="Additional details about the scanning operation"
-    )
+    status: Literal["scanning_started"] = Field(description="Status of the scanning operation")
+    message: Optional[str] = Field(default=None, description="Additional details about the scanning operation")
 
     class Config:
         json_schema_extra = {
@@ -97,11 +94,7 @@ class InsertTextRequest(BaseModel):
         return text.strip()
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "text": "This is a sample text to be inserted into the RAG system."
-            }
-        }
+        json_schema_extra = {"example": {"text": "This is a sample text to be inserted into the RAG system."}}
 
 
 class InsertTextsRequest(BaseModel):
@@ -162,9 +155,7 @@ class ClearDocumentsResponse(BaseModel):
         message: Detailed message describing the operation result
     """
 
-    status: Literal["success", "partial_success", "busy", "fail"] = Field(
-        description="Status of the clear operation"
-    )
+    status: Literal["success", "partial_success", "busy", "fail"] = Field(description="Status of the clear operation")
     message: str = Field(description="Message describing the operation result")
 
     class Config:
@@ -183,9 +174,7 @@ class ClearCacheRequest(BaseModel):
         modes: Optional list of cache modes to clear
     """
 
-    modes: Optional[
-        List[Literal["default", "naive", "local", "global", "hybrid", "mix"]]
-    ] = Field(
+    modes: Optional[List[Literal["default", "naive", "local", "global", "hybrid", "mix"]]] = Field(
         default=None,
         description="Modes of cache to clear. If None, clears all cache.",
     )
@@ -202,9 +191,7 @@ class ClearCacheResponse(BaseModel):
         message: Detailed message describing the operation result
     """
 
-    status: Literal["success", "fail"] = Field(
-        description="Status of the clear operation"
-    )
+    status: Literal["success", "fail"] = Field(description="Status of the clear operation")
     message: str = Field(description="Message describing the operation result")
 
     class Config:
@@ -239,15 +226,9 @@ class DocStatusResponse(BaseModel):
     status: DocStatus = Field(description="Current processing status")
     created_at: str = Field(description="Creation timestamp (ISO format string)")
     updated_at: str = Field(description="Last update timestamp (ISO format string)")
-    chunks_count: Optional[int] = Field(
-        default=None, description="Number of chunks the document was split into"
-    )
-    error: Optional[str] = Field(
-        default=None, description="Error message if processing failed"
-    )
-    metadata: Optional[dict[str, Any]] = Field(
-        default=None, description="Additional metadata about the document"
-    )
+    chunks_count: Optional[int] = Field(default=None, description="Number of chunks the document was split into")
+    error: Optional[str] = Field(default=None, description="Error message if processing failed")
+    metadata: Optional[dict[str, Any]] = Field(default=None, description="Additional metadata about the document")
     file_path: str = Field(description="Path to the document file")
 
     class Config:
@@ -506,8 +487,9 @@ async def pipeline_enqueue_file(rag: LightRAG, file_path: Path) -> bool:
                 else:
                     if not pm.is_installed("pypdf2"):  # type: ignore
                         pm.install("pypdf2")
-                    from PyPDF2 import PdfReader  # type: ignore
                     from io import BytesIO
+
+                    from PyPDF2 import PdfReader  # type: ignore
 
                     pdf_file = BytesIO(file)
                     reader = PdfReader(pdf_file)
@@ -528,14 +510,13 @@ async def pipeline_enqueue_file(rag: LightRAG, file_path: Path) -> bool:
                             pm.install("python-docx")
                         except Exception:
                             pm.install("docx")
-                    from docx import Document  # type: ignore
                     from io import BytesIO
+
+                    from docx import Document  # type: ignore
 
                     docx_file = BytesIO(file)
                     doc = Document(docx_file)
-                    content = "\n".join(
-                        [paragraph.text for paragraph in doc.paragraphs]
-                    )
+                    content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
             case ".pptx":
                 if global_args.document_loading_engine == "DOCLING":
                     if not pm.is_installed("docling"):  # type: ignore
@@ -548,8 +529,9 @@ async def pipeline_enqueue_file(rag: LightRAG, file_path: Path) -> bool:
                 else:
                     if not pm.is_installed("python-pptx"):  # type: ignore
                         pm.install("pptx")
-                    from pptx import Presentation  # type: ignore
                     from io import BytesIO
+
+                    from pptx import Presentation  # type: ignore
 
                     pptx_file = BytesIO(file)
                     prs = Presentation(pptx_file)
@@ -569,26 +551,19 @@ async def pipeline_enqueue_file(rag: LightRAG, file_path: Path) -> bool:
                 else:
                     if not pm.is_installed("openpyxl"):  # type: ignore
                         pm.install("openpyxl")
-                    from openpyxl import load_workbook  # type: ignore
                     from io import BytesIO
+
+                    from openpyxl import load_workbook  # type: ignore
 
                     xlsx_file = BytesIO(file)
                     wb = load_workbook(xlsx_file)
                     for sheet in wb:
                         content += f"Sheet: {sheet.title}\n"
                         for row in sheet.iter_rows(values_only=True):
-                            content += (
-                                "\t".join(
-                                    str(cell) if cell is not None else ""
-                                    for cell in row
-                                )
-                                + "\n"
-                            )
+                            content += "\t".join(str(cell) if cell is not None else "" for cell in row) + "\n"
                         content += "\n"
             case _:
-                logger.error(
-                    f"Unsupported file type: {file_path.name} (extension {ext})"
-                )
+                logger.error(f"Unsupported file type: {file_path.name} (extension {ext})")
                 return False
 
         # Insert into the RAG queue
@@ -712,15 +687,11 @@ async def run_scanning_process(rag: LightRAG, doc_manager: DocumentManager):
         logger.error(traceback.format_exc())
 
 
-def create_document_routes(
-    rag: LightRAG, doc_manager: DocumentManager, api_key: Optional[str] = None
-):
+def create_document_routes(rag: LightRAG, doc_manager: DocumentManager, api_key: Optional[str] = None):
     # Create combined auth dependency for document routes
     combined_auth = get_combined_auth_dependency(api_key)
 
-    @router.post(
-        "/scan", response_model=ScanResponse, dependencies=[Depends(combined_auth)]
-    )
+    @router.post("/scan", response_model=ScanResponse, dependencies=[Depends(combined_auth)])
     async def scan_for_new_documents(background_tasks: BackgroundTasks):
         """
         Trigger the scanning process for new documents.
@@ -739,12 +710,8 @@ def create_document_routes(
             message="Scanning process has been initiated in the background",
         )
 
-    @router.post(
-        "/upload", response_model=InsertResponse, dependencies=[Depends(combined_auth)]
-    )
-    async def upload_to_input_dir(
-        background_tasks: BackgroundTasks, file: UploadFile = File(...)
-    ):
+    @router.post("/upload", response_model=InsertResponse, dependencies=[Depends(combined_auth)])
+    async def upload_to_input_dir(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
         """
         Upload a file to the input directory and index it.
 
@@ -793,12 +760,8 @@ def create_document_routes(
             logger.error(traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e))
 
-    @router.post(
-        "/text", response_model=InsertResponse, dependencies=[Depends(combined_auth)]
-    )
-    async def insert_text(
-        request: InsertTextRequest, background_tasks: BackgroundTasks
-    ):
+    @router.post("/text", response_model=InsertResponse, dependencies=[Depends(combined_auth)])
+    async def insert_text(request: InsertTextRequest, background_tasks: BackgroundTasks):
         """
         Insert text into the RAG system.
 
@@ -831,9 +794,7 @@ def create_document_routes(
         response_model=InsertResponse,
         dependencies=[Depends(combined_auth)],
     )
-    async def insert_texts(
-        request: InsertTextsRequest, background_tasks: BackgroundTasks
-    ):
+    async def insert_texts(request: InsertTextsRequest, background_tasks: BackgroundTasks):
         """
         Insert multiple texts into the RAG system.
 
@@ -862,12 +823,8 @@ def create_document_routes(
             raise HTTPException(status_code=500, detail=str(e))
 
     # TODO: deprecated, use /upload instead
-    @router.post(
-        "/file", response_model=InsertResponse, dependencies=[Depends(combined_auth)]
-    )
-    async def insert_file(
-        background_tasks: BackgroundTasks, file: UploadFile = File(...)
-    ):
+    @router.post("/file", response_model=InsertResponse, dependencies=[Depends(combined_auth)])
+    async def insert_file(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
         """
         Insert a file directly into the RAG system.
 
@@ -911,9 +868,7 @@ def create_document_routes(
         response_model=InsertResponse,
         dependencies=[Depends(combined_auth)],
     )
-    async def insert_batch(
-        background_tasks: BackgroundTasks, files: List[UploadFile] = File(...)
-    ):
+    async def insert_batch(background_tasks: BackgroundTasks, files: List[UploadFile] = File(...)):
         """
         Process multiple files in batch mode.
 
@@ -969,9 +924,7 @@ def create_document_routes(
             logger.error(traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e))
 
-    @router.delete(
-        "", response_model=ClearDocumentsResponse, dependencies=[Depends(combined_auth)]
-    )
+    @router.delete("", response_model=ClearDocumentsResponse, dependencies=[Depends(combined_auth)])
     async def clear_documents():
         """
         Clear all documents from the RAG system.
@@ -993,10 +946,7 @@ def create_document_routes(
             HTTPException: Raised when a serious error occurs during the clearing process,
                           with status code 500 and error details in the detail field.
         """
-        from lightrag.kg.shared_storage import (
-            get_namespace_data,
-            get_pipeline_status_lock,
-        )
+        from lightrag.kg.shared_storage import get_namespace_data, get_pipeline_status_lock
 
         # Get pipeline status and lock
         pipeline_status = await get_namespace_data("pipeline_status")
@@ -1024,9 +974,7 @@ def create_document_routes(
             )
             # Cleaning history_messages without breaking it as a shared list object
             del pipeline_status["history_messages"][:]
-            pipeline_status["history_messages"].append(
-                "Starting document clearing process"
-            )
+            pipeline_status["history_messages"].append("Starting document clearing process")
 
         try:
             # Use drop method to clear all data
@@ -1043,9 +991,7 @@ def create_document_routes(
 
             # Log storage drop start
             if "history_messages" in pipeline_status:
-                pipeline_status["history_messages"].append(
-                    "Starting to drop storage components"
-                )
+                pipeline_status["history_messages"].append("Starting to drop storage components")
 
             for storage in storages:
                 if storage is not None:
@@ -1091,9 +1037,7 @@ def create_document_routes(
 
             # Log file deletion start
             if "history_messages" in pipeline_status:
-                pipeline_status["history_messages"].append(
-                    "Starting to delete files in input directory"
-                )
+                pipeline_status["history_messages"].append("Starting to delete files in input directory")
 
             # Delete all files in input_dir
             deleted_files_count = 0
@@ -1116,9 +1060,7 @@ def create_document_routes(
                     )
                     errors.append(f"Failed to delete {file_errors_count} files")
                 else:
-                    pipeline_status["history_messages"].append(
-                        f"Successfully deleted {deleted_files_count} files"
-                    )
+                    pipeline_status["history_messages"].append(f"Successfully deleted {deleted_files_count} files")
 
             # Prepare final result message
             final_message = ""
@@ -1180,10 +1122,7 @@ def create_document_routes(
             HTTPException: If an error occurs while retrieving pipeline status (500)
         """
         try:
-            from lightrag.kg.shared_storage import (
-                get_namespace_data,
-                get_all_update_flags_status,
-            )
+            from lightrag.kg.shared_storage import get_all_update_flags_status, get_namespace_data
 
             pipeline_status = await get_namespace_data("pipeline_status")
 
@@ -1223,9 +1162,7 @@ def create_document_routes(
             logger.error(traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e))
 
-    @router.get(
-        "", response_model=DocsStatusesResponse, dependencies=[Depends(combined_auth)]
-    )
+    @router.get("", response_model=DocsStatusesResponse, dependencies=[Depends(combined_auth)])
     async def documents() -> DocsStatusesResponse:
         """
         Get the status of all documents in the system.
@@ -1306,9 +1243,7 @@ def create_document_routes(
             # Validate modes if provided
             valid_modes = ["default", "naive", "local", "global", "hybrid", "mix"]
             if request.modes and not all(mode in valid_modes for mode in request.modes):
-                invalid_modes = [
-                    mode for mode in request.modes if mode not in valid_modes
-                ]
+                invalid_modes = [mode for mode in request.modes if mode not in valid_modes]
                 raise HTTPException(
                     status_code=400,
                     detail=f"Invalid mode(s): {invalid_modes}. Valid modes are: {valid_modes}",

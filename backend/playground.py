@@ -1,5 +1,6 @@
 import asyncio
 import os
+from textwrap import dedent
 
 import nest_asyncio
 from agno.agent import Agent
@@ -16,7 +17,6 @@ from agents.image_agent import image_agent
 from agents.weather_agent import weather_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
-from textwrap import dedent
 
 load_dotenv()
 
@@ -50,13 +50,15 @@ async def run_server() -> None:
             description="You are a helpful assistant that can retrieve and analyze documents using the LightRAG system.",
             storage=SqliteStorage(table_name="rag_agent", db_file=agent_storage),
             markdown=True,
-            instructions=dedent("""\
+            instructions=dedent(
+                """\
                 Search your knowledge before answering the question.
                 Use the mode=hybrid, top_k=1
                 
                 Remember:
                     - Always include sources or references at the end of your answer in markdown format.
-            """),
+            """
+            ),
             add_datetime_to_instructions=True,
             add_history_to_messages=True,
             num_history_runs=3,

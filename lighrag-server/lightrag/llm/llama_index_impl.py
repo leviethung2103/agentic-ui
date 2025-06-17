@@ -1,34 +1,19 @@
-import pipmaster as pm
-from llama_index.core.llms import (
-    ChatMessage,
-    MessageRole,
-    ChatResponse,
-)
 from typing import List, Optional
+
+import pipmaster as pm
 from lightrag.utils import logger
+from llama_index.core.llms import ChatMessage, ChatResponse, MessageRole
 
 # Install required dependencies
 if not pm.is_installed("llama-index"):
     pm.install("llama-index")
 
+import numpy as np
+from lightrag.exceptions import APIConnectionError, APITimeoutError, RateLimitError
+from lightrag.utils import locate_json_string_body_from_string, wrap_embedding_func_with_attrs
 from llama_index.core.embeddings import BaseEmbedding
 from llama_index.core.settings import Settings as LlamaIndexSettings
-from tenacity import (
-    retry,
-    stop_after_attempt,
-    wait_exponential,
-    retry_if_exception_type,
-)
-from lightrag.utils import (
-    wrap_embedding_func_with_attrs,
-    locate_json_string_body_from_string,
-)
-from lightrag.exceptions import (
-    APIConnectionError,
-    RateLimitError,
-    APITimeoutError,
-)
-import numpy as np
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 
 def configure_llama_index(settings: LlamaIndexSettings = None, **kwargs):
@@ -63,22 +48,14 @@ def format_chat_messages(messages):
         content = msg.get("content", "")
 
         if role == "system":
-            formatted_messages.append(
-                ChatMessage(role=MessageRole.SYSTEM, content=content)
-            )
+            formatted_messages.append(ChatMessage(role=MessageRole.SYSTEM, content=content))
         elif role == "assistant":
-            formatted_messages.append(
-                ChatMessage(role=MessageRole.ASSISTANT, content=content)
-            )
+            formatted_messages.append(ChatMessage(role=MessageRole.ASSISTANT, content=content))
         elif role == "user":
-            formatted_messages.append(
-                ChatMessage(role=MessageRole.USER, content=content)
-            )
+            formatted_messages.append(ChatMessage(role=MessageRole.USER, content=content))
         else:
             logger.warning(f"Unknown role {role}, treating as user message")
-            formatted_messages.append(
-                ChatMessage(role=MessageRole.USER, content=content)
-            )
+            formatted_messages.append(ChatMessage(role=MessageRole.USER, content=content))
 
     return formatted_messages
 
@@ -86,9 +63,7 @@ def format_chat_messages(messages):
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=4, max=60),
-    retry=retry_if_exception_type(
-        (RateLimitError, APIConnectionError, APITimeoutError)
-    ),
+    retry=retry_if_exception_type((RateLimitError, APIConnectionError, APITimeoutError)),
 )
 async def llama_index_complete_if_cache(
     model: str,
@@ -104,17 +79,13 @@ async def llama_index_complete_if_cache(
 
         # Add system message if provided
         if system_prompt:
-            formatted_messages.append(
-                ChatMessage(role=MessageRole.SYSTEM, content=system_prompt)
-            )
+            formatted_messages.append(ChatMessage(role=MessageRole.SYSTEM, content=system_prompt))
 
         # Add history messages
         for msg in history_messages:
             formatted_messages.append(
                 ChatMessage(
-                    role=MessageRole.USER
-                    if msg["role"] == "user"
-                    else MessageRole.ASSISTANT,
+                    role=MessageRole.USER if msg["role"] == "user" else MessageRole.ASSISTANT,
                     content=msg["content"],
                 )
             )
@@ -178,9 +149,7 @@ async def llama_index_complete(
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=4, max=60),
-    retry=retry_if_exception_type(
-        (RateLimitError, APIConnectionError, APITimeoutError)
-    ),
+    retry=retry_if_exception_type((RateLimitError, APIConnectionError, APITimeoutError)),
 )
 async def llama_index_embed(
     texts: list[str],
