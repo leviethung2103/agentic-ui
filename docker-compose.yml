@@ -58,5 +58,18 @@ services:
     depends_on:
       - postgres
 
+  services:
+  qdrant:
+    image: qdrant/qdrant
+    container_name: homelab_qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_storage:/qdrant/storage:z
+    restart: unless-stopped
+    environment:
+      - QDRANT__SERVICE__API_KEY=3d280f16-5851-4fa5-9604-0438a7a37e5e
+  
 volumes:
   postgres_data:  
