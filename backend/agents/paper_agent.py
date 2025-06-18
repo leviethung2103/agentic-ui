@@ -1,4 +1,3 @@
-import asyncio
 import os
 
 from agno.agent import Agent
@@ -8,9 +7,12 @@ from agno.tools.arxiv import ArxivTools
 from agno.tools.duckduckgo import DuckDuckGoTools
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
-db_url = f"postgresql+psycopg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+db_url = (
+    f"postgresql+psycopg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}"
+    f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+)
 
 paper_agent = Agent(
     name="Paper Agent",
@@ -33,4 +35,5 @@ if __name__ == "__main__":
     paper_agent.print_response("Search arxiv for Reinformcement learning paper", show_full_reasoning=True)
 
     # use the async
+    # import asyncio
     # asyncio.run(paper_agent.aprint_response("Search arxiv for Reinformcement learning paper"))

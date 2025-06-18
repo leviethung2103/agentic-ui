@@ -20,6 +20,8 @@ jina
 psycopg[binary]
 pymongo
 ollama==0.4.7
+pypdf
+arxiv
 # textract
 # unstructured
 # markdown

@@ -3,6 +3,14 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from '@/lib/utils'
 import { type MarkdownRendererProps } from './types'
+import {
+  Table,
+  TableHead,
+  TableHeadCell,
+  TableBody,
+  TableRow,
+  TableCell
+} from './styles'
 import CodeBlock from '@/components/ui/CodeBlock'
 
 // Custom components for markdown rendering
@@ -63,6 +71,12 @@ const components = {
     // The CodeBlock component is already rendered by the code component
     return children
   },
+  table: Table,
+  thead: TableHead,
+  th: TableHeadCell,
+  tbody: TableBody,
+  tr: TableRow,
+  td: TableCell,
   a: ({ node, ...props }: any) => (
     <a
       {...props}

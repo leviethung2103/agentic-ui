@@ -221,45 +221,45 @@ const Img = ({ src, alt }: ImgProps) => {
   )
 }
 
-const Table = ({ className, ...props }: TableProps) => (
-  <div className="w-full max-w-[560px] overflow-hidden rounded-md border border-border">
+export const Table = ({ className, ...props }: TableProps) => (
+  <div className="relative my-4 w-full overflow-hidden rounded-lg border border-gray-700 bg-[#1e1e1e] shadow-lg">
     <div className="w-full overflow-x-auto">
       <table className={cn(className, 'w-full')} {...filterProps(props)} />
     </div>
   </div>
 )
 
-const TableHead = ({ className, ...props }: TableHeaderProps) => (
+export const TableHead = ({ className, ...props }: TableHeaderProps) => (
   <thead
     className={cn(
       className,
-      'rounded-md border-b border-border bg-transparent p-2 text-left text-sm font-[600]'
+      'rounded-md border-b border-gray-700 bg-gray-800/80 p-2 text-left text-sm font-[600] text-gray-300'
     )}
     {...filterProps(props)}
   />
 )
 
-const TableHeadCell = ({ className, ...props }: TableHeaderCellProps) => (
+export const TableHeadCell = ({ className, ...props }: TableHeaderCellProps) => (
   <th
-    className={cn(className, 'p-2 text-sm font-[600]')}
+    className={cn(className, 'p-2 text-sm font-[600] text-gray-300')}
     {...filterProps(props)}
   />
 )
 
-const TableBody = ({ className, ...props }: TableBodyProps) => (
-  <tbody className={cn(className, 'text-xs')} {...filterProps(props)} />
+export const TableBody = ({ className, ...props }: TableBodyProps) => (
+  <tbody className={cn(className, 'text-sm text-gray-300')} {...filterProps(props)} />
 )
 
-const TableRow = ({ className, ...props }: TableRowProps) => (
+export const TableRow = ({ className, ...props }: TableRowProps) => (
   <tr
-    className={cn(className, 'border-b border-border last:border-b-0')}
+    className={cn(className, 'border-b border-gray-700 last:border-b-0')}
     {...filterProps(props)}
   />
 )
 
-const TableCell = ({ className, ...props }: TableCellProps) => (
+export const TableCell = ({ className, ...props }: TableCellProps) => (
   <td
-    className={cn(className, 'whitespace-nowrap p-2 font-[400]')}
+    className={cn(className, 'whitespace-nowrap p-2 font-[400] text-gray-300')}
     {...filterProps(props)}
   />
 )
