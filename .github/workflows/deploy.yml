@@ -239,6 +239,7 @@ jobs:
 
   deploy-lighrag-server:
     name: Deploy LightRAG Server
+    if: false 
     needs: deploy-backend
     runs-on: ubuntu-latest
     steps:
@@ -420,12 +421,8 @@ jobs:
 
   deploy-dozzle:
     name: Deploy Dozzle
-    needs:
-      [
-        deploy-backend-docker,
-        deploy-lighrag-server-docker,
-        deploy-lightrag-mcp-docker
-      ]
+    needs: 
+      - deploy-frontend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -469,7 +466,7 @@ jobs:
             echo "Access Dozzle at: http://${{ secrets.VPS_HOST }}:8080"
   deploy-uptime-kuma:
     name: Deploy Uptime Kuma
-    needs: deploy-dozzle # Run after dozzle is deployed
+    needs: deploy-frontend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
