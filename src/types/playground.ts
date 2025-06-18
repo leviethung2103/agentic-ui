@@ -169,6 +169,7 @@ export interface ReasoningMessage {
   created_at?: number
 }
 export interface PlaygroundChatMessage {
+  id: string
   role: 'user' | 'agent' | 'system' | 'tool'
   content: string
   streamingError?: boolean
@@ -179,6 +180,9 @@ export interface PlaygroundChatMessage {
     reasoning_messages?: ReasoningMessage[]
     references?: ReferenceData[]
   }
+  reasoning_steps?: ReasoningSteps[]
+  reasoning_messages?: ReasoningMessage[]
+  references?: ReferenceData[]
   images?: ImageData[]
   videos?: VideoData[]
   audio?: AudioData[]

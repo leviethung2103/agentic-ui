@@ -5,8 +5,10 @@ import type { PlaygroundChatMessage } from '@/types/playground'
 import Videos from './Multimedia/Videos'
 import Images from './Multimedia/Images'
 import Audios from './Multimedia/Audios'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import AgentThinkingLoader from './AgentThinkingLoader'
+import { Button } from '@/components/ui/button'
+import { Check, Copy, ThumbsUp, ThumbsDown, Share2 } from 'lucide-react'
 
 interface MessageProps {
   message: PlaygroundChatMessage
@@ -14,6 +16,50 @@ interface MessageProps {
 
 const AgentMessage = ({ message }: MessageProps) => {
   const { streamingErrorMessage } = usePlaygroundStore()
+  const [isCopied, setIsCopied] = useState(false)
+  const [userFeedback, setUserFeedback] = useState<'like' | 'dislike' | null>(null)
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content || message.response_audio?.transcript || '')
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
+  const handleFeedback = (type: 'like' | 'dislike') => {
+    setUserFeedback(type)
+    // Here you can add logic to send feedback to your backend
+    console.log(`User ${type}d the message:`, message.id)
+  }
+
+  const handleShare = async () => {
+    const text = message.content || message.response_audio?.transcript || ''
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Check out this message',
+          text: text,
+          url: window.location.href
+        })
+      } catch (err) {
+        console.error('Error sharing:', err)
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      try {
+        await navigator.clipboard.writeText(text)
+        setIsCopied(true)
+        setTimeout(() => setIsCopied(false), 2000)
+      } catch (err) {
+        console.error('Failed to copy text: ', err)
+      }
+    }
+  }
+
   let messageContent
   if (message.streamingError) {
     messageContent = (
@@ -69,11 +115,57 @@ const AgentMessage = ({ message }: MessageProps) => {
   }
 
   return (
-    <div className="flex flex-row items-start gap-4 font-geist">
+    <div className="group relative flex flex-row items-start gap-4 font-geist">
       <div className="flex-shrink-0">
         <Icon type="agent" size="sm" />
       </div>
-      {messageContent}
+      <div className="flex-1">
+        {messageContent}
+        {!message.streamingError && message.content && (
+          <div className="mt-2 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={handleCopy}
+              title="Copy to clipboard"
+            >
+              {isCopied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant={userFeedback === 'like' ? 'default' : 'ghost'}
+              size="icon"
+              className={`h-8 w-8 rounded-full ${userFeedback === 'like' ? 'text-green-500' : ''}`}
+              onClick={() => handleFeedback('like')}
+              title="Like this response"
+            >
+              <ThumbsUp className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={userFeedback === 'dislike' ? 'default' : 'ghost'}
+              size="icon"
+              className={`h-8 w-8 rounded-full ${userFeedback === 'dislike' ? 'text-red-500' : ''}`}
+              onClick={() => handleFeedback('dislike')}
+              title="Dislike this response"
+            >
+              <ThumbsDown className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full"
+              onClick={handleShare}
+              title="Share this message"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
