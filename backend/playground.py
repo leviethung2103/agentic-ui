@@ -17,7 +17,7 @@ from agents.chat_agent import chat_agent
 from agents.code_agent import code_agent
 from agents.finance_agent import finance_agent
 from agents.image_agent import image_agent
-from agents.paper_agent import paper_agent
+from agents.ollama_agent import ollama_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
 
@@ -84,7 +84,7 @@ async def run_server() -> None:
                 youtube_agent,
                 image_agent,
                 code_agent,
-                paper_agent,
+                ollama_agent,
             ],
             settings=settings,
         )

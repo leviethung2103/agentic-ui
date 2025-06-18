@@ -14,13 +14,16 @@ db_url = (
     f"@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
 )
 
-paper_agent = Agent(
-    name="Paper Agent",
-    agent_id="paper_agent",
-    model=Ollama(id="llama3.2"),
+model = "gemma3:4b"
+model = "qwen3:4b"
+
+ollama_agent = Agent(
+    name="Ollama Agent",
+    agent_id="ollama_agent",
+    model=Ollama(id=model),
     tools=[ArxivTools(), DuckDuckGoTools()],
     instructions=["Always use tables to display data"],
-    storage=PostgresStorage(table_name="paper_agent", db_url=db_url),
+    storage=PostgresStorage(table_name="ollama_agent", db_url=db_url),
     add_datetime_to_instructions=True,
     add_history_to_messages=True,
     num_history_responses=5,
