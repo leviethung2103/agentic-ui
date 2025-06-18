@@ -10,6 +10,7 @@ agent_storage: str = "storage/finance_agent.db"
 
 finance_agent = Agent(
     name="Finance Agent",
+    agent_id="finance_agent",
     model=OpenAIChat(id="gpt-4.1-nano"),
     tools=[YFinanceTools(stock_price=True, analyst_recommendations=True, company_info=True, company_news=True)],
     instructions=["Always use tables to display data"],

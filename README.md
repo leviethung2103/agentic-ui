@@ -16,7 +16,16 @@ A modern chat interface for AI agents built with Next.js, Tailwind CSS, and Type
 
 ## Monitoring Agents
 
+### Phoenix
+
 - [Phoenix Arize Projects Dashboard](https://app.phoenix.arize.com/projects) - Monitor and analyze your AI agent's performance, traces, and metrics in real-time.
+- [Phoenix Authentication](https://arize.com/docs/phoenix/self-hosting/features/authentication) - Documentation for setting up and managing authentication in your self-hosted Phoenix instance.
+
+**Default Login Credentials:**
+- **Email:** admin@localhost
+- **Password:** admin
+
+Usually, new password Admin@123
 
 ## Monitoring Tools
 

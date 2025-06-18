@@ -12,6 +12,7 @@ agent_storage: str = "storage/youtube_agent.db"
 
 youtube_agent = Agent(
     name="YouTube Agent",
+    agent_id="youtube_agent",
     model=OpenAIChat(id="gpt-4.1-nano"),
     tools=[YouTubeTools()],
     show_tool_calls=True,

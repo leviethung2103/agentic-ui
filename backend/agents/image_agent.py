@@ -11,6 +11,7 @@ class ImageAgent(Agent):
     def __init__(self):
         super().__init__(
             name="Image Agent",
+            agent_id="image_agent",
             tools=[],
             instructions=[
                 "You are an agent that returns hardcoded image responses in markdown format.",

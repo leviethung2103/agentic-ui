@@ -5,20 +5,23 @@ from textwrap import dedent
 import nest_asyncio
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
+from agno.models.openrouter import OpenRouter
 from agno.playground import Playground
 from agno.playground.settings import PlaygroundSettings
 from agno.storage.sqlite import SqliteStorage
 from agno.tools.mcp import MCPTools
 from dotenv import load_dotenv
+from phoenix.otel import register
 
+from agents.chat_agent import chat_agent
 from agents.code_agent import code_agent
 from agents.finance_agent import finance_agent
 from agents.image_agent import image_agent
-from agents.weather_agent import weather_agent
+from agents.paper_agent import paper_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
 
-load_dotenv()
+load_dotenv(override=True)
 
 # Allow nested event loops
 nest_asyncio.apply()
@@ -38,6 +41,12 @@ server_port = int(os.environ.get("SERVER_PORT", "7777"))
 
 # Custom CORS settings
 settings = PlaygroundSettings(cors_origin_list=cors_origins)
+
+# Configure the Phoenix tracer
+tracer_provider = register(
+    project_name="default",  # Default is 'default'
+    auto_instrument=True,  # Automatically use the installed OpenInference instrumentation
+)
 
 
 async def run_server() -> None:
@@ -67,7 +76,16 @@ async def run_server() -> None:
         )
 
         playground = Playground(
-            agents=[rag_agent, finance_agent, weather_agent, web_agent, youtube_agent, image_agent, code_agent],
+            agents=[
+                chat_agent,
+                rag_agent,
+                finance_agent,
+                web_agent,
+                youtube_agent,
+                image_agent,
+                code_agent,
+                paper_agent,
+            ],
             settings=settings,
         )
         app = playground.get_app()

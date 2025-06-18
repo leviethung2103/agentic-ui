@@ -15,6 +15,7 @@ imdb_csv.parent.mkdir(parents=True, exist_ok=True)
 imdb_csv.write_bytes(response.content)
 
 agent = Agent(
+    agent_id="csv_agent",
     tools=[CsvTools(csvs=[imdb_csv])],
     markdown=True,
     show_tool_calls=True,

@@ -1,14 +1,15 @@
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
-from agno.storage.sqlite import SqliteStorage
+from agno.storage.postgres import PostgresStorage
 from dotenv import load_dotenv
 
 load_dotenv()
 
-agent_storage: str = "storage/code_agent.db"
+db_url = "postgresql+psycopg://admin:zesT8XG2mVpY@localhost:5432/ai"
 
 code_agent = Agent(
     name="Code Agent",
+    agent_id="code_agent",
     model=OpenAIChat(id="gpt-4.1-nano"),
     tools=[],
     description="""
@@ -34,7 +35,7 @@ code_agent = Agent(
         "Be professional and constructive in all feedback",
     ],
     # Store the agent sessions in a sqlite database
-    storage=SqliteStorage(table_name="code_agent", db_file=agent_storage),
+    storage=PostgresStorage(table_name="code_agent", db_url=db_url),
     # Adds the current date and time to the instructions
     add_datetime_to_instructions=True,
     # Adds the history of the conversation to the messages
