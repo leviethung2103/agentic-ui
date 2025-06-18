@@ -464,9 +464,38 @@ jobs:
 
             echo "Dozzle has been deployed successfully!"
             echo "Access Dozzle at: http://${{ secrets.VPS_HOST }}:8080"
+  deploy-qdrant:
+    name: Deploy Qdrant
+    needs: deploy-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy Qdrant to VPS
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Create qdrant directory if it doesn't exist
+            mkdir -p qdrant/qdrant_storage
+
+            # Navigate to qdrant directory and start Qdrant
+            cd qdrant
+            docker-compose down
+            docker-compose up -d
+
+            echo "Qdrant deployed successfully!"
+            echo "Dashboard available at: http://${{ secrets.VPS_HOST }}:6333/dashboard"
+
   deploy-uptime-kuma:
     name: Deploy Uptime Kuma
-    needs: deploy-frontend
+    needs: [deploy-frontend, deploy-qdrant]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code

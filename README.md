@@ -29,11 +29,39 @@ Usually, new password Admin@123
 
 ## Monitoring Tools
 
-This project includes two essential monitoring tools to help you keep track of your services:
+This project includes essential monitoring and database tools to help you manage your services:
+
+### Qdrant Vector Database
+
+Qdrant is a vector similarity search engine and database used for storing and retrieving vector embeddings.
+
+- **Dashboard URL**: `http://your-vps-ip:6333/dashboard`
+- **REST API**: `http://your-vps-ip:6333`
+- **gRPC API**: `your-vps-ip:6334`
+- **Features**:
+  - High-performance vector search
+  - Real-time indexing
+  - Rich filtering capabilities
+  - Horizontal scaling
+  - Persistent storage with snapshot support
+
+To manage Qdrant:
+
+```bash
+# Navigate to qdrant directory
+cd ~/qdrant
+
+# Start/Stop Qdrant
+docker-compose up -d
+docker-compose down
+
+# View logs
+docker-compose logs -f
+```
 
 ### Dozzle
 
-Dozzle is a lightweight, real-time log viewer for Docker containers. It provides a web interface to monitor your container logs.
+Dozzle is a lightweight, real-time log viewer for Docker containers. It provides a web interface to monitor your container logs, including Qdrant.
 
 - **Access URL**: `http://your-vps-ip:8080`
 - **Features**:
