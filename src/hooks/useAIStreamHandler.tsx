@@ -130,17 +130,19 @@ const useAIChatStreamHandler = () => {
       })
 
       addMessage({
+        id: `user-${Date.now()}`,
         role: 'user',
         content: formData.get('message') as string,
         created_at: Math.floor(Date.now() / 1000)
       })
 
       addMessage({
+        id: `agent-${Date.now()}`,
         role: 'agent',
         content: '',
         tool_calls: [],
         streamingError: false,
-        created_at: Math.floor(Date.now() / 1000) + 1
+        created_at: Math.floor(Date.now() / 1000)
       })
 
       let lastContent = ''

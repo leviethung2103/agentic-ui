@@ -76,6 +76,7 @@ const useSessionLoader = () => {
 
               if (run.message) {
                 filteredMessages.push({
+                  id: `user-${run.message.created_at}-${Math.random().toString(36).substr(2, 9)}`,
                   role: 'user',
                   content: run.message.content ?? '',
                   created_at: run.message.created_at
@@ -107,6 +108,7 @@ const useSessionLoader = () => {
                 ]
 
                 filteredMessages.push({
+                  id: `agent-${run.response.created_at}-${Math.random().toString(36).substr(2, 9)}`,
                   role: 'agent',
                   content: (run.response.content as string) ?? '',
                   tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
