@@ -7,10 +7,17 @@ load_dotenv()
 
 db_url = "postgresql+psycopg://admin:zesT8XG2mVpY@localhost:5432/ai"
 
+model = OpenAIChat(
+    id="gpt-4.1-nano",
+    max_completion_tokens=200,
+    max_retries=3,
+    timeout=30.0,
+)
+
 code_agent = Agent(
     name="Code Agent",
     agent_id="code_agent",
-    model=OpenAIChat(id="gpt-4.1-nano"),
+    model=model,
     tools=[],
     description="""
     You are Ethan, an expert code reviewer specialized in KMSLV (KONICA MINOLTA FPT Solution Labs Vietnam) 

@@ -12,10 +12,17 @@ load_dotenv(override=True)
 
 agent_storage: str = "storage/web_agent.db"
 
+model = OpenAIChat(
+    id="gpt-4.1-nano",
+    max_completion_tokens=200,
+    max_retries=3,
+    timeout=30.0,
+)
+
 web_agent = Agent(
     name="Web Agent",
     agent_id="web_agent",
-    model=OpenAIChat(id="gpt-4.1-nano"),
+    model=model,
     tools=[TavilyTools(), DuckDuckGoTools(), JinaReaderTools(api_key=os.getenv("JINA_API_KEY"))],
     instructions=["Always include sources"],
     # Store the agent sessions in a sqlite database

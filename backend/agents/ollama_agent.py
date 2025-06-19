@@ -15,6 +15,7 @@ db_url = (
 )
 
 model = "gemma3:4b"
+model = "llama3.2"
 model = "qwen3:4b"
 
 ollama_agent = Agent(

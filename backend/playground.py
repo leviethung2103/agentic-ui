@@ -79,11 +79,7 @@ async def run_server() -> None:
             agents=[
                 chat_agent,
                 rag_agent,
-                finance_agent,
                 web_agent,
-                youtube_agent,
-                image_agent,
-                code_agent,
                 ollama_agent,
             ],
             settings=settings,

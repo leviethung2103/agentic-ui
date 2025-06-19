@@ -5,6 +5,7 @@ from agno.models.ollama import Ollama
 from agno.models.openai import OpenAIChat
 from agno.models.openrouter import OpenRouter
 from agno.storage.postgres import PostgresStorage
+from agno.tools.arxiv import ArxivTools
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.reasoning import ReasoningTools
 from dotenv import load_dotenv
@@ -18,13 +19,18 @@ db_url = (
 )
 
 # open router
-# model_name = "mistralai/devstral-small-2505:free"
-# model_name = "microsoft/phi-4-reasoning:free" # reasoning model -> OK ->
-# model_name = "deepseek/deepseek-r1-0528-qwen3-8b:free" # streaming , generate respone tot hon microsoft phi4
-# model_name = "deepseek/deepseek-r1-0528:free" # has the stremaing, gegenerate respone tot hon microsoft phi4
-model_name = "qwen/qwen3-30b-a3b-04-28:free"  # has the stremaing,, generate short reponse than deepseek, trả lời bị ngắt quãng, => không tốt
-# model_name = "qwen/qwen3-32b-04-28:free" # has the stremaing, generate short answer than deepseek, trả lời bị ngắt quãng => không tốt
-# model_name = "deepseek/deepseek-chat-v3-0324:free"
+# ort_model_name = "mistralai/devstral-small-2505:free"
+# ort_model_name = "microsoft/phi-4-reasoning:free" # reasoning model -> OK ->
+# ort_model_name = "deepseek/deepseek-r1-0528-qwen3-8b:free" # streaming , generate respone tot hon microsoft phi4
+ort_model_name = "deepseek/deepseek-r1-0528:free"  # has the stremaing, gegenerate respone tot hon microsoft phi4
+# ort_model_name = "qwen/qwen3-30b-a3b-04-28:free"  # has the stremaing,, generate short reponse than deepseek, trả lời bị ngắt quãng, => không tốt
+# ort_model_name = "qwen/qwen3-32b-04-28:free" # has the stremaing, generate short answer than deepseek, trả lời bị ngắt quãng => không tốt
+# ort_model_name = "deepseek/deepseek-chat-v3-0324:free"
+
+ollama_model_name = "llama3.2-8k"
+# ollama_model_name = "qwen3:1.7b-8k"
+# ollama_model_name = "gemma3:4b-8k" # does not support tool, only vision
+
 
 # llama3.2 can use with tool and streaming normally
 # deepseek-r1 : does not support tool calling
@@ -33,9 +39,9 @@ model_name = "qwen/qwen3-30b-a3b-04-28:free"  # has the stremaing,, generate sho
 chat_agent = Agent(
     name="Chat Agent",
     agent_id="chat_agent",
-    # model=OpenRouter(id=model_name, api_key=os.getenv("OPENROUTER_API_KEY")),
-    model=Ollama(id="qwen3:1.7b"),
-    tools=[DuckDuckGoTools()],
+    model=OpenRouter(id=ort_model_name, api_key=os.getenv("OPENROUTER_API_KEY")),
+    # model=Ollama(id=ollama_model_name),
+    # tools=[DuckDuckGoTools(), ArxivTools()],
     instructions=["Always include sources", "Always answer in Vietnamese"],
     # Store the agent sessions in a sqlite database
     storage=PostgresStorage(table_name="chat_agent", db_url=db_url),
