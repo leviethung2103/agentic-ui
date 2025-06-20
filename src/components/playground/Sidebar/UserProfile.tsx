@@ -34,6 +34,11 @@ const UserProfile = () => {
     router.push('/knowledge')
   }
 
+  const navigateToUserManagement = () => {
+    setIsDropdownOpen(false)
+    router.push('/admin/users')
+  }
+
   const dropdownVariants = {
     hidden: {
       opacity: 0,
@@ -98,6 +103,17 @@ const UserProfile = () => {
                 </Button>
 
                 <div className="my-1 h-px bg-border" />
+
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start rounded-lg px-3 py-2 text-sm font-medium text-primary hover:bg-primary/10"
+                  onClick={navigateToUserManagement}
+                >
+                  <Icon type="user" size="xs" className="mr-2" />
+                  User Management
+                </Button>
+
+                <div className="mt-1 h-px bg-border" />
 
                 <Button
                   variant="ghost"

@@ -175,7 +175,7 @@ const Endpoint = () => {
                     {isMounted
                       ? truncateText(selectedEndpoint, 21) ||
                         ENDPOINT_PLACEHOLDER
-                      : process.env.NEXT_PUBLIC_FRONTEND_URL ||
+                      : process.env.NEXT_PUBLIC_API_URL ||
                         'http://localhost:7777'}
                   </p>
                   <div
