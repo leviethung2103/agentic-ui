@@ -23,6 +23,7 @@ ollama==0.4.7
 pypdf
 arxiv
 pgvector
+duckdb
 # textract
 # unstructured
 # markdown

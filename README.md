@@ -244,7 +244,7 @@ NEXT_PUBLIC_AUTH0_CLIENT_ID=your_auth0_client_id
 
 ```bash
 cd /Users/hunglv/Downloads/Projects/mcpservers
-zip -r agent-ui-v2.1.zip agent-ui -x "*/node_modules/*" "*/.next/*" "*/.git/*" "*/.vscode/*" "*/.github/*" "*/backend/*"
+zip -r agent-ui-v2.2.zip agent-ui -x "*/node_modules/*" "*/.next/*" "*/.git/*" "*/.vscode/*" "*/.github/*" "*/backend/*" "*/lightrag-server/*" "*/lightrag-mcp/*" "*/ollama/*" "*/qdrant/*" "*/dozzle/*" "*/uptime/*" "*/logs/*" "*/docs/*" "*/litellm/*"
 ```
 
 The default admin account is:

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d5" for="node" attr.name="created_at" attr.type="long"/>
+<key id="d4" for="node" attr.name="file_path" attr.type="string"/>
+<key id="d3" for="node" attr.name="source_id" attr.type="string"/>
+<key id="d2" for="node" attr.name="description" attr.type="string"/>
+<key id="d1" for="node" attr.name="entity_type" attr.type="string"/>
+<key id="d0" for="node" attr.name="entity_id" attr.type="string"/>
+<graph edgedefault="undirected"><node id="This">
+  <data key="d0">This</data>
+  <data key="d1">organization</data>
+  <data key="d2">This is a sample text to insert, serving as a placeholder or example for testing purposes.&lt;SEP&gt;This is a sample text used for testing the RAG system, serving as a placeholder or example for the process.</data>
+  <data key="d3">chunk-baeca984ad606a347eb9d4a62fdb5cb3&lt;SEP&gt;chunk-a6d159e82b4b44df07064f333a235ddc</data>
+  <data key="d4">unknown_source</data>
+  <data key="d5">1750079806</data>
+</node>
+<node id="sample text">
+  <data key="d0">sample text</data>
+  <data key="d1">category</data>
+  <data key="d2">A generic example or placeholder text used to demonstrate entity and relationship extraction in the RAG system.</data>
+  <data key="d3">chunk-baeca984ad606a347eb9d4a62fdb5cb3</data>
+  <data key="d4">unknown_source</data>
+  <data key="d5">1750079734</data>
+</node>
+</graph></graphml>

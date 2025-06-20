@@ -1,0 +1,22 @@
+{
+  "doc-baeca984ad606a347eb9d4a62fdb5cb3": {
+    "status": "processed",
+    "chunks_count": 1,
+    "content": "This is a sample text to be inserted into the RAG system.",
+    "content_summary": "This is a sample text to be inserted into the RAG system.",
+    "content_length": 57,
+    "created_at": "2025-06-16T13:15:27.387946+00:00",
+    "updated_at": "2025-06-16T13:15:34.675867+00:00",
+    "file_path": "unknown_source"
+  },
+  "doc-a6d159e82b4b44df07064f333a235ddc": {
+    "status": "processed",
+    "chunks_count": 1,
+    "content": "This is a sample text to insert",
+    "content_summary": "This is a sample text to insert",
+    "content_length": 31,
+    "created_at": "2025-06-16T13:16:43.364433+00:00",
+    "updated_at": "2025-06-16T13:16:47.756182+00:00",
+    "file_path": "unknown_source"
+  }
+}
