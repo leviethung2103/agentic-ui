@@ -2,10 +2,7 @@ from agno.agent import Agent
 from agno.models.litellm import LiteLLM
 
 agent = Agent(
-    model=LiteLLM(
-        id="unified-endpoint",
-        name="LiteLLM"
-    ),
+    model=LiteLLM(id="unified-endpoint", name="LiteLLM"),
     markdown=True,
 )
 

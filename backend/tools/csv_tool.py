@@ -1,10 +1,10 @@
-import httpx
 from pathlib import Path
+
+import httpx
 from agno.agent import Agent
+from agno.models.openai import OpenAIChat
 from agno.tools.csv_toolkit import CsvTools
 from dotenv import load_dotenv
-from agno.models.openai import OpenAIChat
-
 
 load_dotenv()
 
@@ -43,8 +43,8 @@ jira_agent = Agent(
         "Then check the columns in the file",
         "Then run the query to answer the question",
         "Always wrap column names with double quotes if they contain spaces or special characters",
-        "Remember to escape the quotes in the JSON string (use \")",
-        "Use single quotes for string values"
+        'Remember to escape the quotes in the JSON string (use ")',
+        "Use single quotes for string values",
     ],
 )
 
