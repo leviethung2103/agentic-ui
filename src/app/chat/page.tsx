@@ -20,9 +20,13 @@ export default function ChatPage() {
   return (
     <ProtectedRoute>
       <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-        <div className="flex h-screen bg-background/80">
-          <Sidebar />
-          <ChatArea />
+        <div className="flex flex-1 overflow-hidden">
+          <div className="hidden md:block h-[calc(100vh-4rem)]">
+            <Sidebar />
+          </div>
+          <div className="flex-1 flex flex-col h-[calc(100vh-4rem)]">
+            <ChatArea />
+          </div>
         </div>
       </Suspense>
     </ProtectedRoute>

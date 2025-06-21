@@ -4,12 +4,16 @@ import ChatInput from './ChatInput'
 import MessageArea from './MessageArea'
 const ChatArea = () => {
   return (
-    <main className="relative m-1.5 flex flex-grow flex-col rounded-xl bg-background">
-      <MessageArea />
-      <div className="sticky bottom-0 ml-9 px-4 pb-2">
-        <ChatInput />
+    <div className="flex flex-col h-full w-full bg-background overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+        <MessageArea />
       </div>
-    </main>
+      <div className="sticky bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm px-4 pt-2 pb-4">
+        <div className="mx-auto max-w-3xl w-full">
+          <ChatInput />
+        </div>
+      </div>
+    </div>
   )
 }
 

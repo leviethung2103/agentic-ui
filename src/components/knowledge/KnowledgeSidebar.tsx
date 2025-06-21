@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import Icon from '@/components/ui/icon'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import UserProfile from '@/components/playground/Sidebar/UserProfile'
 
 type SidebarSection = 'knowledge' | 'other'
 
@@ -55,10 +54,6 @@ const KnowledgeSidebar = () => {
           ))}
         </div>
 
-        {/* User Profile at bottom */}
-        <div className="mt-auto pt-4">
-          <UserProfile />
-        </div>
       </div>
     </aside>
   )
