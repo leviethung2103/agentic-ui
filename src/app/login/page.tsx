@@ -1,9 +1,9 @@
-import AuthForm from '@/components/auth/AuthForm'
+import { LoginButton } from '@/components/auth/login-button'
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background py-12">
-      <AuthForm />
+    <div className="flex h-screen w-full items-center justify-center">
+      <LoginButton />
     </div>
   )
 }

@@ -3,7 +3,8 @@ import { DM_Mono, Geist } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
-import Auth0ProviderWrapper from '@/components/providers/Auth0ProviderWrapper'
+import Navbar from '@/components/Navbar'
+import AuthProvider from '@/components/auth/AuthProvider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,12 +31,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
-        <Auth0ProviderWrapper>
-          <NuqsAdapter>{children}</NuqsAdapter>
-        </Auth0ProviderWrapper>
-
-        <Toaster />
+      <body className={`${geistSans.variable} ${dmMono.variable} font-sans`}>
+        <AuthProvider>
+          <NuqsAdapter>
+            <Navbar />
+            <main className="container mx-auto p-4">
+              {children}
+            </main>
+            <Toaster />
+          </NuqsAdapter>
+        </AuthProvider>
       </body>
     </html>
   )

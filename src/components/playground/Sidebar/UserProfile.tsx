@@ -1,15 +1,37 @@
 'use client'
 
-import { useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import Icon from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 
+// Define user type
+type User = {
+  name?: string;
+  email?: string;
+  picture?: string;
+}
+
+// Mock user data - replace with your actual user session management
+const useMockUser = () => {
+  const [user, setUser] = useState<User | null>(null)
+  
+  useEffect(() => {
+    // In a real app, you would fetch the user from your session
+    setUser({
+      name: 'Demo User',
+      email: 'user@example.com',
+      picture: ''
+    })
+  }, [])
+  
+  return { user, isAuthenticated: !!user }
+}
+
 const UserProfile = () => {
-  const { user, logout, isAuthenticated } = useAuth0()
+  const { user, isAuthenticated } = useMockUser()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const router = useRouter()
 
@@ -18,11 +40,9 @@ const UserProfile = () => {
   }
 
   const handleLogout = () => {
-    logout({
-      logoutParams: {
-        returnTo: window.location.origin
-      }
-    })
+    // Clear session and redirect to login
+    document.cookie = 'session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    router.push('/login')
   }
 
   const toggleDropdown = () => {
@@ -36,7 +56,8 @@ const UserProfile = () => {
 
   const navigateToUserManagement = () => {
     setIsDropdownOpen(false)
-    router.push('/admin/users')
+    // Commented out as we removed the admin users page
+    // router.push('/admin/users')
   }
 
   const dropdownVariants = {
@@ -148,7 +169,7 @@ const UserProfile = () => {
           <div className="relative flex-shrink-0">
             {user.picture ? (
               <img
-                src={user.picture || '/placeholder.svg'}
+                src={user.picture}
                 alt={user.name || 'User avatar'}
                 className="size-8 rounded-full object-cover"
               />
