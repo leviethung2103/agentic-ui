@@ -153,22 +153,34 @@ const Img = ({ src, alt }: ImgProps) => {
 
   if (!src) return null
 
+  const getHref = () => {
+    if (typeof src === 'string') {
+      return src
+    }
+    if (src instanceof Blob) {
+      return URL.createObjectURL(src)
+    }
+    return ''
+  }
+
+  const displayText = typeof src === 'string' ? src : 'Image Blob'
+
   return (
     <div className="w-full max-w-xl">
       {error ? (
         <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-md bg-secondary/50 text-muted">
           <Paragraph className="text-primary">Image unavailable</Paragraph>
           <Link
-            href={src}
+            href={getHref()}
             target="_blank"
             className="max-w-md truncate underline"
           >
-            {src}
+            {displayText}
           </Link>
         </div>
       ) : (
         <Image
-          src={src}
+          src={getHref()}
           width={96}
           height={56}
           alt={alt ?? 'Rendered image'}

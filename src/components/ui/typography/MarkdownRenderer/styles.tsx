@@ -199,23 +199,26 @@ const Img = ({ src, alt }: ImgProps) => {
         <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-md bg-secondary/50 text-muted">
           <Paragraph className="text-primary">Image unavailable</Paragraph>
           <Link
-            href={src}
+            href={typeof src === 'string' ? src : '#'}
             target="_blank"
             className="max-w-md truncate underline"
           >
-            {src}
+            {typeof src === 'string' ? src : 'Image source'}
           </Link>
         </div>
-      ) : (
+      ) : typeof src === 'string' ? (
         <Image
           src={src}
-          width={1280}
-          height={720}
-          alt={alt ?? 'Rendered image'}
-          className="size-full rounded-md object-cover"
+          alt={alt || ''}
+          className="rounded-md object-cover"
+          width={800}
+          height={400}
           onError={() => setError(true)}
-          unoptimized
         />
+      ) : (
+        <div className="flex h-40 flex-col items-center justify-center gap-2 rounded-md bg-secondary/50 text-muted">
+          <Paragraph className="text-primary">Unsupported image format</Paragraph>
+        </div>
       )}
     </div>
   )

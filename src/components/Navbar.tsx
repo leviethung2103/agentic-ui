@@ -2,54 +2,79 @@
 
 import Link from 'next/link';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
   const { user, isLoading } = useUser();
+  const pathname = usePathname();
 
   if (isLoading) {
     return null;
   }
 
   return (
-    <nav className="bg-gray-800 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex space-x-4">
-          <Link href="/" className="text-white hover:text-gray-300">
-            Home
-          </Link>
-          {user && (
-            <Link href="/chat" className="text-white hover:text-gray-300">
-              Chat
-            </Link>
-          )}
-          {user?.app_metadata?.role === 'admin' && (
-            <Link href="/admin" className="text-white hover:text-gray-300">
-              Admin
-            </Link>
-          )}
-        </div>
-        <div>
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-white">
-                {user.name || user.email}
-                {user.app_metadata?.role === 'admin' && ' (Admin)'}
-              </span>
-              <a
-                href="/api/auth/logout"
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              >
-                Logout
-              </a>
-            </div>
-          ) : (
-            <a
-              href="/api/auth/login"
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+    <nav className="bg-background shadow-lg border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center space-x-8">
+            <Link
+              href="/"
+              className="text-primary text-lg font-semibold hover:text-primary/80 transition-colors"
             >
-              Login
-            </a>
-          )}
+              KMSLV Chatbot
+            </Link>
+            <div className="hidden md:flex space-x-4">
+              {user && (
+                <Link
+                  href="/chat"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/chat'
+                    ? 'bg-background-secondary text-primary'
+                    : 'text-muted hover:bg-accent hover:text-primary'
+                    }`}
+                >
+                  Chat
+                </Link>
+              )}
+              {user?.app_metadata?.role === 'admin' && (
+                <Link
+                  href="/admin"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/admin'
+                    ? 'bg-background-secondary text-primary'
+                    : 'text-muted hover:bg-accent hover:text-primary'
+                    }`}
+                >
+                  Admin
+                </Link>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-muted">
+                  {user.name || user.email}
+                  {user.app_metadata?.role === 'admin' && (
+                    <span className="ml-2 bg-brand text-white text-xs px-2 py-0.5 rounded-full">
+                      Admin
+                    </span>
+                  )}
+                </span>
+                <Link
+                  href="/api/auth/logout"
+                  className="bg-destructive hover:bg-destructive/90 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Logout
+                </Link>
+              </div>
+            ) : (
+              <Link
+                href="/api/auth/login"
+                className="bg-brand hover:bg-brand/90 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>

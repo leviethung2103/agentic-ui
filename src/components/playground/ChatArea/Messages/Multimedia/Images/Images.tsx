@@ -12,7 +12,6 @@ const Images = ({ images }: { images: ImageData[] }) => (
   >
     {images.map((image) => (
       <div key={image.url} className="group relative">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image.url}
           alt={image.revised_prompt || 'AI generated image'}

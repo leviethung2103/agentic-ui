@@ -31,7 +31,7 @@ export default function UserProfile() {
         <h3 className="font-semibold">{user.name || 'User'}</h3>
         <p className="text-sm text-gray-600">{user.email}</p>
         {user.app_metadata?.role && (
-          <span className="inline-block mt-1 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+          <span className="inline-block mt-1 px-2 py-1 text-xs font-medium bg-brand/10 text-brand rounded-full">
             {user.app_metadata.role}
           </span>
         )}

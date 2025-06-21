@@ -80,7 +80,7 @@ const components = {
   a: ({ node, ...props }: any) => (
     <a
       {...props}
-      className="text-blue-400 hover:underline"
+      className="text-brand hover:underline"
       target="_blank"
       rel="noopener noreferrer"
     />

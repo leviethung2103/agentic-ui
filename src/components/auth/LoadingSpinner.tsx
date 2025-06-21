@@ -13,9 +13,9 @@ export function LoadingSpinner({ size = 'md', color = 'blue' }: LoadingSpinnerPr
   };
 
   const colorClasses = {
-    blue: 'border-blue-500 border-t-transparent',
     white: 'border-white border-t-transparent',
-    gray: 'border-gray-400 border-t-transparent',
+    brand: 'border-brand border-t-transparent',
+    gray: 'border-gray-500 border-t-transparent'
   };
 
   return (
