@@ -2,39 +2,7 @@
 
 import Link from 'next/link'
 import { motion, Variants } from 'framer-motion'
-import Icon from '@/components/ui/icon'
-import { IconType } from '@/components/ui/icon/types'
 import React, { useState } from 'react'
-
-const EXTERNAL_LINKS = {
-  documentation: 'https://agno.link/agent-ui',
-  playground: 'https://app.agno.com/playground/agents',
-  agno: 'https://agno.com'
-}
-
-const TECH_ICONS = [
-  {
-    type: 'nextjs' as IconType,
-    position: 'left-0',
-    link: 'https://nextjs.org',
-    name: 'Next.js',
-    zIndex: 10
-  },
-  {
-    type: 'shadcn' as IconType,
-    position: 'left-[15px]',
-    link: 'https://ui.shadcn.com',
-    name: 'shadcn/ui',
-    zIndex: 20
-  },
-  {
-    type: 'tailwind' as IconType,
-    position: 'left-[30px]',
-    link: 'https://tailwindcss.com',
-    name: 'Tailwind CSS',
-    zIndex: 30
-  }
-]
 
 interface ActionButtonProps {
   href: string
@@ -105,31 +73,18 @@ const ChatBlankState = () => {
   }
 
   return (
-    <section
-      className="flex flex-col items-center text-center font-geist"
-      aria-label="Welcome message"
-    >
-      <div className="flex max-w-3xl flex-col gap-y-8">
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="text-center">
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-3xl font-[600] tracking-tight"
+          className="text-2xl font-medium text-foreground/90"
         >
-          <div className="flex items-center justify-center gap-x-2 whitespace-nowrap font-medium">
-            <span className="flex items-center font-[600]">
-              What's up? Need anything? 👋
-            </span>
-          </div>
+          What's up? Need anything? 👋
         </motion.h1>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="flex justify-center gap-4"
-        ></motion.div>
       </div>
-    </section>
+    </div>
   )
 }
 
