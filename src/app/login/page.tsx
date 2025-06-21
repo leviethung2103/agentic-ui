@@ -1,21 +1,20 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { LoginButton } from '@/components/auth/login-button';
 
-export default function LoginPage() {
-    const { user, isLoading } = useUser();
+function LoginContent() {
     const searchParams = useSearchParams();
+    const { user, isLoading } = useUser();
     const returnTo = searchParams.get('returnTo') || '/chat';
 
     // If user is already logged in, redirect to the returnTo URL
-    useEffect(() => {
-        if (user && !isLoading) {
-            window.location.href = returnTo;
-        }
-    }, [user, isLoading, returnTo]);
+    if (typeof window !== 'undefined' && user && !isLoading) {
+        window.location.href = returnTo;
+        return null;
+    }
 
     if (isLoading) {
         return (
@@ -33,9 +32,7 @@ export default function LoginPage() {
                     <div className="space-y-6 text-center">
                         <div className="space-y-2">
                             <h1 className="text-3xl font-bold text-primary">Welcome back</h1>
-                            <p className="text-muted">
-                                Sign in to access your account
-                            </p>
+                            <p className="text-muted">Sign in to access your account</p>
                         </div>
                         <div className="pt-2">
                             <LoginButton />
@@ -45,4 +42,12 @@ export default function LoginPage() {
             </div>
         </div>
     );
-} 
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen w-full items-center justify-center">Loading...</div>}>
+            <LoginContent />
+        </Suspense>
+    );
+}

@@ -13,7 +13,7 @@ export default async function middleware(req: NextRequest) {
   
   // Redirect to login if trying to access protected route without session
   if (!user && !publicRoutes.some(route => pathname.startsWith(route))) {
-    const loginUrl = new URL('/login', req.url);
+    const loginUrl = new URL('/api/auth/login', req.url);
     loginUrl.searchParams.set('returnTo', pathname);
     return NextResponse.redirect(loginUrl);
   }
