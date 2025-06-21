@@ -19,14 +19,15 @@ export default function ChatPage() {
 
   return (
     <ProtectedRoute>
-      <div className="flex h-screen bg-background/80">
+      <div className="flex h-screen bg-background">
         <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <div className="p-4 border-b flex justify-between items-center bg-white">
-            <h1 className="text-xl font-semibold">Chat</h1>
-            {user && <UserProfile />}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="p-4 border-b border-border bg-background">
+            <h1 className="text-xl font-semibold text-foreground">Chat</h1>
           </div>
-          <ChatArea />
+          <div className="flex-1 overflow-auto">
+            <ChatArea />
+          </div>
         </div>
       </div>
     </ProtectedRoute>
