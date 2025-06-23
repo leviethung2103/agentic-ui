@@ -9,6 +9,7 @@ from agno.models.openrouter import OpenRouter
 from agno.playground import Playground
 from agno.playground.settings import PlaygroundSettings
 from agno.storage.sqlite import SqliteStorage
+from agno.tools.jina import JinaReaderTools
 from agno.tools.mcp import MCPTools
 from dotenv import load_dotenv
 from phoenix.otel import register
@@ -17,6 +18,7 @@ from agents.chat_agent import chat_agent
 from agents.code_agent import code_agent
 from agents.finance_agent import finance_agent
 from agents.image_agent import image_agent
+from agents.jira_agent import jira_agent
 from agents.ollama_agent import ollama_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
@@ -54,7 +56,7 @@ async def run_server() -> None:
     async with MCPTools(transport="sse", url=server_url, timeout_seconds=30) as mcp_tools:
         rag_agent = Agent(
             name="rag agent",
-            model=OpenAIChat(id="gpt-4.1-nano"),
+            model=OpenAIChat(id="gpt-4.1-nano", max_completion_tokens=500),
             tools=[mcp_tools],
             description="You are a helpful assistant that can retrieve and analyze documents using the LightRAG system.",
             storage=SqliteStorage(table_name="rag_agent", db_file=agent_storage),
@@ -76,12 +78,7 @@ async def run_server() -> None:
         )
 
         playground = Playground(
-            agents=[
-                chat_agent,
-                rag_agent,
-                web_agent,
-                ollama_agent,
-            ],
+            agents=[chat_agent, rag_agent, web_agent, ollama_agent, jira_agent],
             settings=settings,
         )
         app = playground.get_app()
