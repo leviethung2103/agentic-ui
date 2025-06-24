@@ -122,7 +122,7 @@ const AgentMessage = ({ message }: MessageProps) => {
       <div className="flex-1">
         {messageContent}
         {!message.streamingError && message.content && (
-          <div className="mt-2 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="mt-2 flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
