@@ -8,7 +8,7 @@ export function LoginButton() {
     // Using a direct link instead of router.push to avoid error boundaries
     return (
         <Link
-            href="/api/auth/login?prompt=login&returnTo=/chat"
+            href="/api/auth/login?promptreturnTo=/chat"
             className="group relative inline-flex w-full justify-center rounded-lg border border-transparent bg-brand px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-brand/90 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]"
         >
             <span className="flex items-center">

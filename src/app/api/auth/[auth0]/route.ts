@@ -1,19 +1,19 @@
-import { handleAuth, handleLogin, handleLogout} from '@auth0/nextjs-auth0';
+import { handleAuth, handleLogin, handleLogout } from '@auth0/nextjs-auth0';
 
 export const GET = handleAuth({
   login: handleLogin((req) => {
     return {
-      returnTo: '/chat',
-      authorizationParams: {
-        prompt: 'login' // This forces the login screen every time
-      }
+      returnTo: '/chat'
     };
   }),
-  logout: handleLogout({
-    logoutParams: {
-      returnTo: '/', // Where to redirect after logout
-      federated: true // This will also log out from the identity provider
+  logout: handleLogout((req) => {
+    if (req.url) {
+      const url = new URL(req.url);
+      return {
+        returnTo: url.origin
+      };
     }
+    return { returnTo: '/' };
   })
 });
 export const POST = handleAuth(); 

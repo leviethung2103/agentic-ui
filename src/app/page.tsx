@@ -5,8 +5,8 @@ export default function Home() {
   const router = useRouter()
 
   const handleGetStarted = () => {
-    // Redirect to chat page
-    router.push('/chat')
+    // Redirect to auth0 login
+    router.push('/api/auth/login')
   }
 
   return (

@@ -9,12 +9,15 @@ export default async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/login', '/signup', '/403', '/api/auth'];
-  
+  const publicRoutes = ['/403', '/api/auth'];
+
+  // Check if the current route is public
+  const isPublicRoute = pathname === '/' || publicRoutes.some(route => pathname.startsWith(route));
+
   // Redirect to login if trying to access protected route without session
-  if (!user && !publicRoutes.some(route => pathname.startsWith(route))) {
+  if (!user && !isPublicRoute) {
     const loginUrl = new URL('/api/auth/login', req.url);
-    loginUrl.searchParams.set('returnTo', pathname);
+    loginUrl.searchParams.set('returnTo', pathname + req.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 
