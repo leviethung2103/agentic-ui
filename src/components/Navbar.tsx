@@ -25,26 +25,35 @@ const Navbar = () => {
             </Link>
             <div className="hidden md:flex space-x-4">
               {user && (
-                <Link
-                  href="/chat"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/chat'
-                    ? 'bg-background-secondary text-primary'
-                    : 'text-muted hover:bg-accent hover:text-primary'
-                    }`}
-                >
-                  Chat
-                </Link>
-              )}
-              {user?.app_metadata?.role === 'admin' && (
-                <Link
-                  href="/admin"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/admin'
-                    ? 'bg-background-secondary text-primary'
-                    : 'text-muted hover:bg-accent hover:text-primary'
-                    }`}
-                >
-                  Admin
-                </Link>
+                <>
+                  <Link
+                    href="/chat"
+                    className={`px-3 py-2 rounded-md text-sm font-medium ${pathname === '/chat'
+                      ? 'bg-background-secondary text-primary'
+                      : 'text-muted hover:bg-accent hover:text-primary'
+                      }`}
+                  >
+                    Chat
+                  </Link>
+                  <Link
+                      href="/admin/users"
+                      className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/admin')
+                        ? 'bg-background-secondary text-primary'
+                        : 'text-muted hover:bg-accent hover:text-primary'
+                        }`}
+                    >
+                      User Management
+                    </Link>
+                    <Link
+                      href="/knowledge"
+                      className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/knowledge')
+                        ? 'bg-background-secondary text-primary'
+                        : 'text-muted hover:bg-accent hover:text-primary'
+                        }`}
+                    >
+                      Knowledge
+                    </Link>
+                </>
               )}
             </div>
           </div>

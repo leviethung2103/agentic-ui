@@ -12,7 +12,6 @@ from agno.storage.sqlite import SqliteStorage
 from agno.tools.jina import JinaReaderTools
 from agno.tools.mcp import MCPTools
 from dotenv import load_dotenv
-from phoenix.otel import register
 
 from agents.chat_agent import chat_agent
 from agents.code_agent import code_agent
@@ -22,6 +21,9 @@ from agents.jira_agent import jira_agent
 from agents.ollama_agent import ollama_agent
 from agents.web_agent import web_agent
 from agents.youtube_agent import youtube_agent
+
+# from phoenix.otel import register
+
 
 load_dotenv(override=True)
 
@@ -45,10 +47,10 @@ server_port = int(os.environ.get("SERVER_PORT", "7777"))
 settings = PlaygroundSettings(cors_origin_list=cors_origins)
 
 # Configure the Phoenix tracer
-tracer_provider = register(
-    project_name="default",  # Default is 'default'
-    auto_instrument=True,  # Automatically use the installed OpenInference instrumentation
-)
+# tracer_provider = register(
+#     project_name="default",  # Default is 'default'
+#     auto_instrument=True,  # Automatically use the installed OpenInference instrumentation
+# )
 
 
 async def run_server() -> None:
@@ -80,6 +82,7 @@ async def run_server() -> None:
         playground = Playground(
             agents=[chat_agent, rag_agent, web_agent, ollama_agent, jira_agent],
             settings=settings,
+            monitoring=False,  # turn off monitoring
         )
         app = playground.get_app()
 

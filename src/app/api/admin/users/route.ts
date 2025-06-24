@@ -12,23 +12,21 @@ const createDate = (daysAgo: number): string => {
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getSession();
+    const res = new NextResponse();
+    const session = await getSession(req, res);
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
+
+    const user = session?.user;
+    const roles = user ? (user['https://app.buddyai.online/roles'] as string[]) : [];
+
     // In development, bypass auth check for easier testing
-    if (!isDevelopment && (!session || !session.user)) {
-      return NextResponse.json(
-        { error: 'Unauthorized' }, 
-        { status: 401 }
-      );
+    if (!isDevelopment && !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     // In production, check for admin role
-    if (!isDevelopment && session?.user?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Forbidden' }, 
-        { status: 403 }
-      );
+    if (!isDevelopment && !roles.includes('admin')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
   // Generate mock users with realistic data

@@ -22,10 +22,11 @@ db_url = (
 # ort_model_name = "mistralai/devstral-small-2505:free"
 # ort_model_name = "microsoft/phi-4-reasoning:free" # reasoning model -> OK ->
 # ort_model_name = "deepseek/deepseek-r1-0528-qwen3-8b:free" # streaming , generate respone tot hon microsoft phi4
-ort_model_name = "deepseek/deepseek-r1-0528:free"  # has the stremaing, gegenerate respone tot hon microsoft phi4
+# ort_model_name = "deepseek/deepseek-r1-0528:free"  # has the stremaing, gegenerate respone tot hon microsoft phi4
 # ort_model_name = "qwen/qwen3-30b-a3b-04-28:free"  # has the stremaing,, generate short reponse than deepseek, trả lời bị ngắt quãng, => không tốt
 # ort_model_name = "qwen/qwen3-32b-04-28:free" # has the stremaing, generate short answer than deepseek, trả lời bị ngắt quãng => không tốt
 # ort_model_name = "deepseek/deepseek-chat-v3-0324:free"
+ort_model_name = "google/gemma-3-27b-it:free"
 
 ollama_model_name = "llama3.2-8k"
 # ollama_model_name = "qwen3:1.7b-8k"
@@ -42,7 +43,7 @@ chat_agent = Agent(
     model=OpenRouter(id=ort_model_name, api_key=os.getenv("OPENROUTER_API_KEY")),
     # model=Ollama(id=ollama_model_name),
     # tools=[DuckDuckGoTools(), ArxivTools()],
-    instructions=["Always include sources", "Always answer in Vietnamese"],
+    description="You are a helpful, friendly, and knowledgeable assistant named Max. Keep responses clear, concise, and conversational. You can answer questions, provide explanations, help with writing, brainstorm ideas, and carry out simple tasks through text",
     # Store the agent sessions in a sqlite database
     storage=PostgresStorage(table_name="chat_agent", db_url=db_url),
     # Adds the current date and time to the instructions
