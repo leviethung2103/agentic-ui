@@ -232,25 +232,26 @@ The project includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) 
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory with the following variables:
+Create a `.env.local` file in the root directory with any necessary environment variables for your application:
 
 ```env
-NEXT_PUBLIC_AUTH0_DOMAIN=your_auth0_domain
-NEXT_PUBLIC_AUTH0_CLIENT_ID=your_auth0_client_id
-# Add other environment variables as needed
+# Add your environment variables here
+NEXT_PUBLIC_API_URL=http://localhost:7777
 ```
 
-# Package the UI without node_modules, .next, .git, .vscode, .github, and backend folders
+# Package the UI without node_modules, .next, .git, .vscode, and backend folders
 
 ```bash
 cd /Users/hunglv/Downloads/Projects/mcpservers
-zip -r agent-ui-v2.2.zip agent-ui -x "*/node_modules/*" "*/.next/*" "*/.git/*" "*/.vscode/*" "*/.github/*" "*/backend/*" "*/lightrag-server/*" "*/lightrag-mcp/*" "*/ollama/*" "*/qdrant/*" "*/dozzle/*" "*/uptime/*" "*/logs/*" "*/docs/*" "*/litellm/*"
+zip -r agent-ui-v2.3.zip agent-ui -x "*/node_modules/*" "*/.next/*" "*/.git/*" "*/.vscode/*" "*/.github/*" "*/backend/*" "*/lightrag-server/*" "*/lightrag-mcp/*" "*/ollama/*" "*/qdrant/*" "*/dozzle/*" "*/uptime/*" "*/logs/*" "*/docs/*" "*/litellm/*"
+
+zip -r agent-ui-v2.3.zip frontend -x "*/frontend/node_modules/*" "*/frontend/.next/*" 
+
+zip -r agent-ui-v2.3.zip frontend -x "frontend/node_modules/*" "frontend/.next/*"
+
+
 ```
 
-The default admin account is:
-
-- Email: admin@gmail.com
-- Password: Admin@123
 
 ## LightRAG MCP Integration
 
