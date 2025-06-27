@@ -5,7 +5,7 @@ import { Toaster } from '../components/ui/sonner';
 import './globals.css';
 import '../styles/animations.css';
 import Navbar from '../components/Navbar';
-import AuthProvider from '../components/auth/AuthProvider';
+import { AuthProvider } from '../providers/auth-provider';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

@@ -59,30 +59,6 @@ export const columns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string
-      return (
-        <div className="flex items-center space-x-2">
-          <div className={`h-2 w-2 rounded-full ${status === "active" ? "bg-positive" : "bg-destructive"}`} />
-          <span className="text-sm capitalize text-primary">{status}</span>
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "lastLogin",
-    header: "Last Login",
-    cell: ({ row }) => {
-      const lastLogin = row.getValue("lastLogin") as string | null
-      if (!lastLogin) {
-        return <span className="text-xs text-muted">Never</span>
-      }
-      return <span className="text-xs text-muted">{formatDistanceToNow(new Date(lastLogin), { addSuffix: true })}</span>
-    },
-  },
-  {
     accessorKey: "createdAt",
     header: "Created",
     cell: ({ row }) => {
@@ -105,10 +81,6 @@ export const columns: ColumnDef<User>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[160px]">
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)} className="cursor-pointer">
-              <Icon type="user" size="xs" className="mr-2" />
-              Copy user ID
-            </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
               <Icon type="edit" size="xs" className="mr-2" />
               Edit user

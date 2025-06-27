@@ -1,14 +1,32 @@
 'use client';
 
 import Link from 'next/link';
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { usePathname } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
-  const { user, isLoading } = useUser();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+  const [isFading, setIsFading] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut({
+      redirect: false,
+      callbackUrl: '/auth/signin'
+    });
+    router.push('/auth/signin');
+    router.refresh();
+  };
+
+  if (status === 'loading') {
     return null;
   }
 
@@ -24,7 +42,7 @@ const Navbar = () => {
               KMSLV Chatbot
             </Link>
             <div className="hidden md:flex space-x-4">
-              {user && (
+              {status === 'authenticated' && session?.user && (
                 <>
                   <Link
                     href="/chat"
@@ -35,53 +53,59 @@ const Navbar = () => {
                   >
                     Chat
                   </Link>
-                  <Link
-                    href="/admin/users"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/admin')
-                      ? 'bg-background-secondary text-primary'
-                      : 'text-muted hover:bg-accent hover:text-primary'
-                      }`}
-                  >
-                    User Management
-                  </Link>
-                  <Link
-                    href="/knowledge"
-                    className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/knowledge')
-                      ? 'bg-background-secondary text-primary'
-                      : 'text-muted hover:bg-accent hover:text-primary'
-                      }`}
-                  >
-                    Knowledge
-                  </Link>
+                  {session.user.role === 'admin' && (
+                    <Link
+                      href="/admin/users"
+                      className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/admin')
+                        ? 'bg-background-secondary text-primary'
+                        : 'text-muted hover:bg-accent hover:text-primary'
+                        }`}
+                    >
+                      User Management
+                    </Link>
+                  )}
+                  {session.user.role === 'admin' && (
+                    <Link
+                      href="/knowledge"
+                      className={`px-3 py-2 rounded-md text-sm font-medium ${pathname.startsWith('/knowledge')
+                        ? 'bg-background-secondary text-primary'
+                        : 'text-muted hover:bg-accent hover:text-primary'
+                        }`}
+                    >
+                      Knowledge
+                    </Link>
+                  )}
                 </>
               )}
             </div>
           </div>
           <div className="flex items-center">
-            {user ? (
+            {session ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-muted">
-                  {user.name || user.email}
-                  {user.app_metadata?.role === 'admin' && (
-                    <span className="ml-2 bg-brand text-white text-xs px-2 py-0.5 rounded-full">
-                      Admin
-                    </span>
+                <div className="text-right">
+                  {session.user.name && (
+                    <p className="text-sm font-medium text-foreground">
+                      {session.user.name}
+                    </p>
                   )}
-                </span>
-                <Link
-                  href={`/api/auth/logout?returnTo=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}&federated`}
-                  className="bg-destructive hover:bg-destructive/90 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  <p className="text-xs text-muted-foreground">
+                    {session.user.email}
+                  </p>
+                </div>
+                {session.user.role === 'admin' && (
+                  <span className="ml-2 bg-brand text-white text-xs px-2 py-0.5 rounded-full">
+                    Admin
+                  </span>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="bg-destructive hover:bg-destructive/90 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
                 >
                   Logout
-                </Link>
+                </button>
               </div>
             ) : (
-              <Link
-                href="/api/auth/login"
-                className="bg-brand hover:bg-brand/90 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Login
-              </Link>
+              null
             )}
           </div>
         </div>

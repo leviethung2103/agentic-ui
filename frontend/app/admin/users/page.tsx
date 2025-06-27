@@ -1,6 +1,6 @@
 "use client"
 
-import { useAdminAccess } from '../../../hooks/useAdminAccess'
+import { useSession } from 'next-auth/react'
 import { DataTable } from '../../../components/ui/data-table'
 import { columns } from "./columns"
 import type { User } from '../../../types/user'
@@ -13,21 +13,23 @@ import { Badge } from '../../../components/ui/badge'
 import Icon from '../../../components/ui/icon'
 import { Skeleton } from '../../../components/ui/skeleton'
 import { motion } from "framer-motion"
+import { Dialog } from '../../../components/ui/dialog'
 
 export default function AdminUsersPage() {
-  const { isAdmin, isLoading: isAuthLoading } = useAdminAccess()
+  const { data: session, status } = useSession();
+  const isClient = typeof window !== 'undefined';
+  const isAuthLoading = status === 'loading';
+  const isAdmin = session?.user?.role === 'admin';
   const [users, setUsers] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all")
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all")
-  const [isClient, setIsClient] = useState(false)
-  
-  // Set isClient to true after component mounts (client-side only)
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [addUserForm, setAddUserForm] = useState({ username: '', email: '', password: '', role: 'user' });
+  const [addUserError, setAddUserError] = useState('');
 
   useEffect(() => {
     if (isAdmin) {
@@ -63,13 +65,47 @@ export default function AdminUsersPage() {
       filtered = filtered.filter((user) => user.role === roleFilter)
     }
 
-    // Status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((user) => user.status === statusFilter)
-    }
-
     setFilteredUsers(filtered)
-  }, [users, searchQuery, roleFilter, statusFilter])
+  }, [users, searchQuery, roleFilter])
+
+  // Calculate paginated users
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
+  const paginatedUsers = filteredUsers.slice((page - 1) * pageSize, page * pageSize);
+
+  // Reset to page 1 if filters/search change and page is out of range
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [filteredUsers, page, totalPages]);
+
+  function handleAddUserChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    setAddUserForm({ ...addUserForm, [e.target.name]: e.target.value });
+  }
+
+  async function handleAddUserSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setAddUserError('');
+    if (!addUserForm.username || !addUserForm.email || !addUserForm.password) {
+      setAddUserError('All fields are required.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(addUserForm),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAddUserError(data.error || 'Failed to add user.');
+        return;
+      }
+      setUsers([data, ...users]);
+      setShowAddUser(false);
+      setAddUserForm({ username: '', email: '', password: '', role: 'user' });
+    } catch (err) {
+      setAddUserError('Failed to add user.');
+    }
+  }
 
   // Show loading state while checking auth or not on client yet
   if (!isClient || isAuthLoading) {
@@ -131,11 +167,50 @@ export default function AdminUsersPage() {
             <h1 className="text-3xl font-bold text-primary">User Management</h1>
             <p className="text-muted">Manage user accounts and permissions</p>
           </div>
-          <Button className="bg-brand text-white hover:bg-brand/90">
+          <Button className="bg-brand text-white hover:bg-brand/90" onClick={() => setShowAddUser(true)}>
             <Icon type="plus-icon" size="xs" className="mr-2" />
             Add User
           </Button>
         </motion.div>
+
+        {/* Add User Modal */}
+        {showAddUser && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-background-secondary rounded-lg shadow-lg p-8 w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4">Add New User</h2>
+              <form onSubmit={handleAddUserSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Username</label>
+                  <Input name="username" value={addUserForm.username} onChange={handleAddUserChange} autoFocus />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <Input name="email" type="email" value={addUserForm.email} onChange={handleAddUserChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Password</label>
+                  <Input name="password" type="password" value={addUserForm.password} onChange={handleAddUserChange} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Role</label>
+                  <select name="role" value={addUserForm.role} onChange={handleAddUserChange} className="border rounded px-2 py-1 w-full bg-background-secondary">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                {addUserError && <div className="text-destructive text-sm">{addUserError}</div>}
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="ghost" onClick={() => setShowAddUser(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="bg-brand text-white hover:bg-brand/90">
+                    Add
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <motion.div
@@ -152,18 +227,6 @@ export default function AdminUsersPage() {
             <CardContent>
               <div className="text-2xl font-bold text-primary">
                 {isLoading ? <Skeleton className="h-8 w-16" /> : users.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border bg-background-secondary">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted">Active Users</CardTitle>
-              <div className="h-2 w-2 rounded-full bg-positive" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">
-                {isLoading ? <Skeleton className="h-8 w-16" /> : users.filter((u) => u.status === "active").length}
               </div>
             </CardContent>
           </Card>
@@ -224,17 +287,6 @@ export default function AdminUsersPage() {
               <SelectItem value="user">User</SelectItem>
             </SelectContent>
           </Select>
-
-          <Select value={statusFilter} onValueChange={(value: "all" | "active" | "inactive") => setStatusFilter(value)}>
-            <SelectTrigger className="w-full sm:w-[180px] border-border bg-background-secondary">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
         </motion.div>
 
         {/* Results count */}
@@ -247,14 +299,13 @@ export default function AdminUsersPage() {
           <p className="text-sm text-muted">
             Showing {filteredUsers.length} of {users.length} users
           </p>
-          {(searchQuery || roleFilter !== "all" || statusFilter !== "all") && (
+          {(searchQuery || roleFilter !== "all") && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => {
                 setSearchQuery("")
                 setRoleFilter("all")
-                setStatusFilter("all")
               }}
               className="text-muted hover:text-primary"
             >
@@ -282,7 +333,46 @@ export default function AdminUsersPage() {
                   ))}
                 </div>
               ) : (
-                <DataTable columns={columns} data={filteredUsers} />
+                <>
+                  <DataTable columns={columns} data={paginatedUsers} />
+                  {/* Pagination Controls */}
+                  <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-background-secondary">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted">Rows per page:</span>
+                      <select
+                        className="border rounded px-2 py-1 text-sm bg-background-secondary"
+                        value={pageSize}
+                        onChange={e => {
+                          setPageSize(Number(e.target.value));
+                          setPage(1);
+                        }}
+                      >
+                        {[5, 10, 20, 50].map(size => (
+                          <option key={size} value={size}>{size}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+                        onClick={() => setPage(page - 1)}
+                        disabled={page === 1}
+                      >
+                        Prev
+                      </button>
+                      <span className="text-sm text-muted">
+                        Page {page} of {totalPages || 1}
+                      </span>
+                      <button
+                        className="px-2 py-1 rounded border text-sm disabled:opacity-50"
+                        onClick={() => setPage(page + 1)}
+                        disabled={page === totalPages || totalPages === 0}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
