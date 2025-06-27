@@ -24,7 +24,7 @@ export default function AdminUsersPage() {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all")
+  const [roleFilter, setRoleFilter] = useState<"admin" | "user">("user")
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [showAddUser, setShowAddUser] = useState(false);
@@ -61,9 +61,7 @@ export default function AdminUsersPage() {
     }
 
     // Role filter
-    if (roleFilter !== "all") {
-      filtered = filtered.filter((user) => user.role === roleFilter)
-    }
+    filtered = filtered.filter((user) => user.role === roleFilter)
 
     setFilteredUsers(filtered)
   }, [users, searchQuery, roleFilter])
@@ -79,6 +77,10 @@ export default function AdminUsersPage() {
 
   function handleAddUserChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     setAddUserForm({ ...addUserForm, [e.target.name]: e.target.value });
+  }
+
+  function handleAddUserRoleChange(value: string) {
+    setAddUserForm({ ...addUserForm, role: value });
   }
 
   async function handleAddUserSubmit(e: React.FormEvent) {
@@ -193,10 +195,15 @@ export default function AdminUsersPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Role</label>
-                  <select name="role" value={addUserForm.role} onChange={handleAddUserChange} className="border rounded px-2 py-1 w-full bg-background-secondary">
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                  <Select name="role" value={addUserForm.role} onValueChange={handleAddUserRoleChange}>
+                    <SelectTrigger className="w-full bg-[#111113] focus:ring-0 focus:border-none border-none shadow-none">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 {addUserError && <div className="text-destructive text-sm">{addUserError}</div>}
                 <div className="flex gap-2 justify-end">
@@ -277,16 +284,15 @@ export default function AdminUsersPage() {
             />
           </div>
 
-          <Select value={roleFilter} onValueChange={(value: "all" | "admin" | "user") => setRoleFilter(value)}>
+          {/* <Select value={roleFilter} onValueChange={(value: "admin" | "user") => setRoleFilter(value)}>
             <SelectTrigger className="w-full sm:w-[180px] border-border bg-background-secondary">
               <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="user">User</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
         </motion.div>
 
         {/* Results count */}
@@ -299,17 +305,16 @@ export default function AdminUsersPage() {
           <p className="text-sm text-muted">
             Showing {filteredUsers.length} of {users.length} users
           </p>
-          {(searchQuery || roleFilter !== "all") && (
+          {searchQuery && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => {
                 setSearchQuery("")
-                setRoleFilter("all")
               }}
               className="text-muted hover:text-primary"
             >
-              Clear filters
+              Clear search
             </Button>
           )}
         </motion.div>

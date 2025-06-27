@@ -14,6 +14,12 @@ import {
   DropdownMenuTrigger,
 } from '../../../components/ui/dropdown-menu'
 import { formatDistanceToNow } from "date-fns"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../../components/ui/tooltip/tooltip"
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -73,29 +79,43 @@ export const columns: ColumnDef<User>[] = [
       const user = row.original
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-background-secondary">
-              <span className="sr-only">Open menu</span>
-              <Icon type="chevron-down" size="xs" className="rotate-0" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[160px]">
-            <DropdownMenuItem className="cursor-pointer">
-              <Icon type="edit" size="xs" className="mr-2" />
-              Edit user
-            </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <Icon type="refresh" size="xs" className="mr-2" />
-              Reset password
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
-              <Icon type="trash" size="xs" className="mr-2" />
-              Delete user
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <TooltipProvider>
+          <div className="flex items-center space-x-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-background-secondary">
+                  <span className="sr-only">Edit user</span>
+                  <Icon type="edit" size="xs" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit user</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-background-secondary">
+                  <span className="sr-only">Reset password</span>
+                  <Icon type="refresh" size="xs" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Reset password</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0 text-destructive hover:bg-background-secondary hover:text-destructive">
+                  <span className="sr-only">Delete user</span>
+                  <Icon type="trash" size="xs" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Delete user</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       )
     },
   },
