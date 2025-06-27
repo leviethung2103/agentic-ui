@@ -1,247 +1,315 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import clsx from 'clsx';
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import Icon from "@/components/ui/icon"
+import { toast } from "sonner"
+import { CheckCircle, XCircle } from "lucide-react"
+
+interface PasswordRequirement {
+  text: string
+  met: boolean
+}
 
 export default function SignUpPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false)
+  const router = useRouter()
 
-  const commonPasswords = [
-    'password', '123456', '123456789', 'qwerty', 'abc123', '111111', '123123', 'password1', '1234', '12345', '12345678', 'admin', 'letmein', 'welcome', 'monkey', 'login', 'football', 'iloveyou', 'starwars', 'dragon'
-  ];
+  const passwordRequirements: PasswordRequirement[] = [
+    { text: "At least 8 characters long", met: formData.password.length >= 8 },
+    { text: "Contains uppercase letter", met: /[A-Z]/.test(formData.password) },
+    { text: "Contains lowercase letter", met: /[a-z]/.test(formData.password) },
+    { text: "Contains number", met: /\d/.test(formData.password) },
+    { text: "Contains special character", met: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password) },
+  ]
 
-  // Password validation logic
-  const passwordRequirements = [
-    {
-      label: '8-32 characters',
-      test: (pw: string) => pw.length >= 8 && pw.length <= 32,
-    },
-    {
-      label: 'At least 1 uppercase letter',
-      test: (pw: string) => /[A-Z]/.test(pw),
-    },
-    {
-      label: 'At least 1 lowercase letter',
-      test: (pw: string) => /[a-z]/.test(pw),
-    },
-    {
-      label: 'At least 1 number',
-      test: (pw: string) => /[0-9]/.test(pw),
-    },
-    {
-      label: 'At least 1 special character',
-      test: (pw: string) => /[^A-Za-z0-9]/.test(pw),
-    },
-    {
-      label: 'Not a common password',
-      test: (pw: string) => !commonPasswords.includes(pw.toLowerCase()),
-    },
-  ];
+  const isPasswordValid = passwordRequirements.every((req) => req.met)
+  const doPasswordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== ""
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    if (!name || !email || !password || !confirmPassword) {
-      setError('All fields are required');
-      return;
+    e.preventDefault()
+
+    // Validation
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+      toast.error("Please fill in all fields", {
+        style: {
+          background: "#fef2f2",
+          border: "1px solid #fecaca",
+          color: "#dc2626",
+        },
+      })
+      return
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
-      return;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address", {
+        style: {
+          background: "#fef2f2",
+          border: "1px solid #fecaca",
+          color: "#dc2626",
+        },
+      })
+      return
     }
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
+    if (!isPasswordValid) {
+      toast.error("Password does not meet requirements", {
+        style: {
+          background: "#fef2f2",
+          border: "1px solid #fecaca",
+          color: "#dc2626",
+        },
+      })
+      return
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return;
+    if (!doPasswordsMatch) {
+      toast.error("Passwords do not match", {
+        style: {
+          background: "#fef2f2",
+          border: "1px solid #fecaca",
+          color: "#dc2626",
+        },
+      })
+      return
     }
 
-    if (password.length > 32) {
-      setError('Password must not exceed 32 characters');
-      return;
-    }
-
-    if (commonPasswords.includes(password.toLowerCase())) {
-      setError('This password is too common. Please choose a more secure password.');
-      return;
-    }
-
-    setError('');
-    setIsLoading(true);
+    setIsLoading(true)
 
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
-          email,
-          password,
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
         }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
+        toast.error(data.message || "Failed to create account", {
+          style: {
+            background: "#fef2f2",
+            border: "1px solid #fecaca",
+            color: "#dc2626",
+          },
+        })
+        return
       }
 
-      // Redirect to sign-in page after successful registration
-      router.push('/auth/signin?registered=true');
+      toast.success("Account created successfully!", {
+        description: "You can now sign in with your credentials.",
+        style: {
+          background: "#f0fdf4",
+          border: "1px solid #bbf7d0",
+          color: "#16a34a",
+        },
+      })
+
+      // Redirect to sign in page with success indicator
+      router.push("/auth/signin?registered=true")
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Registration failed');
+      console.error("Sign up error:", error)
+      toast.error("An error occurred. Please try again.", {
+        style: {
+          background: "#fef2f2",
+          border: "1px solid #fecaca",
+          color: "#dc2626",
+        },
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Create a new account
-          </h2>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      <div className="mx-auto w-full max-w-md">
+        <div className="mb-8 flex flex-col items-center">
+          <Icon type="agno" size="md" />
+          <h1 className="mt-6 text-2xl font-bold text-primary">Create your account</h1>
+          <p className="mt-2 text-center text-sm text-muted">Join us and start your journey</p>
         </div>
 
-        {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">{error}</h3>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="name" className="text-gray-900">Full Name</Label>
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-primary">
+                Full Name
+              </Label>
               <Input
                 id="name"
+                name="name"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
                 required
-                className="mt-1 block w-full"
-                placeholder="John Doe"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="border-border bg-background text-primary"
+                placeholder="Enter your full name"
               />
             </div>
 
-            <div>
-              <Label htmlFor="email" className="text-gray-900">Email</Label>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-primary">
+                Email
+              </Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
                 required
-                className="mt-1 block w-full"
-                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="border-border bg-background text-primary"
+                placeholder="Enter your email"
               />
             </div>
 
-            <div>
-              <Label htmlFor="password" className="text-gray-900">Password</Label>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-primary">
+                Password
+              </Label>
               <Input
                 id="password"
                 name="password"
                 type="password"
                 autoComplete="new-password"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full placeholder:text-gray-500"
-                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange}
+                onFocus={() => setShowPasswordRequirements(true)}
+                className="border-border bg-background text-primary"
+                placeholder="Create a password"
               />
-              <ul className="mt-2 space-y-1 text-xs">
-                {passwordRequirements.map((req, idx) => (
-                  <li
-                    key={req.label}
-                    className={clsx(
-                      req.test(password)
-                        ? 'text-green-600'
-                        : 'text-gray-400',
-                      'flex items-center gap-1'
-                    )}
-                  >
-                    <span>
-                      {req.test(password) ? '✓' : '•'}
-                    </span>
-                    {req.label}
-                  </li>
-                ))}
-              </ul>
+              {showPasswordRequirements && (
+                <div className="mt-2 space-y-2 rounded-xl border border-border bg-background-secondary p-3">
+                  <p className="text-sm font-medium text-primary">Password requirements:</p>
+                  {passwordRequirements.map((requirement, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      {requirement.met ? (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                      <span className={`text-sm ${requirement.met ? "text-green-600" : "text-red-600"}`}>
+                        {requirement.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div>
-              <Label htmlFor="confirmPassword" className="text-gray-900">Confirm Password</Label>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-primary">
+                Confirm Password
+              </Label>
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 autoComplete="new-password"
                 required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full placeholder:text-gray-500"
-                placeholder="Re-enter your password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className="border-border bg-background text-primary"
+                placeholder="Confirm your password"
               />
+              {formData.confirmPassword && (
+                <div className="flex items-center space-x-2">
+                  {doPasswordsMatch ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-sm text-green-600">Passwords match</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-4 w-4 text-red-500" />
+                      <span className="text-sm text-red-600">Passwords do not match</span>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          <div>
-            <Button
-              type="submit"
-              className="w-full justify-center bg-brand text-white hover:bg-brand/90"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            className="w-full bg-brand text-white hover:bg-brand/90"
+            disabled={isLoading || !isPasswordValid || !doPasswordsMatch}
+          >
+            {isLoading ? (
+              <div className="flex items-center">
+                <svg
+                  className="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Creating account...
+              </div>
+            ) : (
+              "Create account"
+            )}
+          </Button>
         </form>
 
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-gray-500">
-                Already have an account?
-              </span>
+              <span className="bg-background px-2 text-muted">Already have an account?</span>
             </div>
           </div>
 
           <div className="mt-6">
             <Button
               variant="outline"
-              className="w-full"
-              onClick={() => router.push('/auth/signin')}
+              className="w-full border-border bg-background text-primary hover:bg-background-secondary"
+              onClick={() => router.push("/auth/signin")}
             >
-              Sign in
+              Sign in instead
             </Button>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
