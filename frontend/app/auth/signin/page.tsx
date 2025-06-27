@@ -73,6 +73,7 @@ export default function SignInPage() {
             border: "1px solid #bbf7d0",
             color: "#16a34a",
           },
+          duration: 1000
         })
         router.push("/chat")
       }

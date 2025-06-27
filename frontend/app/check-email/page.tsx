@@ -23,6 +23,7 @@ export default function CheckEmailPage() {
           border: "1px solid #bbf7d0",
           color: "#16a34a",
         },
+        duration: 1000
       })
       setIsResending(false)
     }, 2000)
