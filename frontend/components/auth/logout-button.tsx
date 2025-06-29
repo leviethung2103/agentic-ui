@@ -1,26 +1,33 @@
-// src/components/auth/logout-button.tsx
 'use client'
 
-import { Button } from '../ui/button'
-import { useRouter } from 'next/navigation'
-import { useUser } from '@auth0/nextjs-auth0/client'
+import { Button } from '@/components/ui/button';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export function LogoutButton() {
-  const router = useRouter()
-  const { user } = useUser()
+  const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     // Clear any client-side state if needed
     if (typeof window !== 'undefined') {
-      localStorage.clear()
-      sessionStorage.clear()
+      localStorage.clear();
+      sessionStorage.clear();
     }
 
-    // Redirect to Auth0 logout with federated logout
-    window.location.href = `/api/auth/logout?returnTo=${encodeURIComponent(window.location.origin)}&federated`
-  }
-
-  if (!user) return null
+    try {
+      // Sign out using NextAuth
+      await signOut({
+        redirect: false,
+        callbackUrl: '/auth/signin'
+      });
+      
+      // Redirect to sign-in page
+      router.push('/auth/signin');
+      router.refresh();
+    } catch (error) {
+      console.error('Error during sign out:', error);
+    }
+  };
 
   return (
     <Button
@@ -30,5 +37,5 @@ export function LogoutButton() {
     >
       Sign Out
     </Button>
-  )
+  );
 }
