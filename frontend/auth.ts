@@ -3,6 +3,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
+import NextAuth from 'next-auth';
 
 // Initialize Prisma Client
 const prisma = new PrismaClient();
@@ -94,4 +95,5 @@ export const authConfig: NextAuthConfig = {
   trustHost: true,
 };
 
+export const { auth } = NextAuth(authConfig);
 export default authConfig;

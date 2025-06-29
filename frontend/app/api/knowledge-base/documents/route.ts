@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
+import { auth } from '@/auth';
 import path from 'path';
 import fs from 'fs/promises';
 import { Document } from '@/types/document';
@@ -22,7 +22,7 @@ async function readMetadata(): Promise<Document[]> {
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

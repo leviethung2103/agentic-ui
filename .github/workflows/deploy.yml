@@ -39,6 +39,10 @@ jobs:
               cd agent-ui
             fi
 
+             # Set up and start the frontend
+            echo "Setting up frontend environment..."
+            cd agent-ui/frontend
+
             # Install pnpm if not exists
             if ! command -v pnpm &> /dev/null; then
               echo "Installing pnpm..."

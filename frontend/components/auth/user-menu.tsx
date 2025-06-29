@@ -7,7 +7,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -21,9 +20,9 @@ export function UserMenu() {
   const user = session.user;
   const userInitials = user.name
     ? user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
     : user.email?.[0].toUpperCase() || 'U';
 
   return (
@@ -37,14 +36,14 @@ export function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
+        <div className="px-2 py-1 font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
           </div>
-        </DropdownMenuLabel>
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <SignOutButton />

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
+import { auth } from '@/auth';
 import path from 'path';
 import fs from 'fs/promises';
 import { Document } from '@/types/document';
 
 const metadataPath = path.resolve(process.cwd(), 'data/documents.json');
 const uploadsPath = path.resolve(process.cwd(), 'data/user_uploads');
-
 
 async function readMetadata(): Promise<Document[]> {
   try {
@@ -24,13 +23,13 @@ async function writeMetadata(data: Document[]): Promise<void> {
   await fs.writeFile(metadataPath, JSON.stringify(data, null, 2), 'utf-8');
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id } = params;
   const { permission } = await req.json();
 
   if (!['public', 'private'].includes(permission)) {
@@ -50,13 +49,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   return NextResponse.json(documents[docIndex]);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await auth();
-    if (!session?.user?.id) {
+    if (!session || !session.user?.id) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id } = params;
     const documents = await readMetadata();
     const docIndex = documents.findIndex((doc) => doc.id === id && doc.userId === session.user.id);
 
