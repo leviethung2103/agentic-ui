@@ -60,33 +60,31 @@ const Navbar = () => {
                 <Link
                   href="/chat"
                   className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${pathname === "/chat"
-                      ? "bg-brand text-white shadow-sm"
-                      : "text-muted-foreground hover:bg-background hover:text-primary"
+                    ? "bg-brand text-white shadow-sm"
+                    : "text-muted-foreground hover:bg-background hover:text-primary"
                     }`}
                 >
                   Chat
                 </Link>
+                <Link
+                  href="/knowledge-base"
+                  className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${pathname.startsWith("/knowledge-base")
+                    ? "bg-brand text-white shadow-sm"
+                    : "text-muted-foreground hover:bg-background hover:text-primary"
+                    }`}
+                >
+                  Knowledge Base
+                </Link>
                 {session.user.role === "admin" && (
-                  <>
-                    <Link
-                      href="/admin/users"
-                      className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${pathname.startsWith("/admin")
-                          ? "bg-brand text-white shadow-sm"
-                          : "text-muted-foreground hover:bg-background hover:text-primary"
-                        }`}
-                    >
-                      User Management
-                    </Link>
-                    <Link
-                      href="/knowledge"
-                      className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${pathname.startsWith("/knowledge")
-                          ? "bg-brand text-white shadow-sm"
-                          : "text-muted-foreground hover:bg-background hover:text-primary"
-                        }`}
-                    >
-                      Knowledge
-                    </Link>
-                  </>
+                  <Link
+                    href="/admin/users"
+                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${pathname.startsWith("/admin")
+                      ? "bg-brand text-white shadow-sm"
+                      : "text-muted-foreground hover:bg-background hover:text-primary"
+                      }`}
+                  >
+                    User Management
+                  </Link>
                 )}
               </div>
             </div>
@@ -138,33 +136,31 @@ const Navbar = () => {
               <Link
                 href="/chat"
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${pathname === "/chat"
-                    ? "bg-brand text-white"
-                    : "text-muted-foreground hover:bg-accent hover:text-primary"
+                  ? "bg-brand text-white"
+                  : "text-muted-foreground hover:bg-accent hover:text-primary"
                   }`}
               >
                 Chat
               </Link>
+              <Link
+                href="/knowledge-base"
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${pathname.startsWith("/knowledge-base")
+                  ? "bg-brand text-white"
+                  : "text-muted-foreground hover:bg-accent hover:text-primary"
+                  }`}
+              >
+                Knowledge Base
+              </Link>
               {session.user.role === "admin" && (
-                <>
-                  <Link
-                    href="/admin/users"
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin")
-                        ? "bg-brand text-white"
-                        : "text-muted-foreground hover:bg-accent hover:text-primary"
-                      }`}
-                  >
-                    User Management
-                  </Link>
-                  <Link
-                    href="/knowledge"
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${pathname.startsWith("/knowledge")
-                        ? "bg-brand text-white"
-                        : "text-muted-foreground hover:bg-background hover:text-primary"
-                      }`}
-                  >
-                    Knowledge
-                  </Link>
-                </>
+                <Link
+                  href="/admin/users"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${pathname.startsWith("/admin")
+                    ? "bg-brand text-white"
+                    : "text-muted-foreground hover:bg-accent hover:text-primary"
+                    }`}
+                >
+                  User Management
+                </Link>
               )}
             </div>
           </div>

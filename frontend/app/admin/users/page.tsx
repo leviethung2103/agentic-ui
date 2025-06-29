@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import { DataTable } from '../../../components/ui/data-table'
-import { columns } from "./columns"
+import { columns as userColumns } from "./columns"
 import type { User } from '../../../types/user'
 import { useEffect, useState } from "react"
 import { Button } from '../../../components/ui/button'
@@ -24,7 +24,7 @@ export default function AdminUsersPage() {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [roleFilter, setRoleFilter] = useState<"admin" | "user">("user")
+  const [roleFilter, setRoleFilter] = useState<"all" | "admin" | "user">("all")
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [showAddUser, setShowAddUser] = useState(false);
@@ -61,7 +61,9 @@ export default function AdminUsersPage() {
     }
 
     // Role filter
-    filtered = filtered.filter((user) => user.role === roleFilter)
+    if (roleFilter !== "all") {
+      filtered = filtered.filter((user) => user.role === roleFilter)
+    }
 
     setFilteredUsers(filtered)
   }, [users, searchQuery, roleFilter])
@@ -107,6 +109,48 @@ export default function AdminUsersPage() {
     } catch (err) {
       setAddUserError('Failed to add user.');
     }
+  }
+
+  // Handler to remove user from state after delete
+  function handleUserDeleted(id: string) {
+    setUsers((prev) => {
+      const newUsers = prev.filter((u) => u.id !== id)
+      // Re-filter after delete
+      let filtered = newUsers
+      if (searchQuery.trim()) {
+        filtered = filtered.filter(
+          (user) =>
+            user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      }
+      if (roleFilter !== "all") {
+        filtered = filtered.filter((user) => user.role === roleFilter)
+      }
+      setFilteredUsers(filtered)
+      return newUsers
+    })
+  }
+
+  // Handler to update user in state after edit
+  function handleUserUpdated(updatedUser: User) {
+    setUsers((prev) => {
+      const newUsers = prev.map((u) => (u.id === updatedUser.id ? updatedUser : u))
+      // Re-filter after edit
+      let filtered = newUsers
+      if (searchQuery.trim()) {
+        filtered = filtered.filter(
+          (user) =>
+            user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+      }
+      if (roleFilter !== "all") {
+        filtered = filtered.filter((user) => user.role === roleFilter)
+      }
+      setFilteredUsers(filtered)
+      return newUsers
+    })
   }
 
   // Show loading state while checking auth or not on client yet
@@ -283,16 +327,16 @@ export default function AdminUsersPage() {
               className="pl-9 border-border bg-background-secondary"
             />
           </div>
-
-          {/* <Select value={roleFilter} onValueChange={(value: "admin" | "user") => setRoleFilter(value)}>
+          <Select value={roleFilter} onValueChange={(value: "all" | "admin" | "user") => setRoleFilter(value)}>
             <SelectTrigger className="w-full sm:w-[180px] border-border bg-background-secondary">
               <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="all">All</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="user">User</SelectItem>
             </SelectContent>
-          </Select> */}
+          </Select>
         </motion.div>
 
         {/* Results count */}
@@ -339,7 +383,7 @@ export default function AdminUsersPage() {
                 </div>
               ) : (
                 <>
-                  <DataTable columns={columns} data={paginatedUsers} />
+                  <DataTable columns={userColumns(handleUserDeleted, handleUserUpdated)} data={paginatedUsers} />
                   {/* Pagination Controls */}
                   <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-background-secondary">
                     <div className="flex items-center gap-2">
