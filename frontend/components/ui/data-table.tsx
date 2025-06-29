@@ -28,7 +28,7 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
   })
 
   return (
-    <div className="rounded-md border">
+    <div className="rounded-lg border border-border bg-background-secondary transition-all duration-200 hover:border-brand/30">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
@@ -38,9 +38,9 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                   {header.isPlaceholder
                     ? null
                     : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                 </TableHead>
               ))}
             </TableRow>

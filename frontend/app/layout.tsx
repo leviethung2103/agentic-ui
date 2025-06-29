@@ -4,8 +4,8 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { Toaster } from '../components/ui/sonner';
 import './globals.css';
 import '../styles/animations.css';
-import Navbar from '../components/Navbar';
-import AuthProvider from '../components/auth/AuthProvider';
+import { AuthProvider } from '../providers/auth-provider';
+import ClientLayout from './ClientLayout';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -37,12 +37,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <NuqsAdapter>
-            <div className="flex flex-col h-screen">
-              <Navbar />
-              <main className="flex-1 overflow-hidden">
-                {children}
-              </main>
-            </div>
+            <ClientLayout>{children}</ClientLayout>
             <Toaster position="top-center" />
           </NuqsAdapter>
         </AuthProvider>
