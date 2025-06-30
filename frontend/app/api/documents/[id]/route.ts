@@ -19,8 +19,8 @@ async function readMetadata(): Promise<Document[]> {
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const { id } = params;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const documents = await readMetadata();
     const document = documents.find((doc) => doc.id === id);
 

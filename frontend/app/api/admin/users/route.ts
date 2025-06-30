@@ -1,10 +1,8 @@
-// import { getServerSession } from 'next-auth/next';
-import getServerSession from 'next-auth'
-import authConfig from '@/auth';
-import { NextResponse } from 'next/server';
+import { auth } from '@/auth';
 import type { User } from '../../../../types/user';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { cookies } from 'next/headers';
 
 const prisma = new PrismaClient();
 
@@ -15,22 +13,27 @@ const createDate = (daysAgo: number): string => {
   return date.toISOString();
 };
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authConfig);
     const isDevelopment = process.env.NODE_ENV === 'development';
-
-    const user = session && 'user' in session ? (session.user as any) : null;
+    const session = await auth();
+    const user = session?.user || null;
+    // Debug logs
+    console.log('[DEBUG] /api/admin/users GET', {
+      NODE_ENV: process.env.NODE_ENV,
+      session,
+      user,
+    });
     // In development, bypass auth check for easier testing
     if (!isDevelopment && !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
     }
     // In production, check for admin role
     if (
       !isDevelopment &&
       (!user || typeof user !== 'object' || !('role' in user) || user.role !== 'admin')
     ) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
     }
 
     // Fetch users from the database
@@ -46,36 +49,39 @@ export async function GET() {
       updatedAt: u.updatedAt.toISOString(),
     }));
 
-    return NextResponse.json(users);
+    return new Response(JSON.stringify(users), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error('Error in users API route:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authConfig);
     const isDevelopment = process.env.NODE_ENV === 'development';
-    const user = session && 'user' in session ? (session.user as any) : null;
+    const session = await auth();
+    const user = session?.user || null;
+    // Debug logs
+    console.log('[DEBUG] /api/admin/users POST', {
+      NODE_ENV: process.env.NODE_ENV,
+      session,
+      user,
+    });
     if (!isDevelopment && (!user || user.role !== 'admin')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
     }
 
     const body = await request.json();
     const { username, email, password, role } = body;
     if (!username || !email || !password) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
     const userRole = role === 'admin' ? 'admin' : 'user';
 
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return NextResponse.json({ error: 'Email already in use' }, { status: 400 });
+      return new Response(JSON.stringify({ error: 'Email already in use' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     // Hash password
@@ -94,21 +100,21 @@ export async function POST(request: Request) {
     // Exclude password from response and map 'name' to 'username'
     const { password: _, ...userWithoutPassword } = newUser;
     const userWithUsername = { ...userWithoutPassword, username: newUser.name || '' };
-    return NextResponse.json(userWithUsername, { status: 201 });
+    return new Response(JSON.stringify(userWithUsername), { status: 201, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error('Error creating user:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
 
 export async function PUT() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
 }
 
 export async function DELETE() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
 }
 
 export async function PATCH() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
 }

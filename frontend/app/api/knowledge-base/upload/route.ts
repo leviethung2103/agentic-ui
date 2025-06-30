@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
 import path from 'path';
 import fs from 'fs/promises';
 import { Document } from '@/types/document';
 import { v4 as uuidv4 } from 'uuid';
+import { auth } from '@/auth';
 
 const metadataPath = path.resolve(process.cwd(), 'data/documents.json');
 const uploadsPath = path.resolve(process.cwd(), 'data/user_uploads');
@@ -70,4 +70,4 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Internal server error' }, { status: 500 });
   }
-} 
+}

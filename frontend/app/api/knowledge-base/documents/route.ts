@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/app/api/auth/[...nextauth]/route';
 import path from 'path';
 import fs from 'fs/promises';
 import { Document } from '@/types/document';
 import { v4 as uuidv4 } from 'uuid';
+import { auth } from '@/auth';
 
 const metadataPath = path.resolve(process.cwd(), 'data/documents.json');
 
@@ -22,7 +22,7 @@ async function readMetadata(): Promise<Document[]> {
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user?.id) {
+  if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -30,4 +30,4 @@ export async function GET() {
   const userDocuments = documents.filter((doc) => doc.userId === session.user.id);
 
   return NextResponse.json(userDocuments);
-} 
+}

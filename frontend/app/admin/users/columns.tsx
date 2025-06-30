@@ -28,6 +28,103 @@ import {
   DialogDescription,
   DialogTitle,
 } from "../../../components/ui/dialog"
+import { NextRequest, NextResponse } from 'next/server'
+
+function UserActionsCell({ user, onUserDeleted, onUserUpdated }: { user: User, onUserDeleted: (id: string) => void, onUserUpdated: (user: User) => void }) {
+  const [showEdit, setShowEdit] = useState(false)
+  const [editRole, setEditRole] = useState<'user' | 'admin'>(user.role)
+  const [editLoading, setEditLoading] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
+
+  const handleDelete = async () => {
+    if (user.role === 'admin') {
+      toast.error('You do not have permission to delete admin users.')
+      return
+    }
+    setDeleteLoading(true)
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error || 'Failed to delete user')
+      } else {
+        toast.success('User deleted successfully')
+        onUserDeleted(user.id)
+      }
+    } catch (err) {
+      toast.error('Failed to delete user')
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
+
+  const handleEdit = async () => {
+    setEditLoading(true)
+    try {
+      const res = await fetch(`/api/admin/users/${user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: editRole }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error || 'Failed to update user')
+      } else {
+        toast.success('User role updated')
+        onUserUpdated(data)
+        setShowEdit(false)
+      }
+    } catch (err) {
+      toast.error('Failed to update user')
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
+  return (
+    <TooltipProvider>
+      <div className="flex items-center space-x-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-background-secondary" onClick={() => setShowEdit(true)}>
+              <span className="sr-only">Edit user</span>
+              <Icon type="edit" size="xs" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Edit user</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0 text-destructive hover:bg-background-secondary hover:text-destructive" onClick={handleDelete} disabled={deleteLoading}>
+              <span className="sr-only">Delete user</span>
+              <Icon type="trash" size="xs" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Delete user</p>
+          </TooltipContent>
+        </Tooltip>
+        {showEdit && (
+          <Dialog open={showEdit} onOpenChange={setShowEdit}>
+            <div className="p-4">
+              <h2 className="font-bold mb-2">Edit User Role</h2>
+              <select value={editRole} onChange={e => setEditRole(e.target.value as 'user' | 'admin')} className="border rounded px-2 py-1">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+              </select>
+              <div className="flex gap-2 mt-4">
+                <Button onClick={handleEdit} disabled={editLoading} className="bg-brand text-white">Save</Button>
+                <Button variant="ghost" onClick={() => setShowEdit(false)}>Cancel</Button>
+              </div>
+            </div>
+          </Dialog>
+        )}
+      </div>
+    </TooltipProvider>
+  )
+}
 
 export const columns = (
   onUserDeleted: (id: string) => void,
@@ -88,99 +185,15 @@ export const columns = (
       header: "Actions",
       cell: ({ row }: { row: any }) => {
         const user: User = row.original
-        const [showEdit, setShowEdit] = useState(false)
-        const [editRole, setEditRole] = useState<"user" | "admin">(user.role)
-        const [editLoading, setEditLoading] = useState(false)
-        const [deleteLoading, setDeleteLoading] = useState(false)
-
-        const handleDelete = async () => {
-          if (user.role === 'admin') {
-            toast.error('You do not have permission to delete admin users.')
-            return
-          }
-          setDeleteLoading(true)
-          try {
-            const res = await fetch(`/api/admin/users/${user.id}`, { method: 'DELETE' })
-            const data = await res.json()
-            if (!res.ok) {
-              toast.error(data.error || 'Failed to delete user')
-            } else {
-              toast.success('User deleted successfully')
-              onUserDeleted(user.id)
-            }
-          } catch (err) {
-            toast.error('Failed to delete user')
-          } finally {
-            setDeleteLoading(false)
-          }
-        }
-
-        const handleEdit = async () => {
-          setEditLoading(true)
-          try {
-            const res = await fetch(`/api/admin/users/${user.id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ role: editRole }),
-            })
-            const data = await res.json()
-            if (!res.ok) {
-              toast.error(data.error || 'Failed to update user')
-            } else {
-              toast.success('User role updated')
-              onUserUpdated(data)
-              setShowEdit(false)
-            }
-          } catch (err) {
-            toast.error('Failed to update user')
-          } finally {
-            setEditLoading(false)
-          }
-        }
-
-        return (
-          <TooltipProvider>
-            <div className="flex items-center space-x-2">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-background-secondary" onClick={() => setShowEdit(true)}>
-                    <span className="sr-only">Edit user</span>
-                    <Icon type="edit" size="xs" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Edit user</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0 text-destructive hover:bg-background-secondary hover:text-destructive" onClick={handleDelete} disabled={deleteLoading}>
-                    <span className="sr-only">Delete user</span>
-                    <Icon type="trash" size="xs" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Delete user</p>
-                </TooltipContent>
-              </Tooltip>
-              {showEdit && (
-                <Dialog open={showEdit} onOpenChange={setShowEdit}>
-                  <div className="p-4">
-                    <h2 className="font-bold mb-2">Edit User Role</h2>
-                    <select value={editRole} onChange={e => setEditRole(e.target.value as 'user' | 'admin')} className="border rounded px-2 py-1">
-                      <option value="user">User</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                    <div className="flex gap-2 mt-4">
-                      <Button onClick={handleEdit} disabled={editLoading} className="bg-brand text-white">Save</Button>
-                      <Button variant="ghost" onClick={() => setShowEdit(false)}>Cancel</Button>
-                    </div>
-                  </div>
-                </Dialog>
-              )}
-            </div>
-          </TooltipProvider>
-        )
+        return <UserActionsCell user={user} onUserDeleted={onUserDeleted} onUserUpdated={onUserUpdated} />
       },
     },
   ]
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  // ... existing code ...
+}
+
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+  // ... existing code ...
+}

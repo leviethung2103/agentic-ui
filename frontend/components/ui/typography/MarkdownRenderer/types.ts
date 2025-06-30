@@ -67,10 +67,12 @@ type HeadingProps = DetailedHTMLProps<
   HTMLHeadingElement
 >
 
-type ImgProps = DetailedHTMLProps<
+type ImgProps = Omit<DetailedHTMLProps<
   ImgHTMLAttributes<HTMLImageElement>,
   HTMLImageElement
->
+>, 'src'> & {
+  src?: string | Blob
+}
 
 type ParagraphProps = DetailedHTMLProps<
   HTMLAttributes<HTMLParagraphElement>,

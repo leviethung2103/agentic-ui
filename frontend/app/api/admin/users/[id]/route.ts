@@ -1,19 +1,18 @@
-import getServerSession from 'next-auth';
-import authConfig from '@/auth';
-import { NextResponse } from 'next/server';
+import { auth } from '@/auth';
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession(authConfig);
+    const { id } = await params;
+    const session = await auth();
     const isDevelopment = process.env.NODE_ENV === 'development';
-    const user = session && 'user' in session ? (session.user as any) : null;
+    const user = session?.user || null;
     if (!isDevelopment && (!user || user.role !== 'admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    const { id } = params;
     const userToDelete = await prisma.user.findUnique({ where: { id } });
     if (!userToDelete) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -29,15 +28,15 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession(authConfig);
+    const { id } = await params;
+    const session = await auth();
     const isDevelopment = process.env.NODE_ENV === 'development';
-    const user = session && 'user' in session ? (session.user as any) : null;
+    const user = session?.user || null;
     if (!isDevelopment && (!user || user.role !== 'admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    const { id } = params;
     const body = await request.json();
     if (!body.role || !['admin', 'user'].includes(body.role)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
@@ -65,4 +64,4 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-} 
+}

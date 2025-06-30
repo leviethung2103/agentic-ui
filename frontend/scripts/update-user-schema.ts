@@ -8,9 +8,7 @@ async function main() {
   
   try {
     // 1. Update existing users with null email
-    const usersWithNullEmail = await prisma.user.findMany({
-      where: { email: null },
-    });
+    const usersWithNullEmail = await prisma.$queryRaw`SELECT * FROM "User" WHERE "email" IS NULL` as any[];
 
     if (usersWithNullEmail.length > 0) {
       console.log(`Found ${usersWithNullEmail.length} users with null email`);

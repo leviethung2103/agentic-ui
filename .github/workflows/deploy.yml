@@ -9,8 +9,48 @@ on:
       - '.github/workflows/deploy.yml'
 
 jobs:
+  deploy-fe-script:
+    name: Setup Frontend Environment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Run Setup Script
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            # Navigate to deploy directory
+            cd ${{ secrets.VPS_PATH || '~' }}
+
+            # Clone or update the repository
+            if [ -d "agent-ui" ]; then
+              echo "Updating existing repository..."
+              cd agent-ui
+              git fetch origin
+              git reset --hard origin/develop
+              git pull origin develop
+            else
+              echo "Cloning repository..."
+              git clone -b develop ${{ secrets.REPO_URL }} agent-ui
+              cd agent-ui
+            fi
+
+            # Make setup.sh executable
+            chmod +x setup.sh
+
+            # Run the setup script
+            echo "Running setup script..."
+            ./setup.sh
+
+            echo "Frontend setup completed successfully!"
+
   deploy-frontend:
     name: Deploy Frontend
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -31,18 +71,24 @@ jobs:
               echo "Updating existing repository..."
               cd agent-ui
               git fetch origin
-              git reset --hard origin/main
-              git pull origin main
+              git reset --hard origin/develop
+              git pull origin develop
             else
               echo "Cloning repository..."
-              git clone ${{ secrets.REPO_URL }} agent-ui
+              git clone -b develop ${{ secrets.REPO_URL }} agent-ui
               cd agent-ui
             fi
+
+            # Set up and start the frontend
+            echo "Setting up frontend environment..."
+            cd frontend
 
             # Install pnpm if not exists
             if ! command -v pnpm &> /dev/null; then
               echo "Installing pnpm..."
               curl -fsSL https://get.pnpm.io/install.sh | sh -
+              export PATH="$HOME/.local/share/pnpm:$PATH"
+              echo 'export PATH="$HOME/.local/share/pnpm:$PATH"' >> ~/.bashrc
               source ~/.bashrc
             fi
 
@@ -53,6 +99,12 @@ jobs:
             # Build the application
             echo "Building frontend application..."
             pnpm build
+
+            # Install PM2 if not exists
+            if ! command -v pm2 &> /dev/null; then
+              echo "Installing PM2..."
+              npm install -g pm2
+            fi
 
             # Stop existing PM2 process if running
             if pm2 describe agent-ui &> /dev/null; then
@@ -150,7 +202,7 @@ jobs:
             # Set up and start the backend
             echo "Setting up backend environment..."
             cd agent-ui/backend
-
+            
             # Set path to uv
             export PATH="/root/.local/bin:$PATH"
             if ! command -v uv &> /dev/null; then
@@ -165,11 +217,11 @@ jobs:
             fi
 
             source .venv/bin/activate
-
+            
             # Install Python dependencies
             echo "Installing Python dependencies..."
             uv pip install -r requirements.txt
-
+            
             # Create logs directory if it doesn't exist
             mkdir -p logs
 
@@ -369,7 +421,7 @@ jobs:
             # Set up LightRAG MCP Server
             echo "Setting up LightRAG MCP Server..."
             cd agent-ui/lightrag-mcp
-
+            
             # Ensure uv is in PATH
             export PATH="/root/.local/bin:$PATH"
 
@@ -380,7 +432,7 @@ jobs:
             fi
 
             source .venv/bin/activate
-
+            
             # Install LightRAG MCP dependencies
             echo "Installing LightRAG MCP dependencies..."
             uv pip install -r requirements.txt
@@ -388,7 +440,7 @@ jobs:
             # Install in development mode
             echo "Installing LightRAG MCP in development mode..."
             uv pip install -e .
-
+            
             # Copy .env.example to .env if .env doesn't exist
             if [ ! -f ".env" ]; then
               echo "Creating .env file from .env.example..."

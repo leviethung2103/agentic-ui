@@ -157,7 +157,7 @@ const Img = ({ src, alt }: ImgProps) => {
     if (typeof src === 'string') {
       return src
     }
-    if (src instanceof Blob) {
+    if (src && typeof src === 'object' && src instanceof Blob) {
       return URL.createObjectURL(src)
     }
     return ''

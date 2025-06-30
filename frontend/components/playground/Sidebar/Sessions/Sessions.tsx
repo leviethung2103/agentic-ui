@@ -69,7 +69,7 @@ const Sessions = () => {
   )
   const [searchQuery, setSearchQuery] = useState('')
   const { getSession, getSessions } = useSessionLoader()
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { isSessionsLoading } = usePlaygroundStore()
 
   const handleScroll = () => {
