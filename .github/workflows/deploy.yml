@@ -2,11 +2,11 @@ name: Deploy to VPS
 
 on:
   push:
-    # branches: [develop]
-    # paths:
-    #   - '**'
-    #   - '!.github/**'
-    #   - '.github/workflows/deploy.yml'
+    branches: [develop]
+    paths:
+      - '**'
+      - '!.github/**'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   deploy-fe-script:
