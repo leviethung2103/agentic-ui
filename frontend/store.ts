@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import { createRef } from 'react'
 
 import {
   type PlaygroundChatMessage,
@@ -44,7 +45,7 @@ interface PlaygroundStore {
   ) => void
   hasStorage: boolean
   setHasStorage: (hasStorage: boolean) => void
-  chatInputRef: React.RefObject<HTMLTextAreaElement | null>
+  chatInputRef: React.RefObject<HTMLTextAreaElement>
   selectedEndpoint: string
   setSelectedEndpoint: (selectedEndpoint: string) => void
   agents: Agent[]
@@ -87,7 +88,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
         })),
       hasStorage: false,
       setHasStorage: (hasStorage) => set(() => ({ hasStorage })),
-      chatInputRef: { current: null },
+      chatInputRef: createRef<HTMLTextAreaElement>(),
       selectedEndpoint:
         process.env.NEXT_PUBLIC_API_URL || 'http://localhost:7777',
       setSelectedEndpoint: (selectedEndpoint) =>

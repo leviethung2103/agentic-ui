@@ -1,5 +1,4 @@
-import getServerSession from 'next-auth';
-import authConfig from '@/auth';
+import { auth } from '@/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -8,9 +7,9 @@ const prisma = new PrismaClient();
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authConfig);
+    const session = await auth();
     const isDevelopment = process.env.NODE_ENV === 'development';
-    const user = session && 'user' in session ? (session.user as any) : null;
+    const user = session?.user || null;
     if (!isDevelopment && (!user || user.role !== 'admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -32,9 +31,9 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authConfig);
+    const session = await auth();
     const isDevelopment = process.env.NODE_ENV === 'development';
-    const user = session && 'user' in session ? (session.user as any) : null;
+    const user = session?.user || null;
     if (!isDevelopment && (!user || user.role !== 'admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -65,4 +64,4 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     console.error('Error updating user:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-} 
+}

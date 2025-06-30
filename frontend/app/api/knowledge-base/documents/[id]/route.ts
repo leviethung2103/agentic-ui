@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
 import path from 'path';
 import fs from 'fs/promises';
 import { Document } from '@/types/document';
+import { auth } from '@/auth';
 
 const metadataPath = path.resolve(process.cwd(), 'data/documents.json');
 const uploadsPath = path.resolve(process.cwd(), 'data/user_uploads');
@@ -79,4 +79,4 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await writeMetadata(documents);
 
     return NextResponse.json({ message: 'Document deleted successfully' });
-} 
+}

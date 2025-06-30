@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
 import path from 'path';
 import fs from 'fs/promises';
 import { Document } from '@/types/document';
 import { v4 as uuidv4 } from 'uuid';
+import { auth } from '@/auth';
 
 const metadataPath = path.resolve(process.cwd(), 'data/documents.json');
 
@@ -30,4 +30,4 @@ export async function GET() {
   const userDocuments = documents.filter((doc) => doc.userId === session.user.id);
 
   return NextResponse.json(userDocuments);
-} 
+}
