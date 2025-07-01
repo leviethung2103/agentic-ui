@@ -77,6 +77,7 @@ const AgentMessageWrapper = ({ message }: MessageWrapperProps) => {
             </div>
           </div>
         )}
+      {/*
       {message.extra_data?.references &&
         message.extra_data.references.length > 0 && (
           <div className="flex items-start gap-4">
@@ -92,6 +93,7 @@ const AgentMessageWrapper = ({ message }: MessageWrapperProps) => {
             </div>
           </div>
         )}
+      */}
       {message.tool_calls && message.tool_calls.length > 0 && (
         <div className="flex items-start gap-3">
           <Tooltip
