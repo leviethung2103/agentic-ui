@@ -148,7 +148,7 @@ jobs:
             if [ -d "agent-ui" ]; then
               cd agent-ui
               git fetch origin
-              git reset --hard origin/main
+              git reset --hard origin/develop
               cd ..
             else
               echo "Error: Frontend repository not found. Deploy frontend first."
@@ -192,7 +192,7 @@ jobs:
             if [ -d "agent-ui" ]; then
               cd agent-ui
               git fetch origin
-              git reset --hard origin/main
+              git reset --hard origin/develop
               cd ..
             else
               echo "Error: Frontend repository not found. Deploy frontend first."
@@ -267,7 +267,7 @@ jobs:
             if [ -d "agent-ui" ]; then
               cd agent-ui
               git fetch origin
-              git reset --hard origin/main
+              git reset --hard origin/develop
               cd ..
             else
               echo "Error: Frontend repository not found. Deploy frontend first."
@@ -276,69 +276,15 @@ jobs:
 
             # Set up and start the backend
             echo "Setting up backend environment..."
-            cd agent-ui/lighrag-server
-
-            # Stop any existing process using the same port if needed
-            lsof -ti:9621 | xargs kill -9 2>/dev/null || true
-
-            # Build and run the backend
-            echo "Building and running backend..."
-            docker compose up -d --build
-
-            # Clean up unused Docker resources (excluding volumes)
-            echo "Cleaning up unused Docker resources..."
-            docker system prune -f || true
-
-  deploy-lighrag-server:
-    name: Deploy LightRAG Server
-    if: false 
-    needs: deploy-backend
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Deploy LightRAG Server to VPS
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            # Navigate to deploy directory
-            cd ${{ secrets.VPS_PATH || '~' }}
-
-            # Make sure the repository exists and is up to date
-            if [ -d "agent-ui" ]; then
-              cd agent-ui
-              git fetch origin
-              git reset --hard origin/main
-              cd ..
-            else
-              echo "Error: Repository not found."
-              exit 1
-            fi
-
-            # Set up LightRAG Server
-            echo "Setting up LightRAG Server..."
-            cd agent-ui/lighrag-server
+            cd agent-ui/lightrag-server
 
             # Create necessary directories
             mkdir -p ./data/rag_storage
             mkdir -p ./data/inputs
 
-            # Stop and remove existing container if it exists
-            if [ "$(docker ps -aq -f name=agentic-lighrag)" ]; then
-              echo "Stopping and removing existing container..."
-              docker stop agentic-lighrag || true
-              docker rm agentic-lighrag || true
-            fi
-
-            # Start new container
-            echo "Starting new LightRAG container..."
-            docker compose down && docker compose up -d
-
-            echo "LightRAG Server deployment completed successfully!"
+            # Build and run the backend
+            echo "Building and running backend..."
+            docker compose down && docker compose up -d --build
 
             # Clean up unused Docker resources (excluding volumes)
             echo "Cleaning up unused Docker resources..."
@@ -366,7 +312,7 @@ jobs:
             if [ -d "agent-ui" ]; then
               cd agent-ui
               git fetch origin
-              git reset --hard origin/main
+              git reset --hard origin/develop
               cd ..
             else
               echo "Error: Repository not found."
@@ -411,7 +357,7 @@ jobs:
             if [ -d "agent-ui" ]; then
               cd agent-ui
               git fetch origin
-              git reset --hard origin/main
+              git reset --hard origin/develop
               cd ..
             else
               echo "Error: Repository not found."
@@ -516,6 +462,7 @@ jobs:
 
             echo "Dozzle has been deployed successfully!"
             echo "Access Dozzle at: http://${{ secrets.VPS_HOST }}:8080"
+  
   deploy-qdrant:
     name: Deploy Qdrant
     needs: deploy-frontend
